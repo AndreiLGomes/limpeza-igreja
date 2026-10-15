@@ -9,7 +9,10 @@ import { config } from './config.js';
 import { limitarEscritas } from './http/limitar-escritas.js';
 import { criarLog, registrarRequisicoes, type Log } from './http/log.js';
 import { rotaNaoEncontrada, tratarErros } from './http/tratar-erros.js';
+import { rotasDeConfirmacoes } from './modulos/confirmacoes/rotas.js';
+import { rotasDeDias } from './modulos/dias/rotas.js';
 import { rotasDeSaude } from './modulos/saude/rotas.js';
+import { rotasDeTarefas } from './modulos/tarefas/rotas.js';
 
 /** Tamanho máximo do corpo das requisições (docs/04-api.md). */
 const CORPO_MAXIMO = '10kb';
@@ -32,7 +35,7 @@ export function criarApp(opcoes: OpcoesDoApp = {}) {
   app.use(limitarEscritas(opcoes.escritasPorMinuto));
 
   const api = express.Router();
-  api.use(rotasDeSaude);
+  api.use(rotasDeSaude, rotasDeDias, rotasDeConfirmacoes, rotasDeTarefas);
   app.use(PREFIXO_API, api);
 
   app.use(rotaNaoEncontrada);

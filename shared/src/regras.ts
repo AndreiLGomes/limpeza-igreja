@@ -2,11 +2,14 @@
 import { ehPassada } from './datas.js';
 import type { Status, Tarefa } from './tipos.js';
 
-/** O mínimo de um dia que as regras precisam. Serve para DiaPublico e DiaCompleto. */
+/**
+ * O mínimo de um dia que as regras precisam. Serve para DiaPublico, DiaCompleto e para o servidor,
+ * que pode passar só a contagem: { pessoas: { length: 3 } }.
+ */
 interface DiaComVagas {
   data: string;
   vagas: number;
-  pessoas: readonly unknown[];
+  pessoas: { readonly length: number };
 }
 
 /** Quantas vagas ainda estão livres (nunca negativo). */

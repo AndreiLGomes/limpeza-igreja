@@ -5,13 +5,11 @@
  */
 import { FIM_PADRAO, INICIO_PADRAO, somarDias, VAGAS_PADRAO } from '@limpeza/shared';
 import { db } from '../../src/banco/cliente.js';
-import { confirmacoes, dias, tarefas } from '../../src/banco/esquema.js';
+import {
+  confirmacoes, dias, tarefas, type Confirmacao, type Dia, type TarefaDoBanco,
+} from '../../src/banco/esquema.js';
 import { BYTES_DO_CODIGO, gerarToken, hashDeToken } from '../../src/comum/seguranca.js';
 import { hoje } from '../../src/comum/tempo.js';
-
-export type Dia = typeof dias.$inferSelect;
-export type Confirmacao = typeof confirmacoes.$inferSelect;
-export type TarefaDoBanco = typeof tarefas.$inferSelect;
 
 /** Contador para gerar datas, nomes e telefones diferentes a cada chamada. */
 let sequencia = 0;

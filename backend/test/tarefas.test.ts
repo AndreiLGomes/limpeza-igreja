@@ -1,0 +1,57 @@
+import { eq } from 'drizzle-orm';
+import request from 'supertest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { db } from '../src/banco/cliente.js';
+import { tarefas } from '../src/banco/esquema.js';
+import { criarAppDeTeste } from './ajuda/app.js';
+import { limparBanco } from './ajuda/banco.js';
+import { criarDia, criarDiaPassado, criarTarefa } from './ajuda/fabricas.js';
+
+const app = criarAppDeTeste();
+
+const marcar = (diaId: string, tarefaId: string, corpo: object) =>
+  request(app).patch(`/api/dias/${diaId}/tarefas/${tarefaId}`).send(corpo);
+
+beforeEach(limparBanco);
+
+describe('PATCH /api/dias/:id/tarefas/:tarefaId (T1, T2)', () => {
+  it('qualquer pessoa marca e desmarca → 200 com a tarefa', async () => {
+    const dia = await criarDia();
+    const tarefa = await criarTarefa(dia, { nome: 'Varrer o salão' });
+
+    const marcada = await marcar(dia.id, tarefa.id, { feita: true });
+    expect(marcada.status).toBe(200);
+    expect(marcada.body).toEqual({ id: tarefa.id, nome: 'Varrer o salão', feita: true });
+    const [noBanco] = await db.select().from(tarefas).where(eq(tarefas.id, tarefa.id));
+    expect(noBanco?.feitaEm).toBeInstanceOf(Date);
+
+    const desmarcada = await marcar(dia.id, tarefa.id, { feita: false });
+    expect(desmarcada.body.feita).toBe(false);
+    const [depois] = await db.select().from(tarefas).where(eq(tarefas.id, tarefa.id));
+    expect(depois?.feitaEm).toBeNull();
+  });
+
+  it('sexta passada → 409 SEXTA_PASSADA', async () => {
+    const dia = await criarDiaPassado();
+    const tarefa = await criarTarefa(dia);
+    const resposta = await marcar(dia.id, tarefa.id, { feita: true });
+    expect(resposta.status).toBe(409);
+    expect(resposta.body.codigo).toBe('SEXTA_PASSADA');
+  });
+
+  it('tarefa de outra sexta ou que não existe → 404 TAREFA_NAO_ENCONTRADA', async () => {
+    const dia = await criarDia();
+    const tarefaDeOutroDia = await criarTarefa(await criarDia());
+    for (const tarefaId of [tarefaDeOutroDia.id, '6f1c1b0e-8a3e-4c1a-9b7d-2f4e5a6b7c8d', 'abc']) {
+      const resposta = await marcar(dia.id, tarefaId, { feita: true });
+      expect(resposta.status, tarefaId).toBe(404);
+      expect(resposta.body.codigo, tarefaId).toBe('TAREFA_NAO_ENCONTRADA');
+    }
+  });
+
+  it('"feita" que não é verdadeiro/falso → 400', async () => {
+    const dia = await criarDia();
+    const tarefa = await criarTarefa(dia);
+    expect((await marcar(dia.id, tarefa.id, { feita: 'sim' })).status).toBe(400);
+  });
+});

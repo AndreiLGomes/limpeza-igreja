@@ -1,7 +1,7 @@
 import express from 'express';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
-import { mensagemDoErro } from '@limpeza/shared';
+import { ESCRITAS_POR_MINUTO, mensagemDoErro } from '@limpeza/shared';
 import { ErroApp } from '../src/comum/erros.js';
 import { config } from '../src/config.js';
 import { rotaNaoEncontrada, tratarErros } from '../src/http/tratar-erros.js';
@@ -101,7 +101,7 @@ describe('formato de erro (docs/04-api.md)', () => {
 
 describe('limite geral de escritas', () => {
   it('a 61ª escrita no mesmo minuto recebe 429 com tentarEmSegundos', async () => {
-    const app = criarAppDeTeste();
+    const app = criarAppDeTeste({ escritasPorMinuto: ESCRITAS_POR_MINUTO });
     for (let i = 0; i < 60; i++) {
       const resposta = await request(app).post('/api/qualquer');
       expect(resposta.status, `escrita ${i + 1}`).toBe(404);

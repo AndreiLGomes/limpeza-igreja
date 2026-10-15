@@ -103,6 +103,14 @@ export const tarefas = pgTable(
   ],
 );
 
+/** Linhas como vêm do banco. */
+export type Dia = typeof dias.$inferSelect;
+export type Confirmacao = typeof confirmacoes.$inferSelect;
+export type TarefaDoBanco = typeof tarefas.$inferSelect;
+
+/** Uma sexta com as pessoas (em ordem de confirmação) e as tarefas (em ordem). */
+export type DiaComTudo = Dia & { pessoas: Confirmacao[]; tarefas: TarefaDoBanco[] };
+
 /** Quem entrou com a senha de organizador (O2). */
 export const sessoesOrganizador = pgTable(
   'sessoes_organizador',

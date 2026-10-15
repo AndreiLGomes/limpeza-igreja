@@ -20,3 +20,8 @@ export function gerarToken(bytes: number): string {
 export function hashDeToken(valor: string): string {
   return createHash('sha256').update(valor).digest('hex');
 }
+
+/** O IP é guardado só como hash (docs/05-seguranca.md). */
+export function hashDeIp(ip: string): string {
+  return hashDeToken(`ip:${ip}`);
+}
