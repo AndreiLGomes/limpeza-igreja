@@ -18,7 +18,7 @@ async function preencherConfirmacao(pagina: Page, nome: string, telefone: string
   await pagina.getByLabel('Telefone').fill(telefone);
 }
 
-teste('1. a tela inicial mostra linhas cinzas e depois o cartão da próxima sexta', async ({ page }) => {
+teste('1. a tela inicial mostra linhas cinzas e depois o cartão da próxima sexta @escuro', async ({ page }) => {
   // Atrasa a resposta da escala para dar tempo de ver o "carregando".
   await page.route('**/api/dias', async (rota) => {
     await new Promise((pronto) => setTimeout(pronto, 800));
@@ -49,7 +49,7 @@ teste('3. confirmar com telefone já usado mostra a mensagem do servidor no avis
   await semRolagemLateral(page);
 });
 
-teste('4, 5 e 6. confirmar, ver "Você vai nesta sexta" e cancelar a própria presença', async ({ page }) => {
+teste('4, 5 e 6. confirmar, ver "Você vai nesta sexta" e cancelar a própria presença @escuro', async ({ page }) => {
   // 4. Confirmar certo → "Salvando…" → volta ao início com notificação → nome no cartão.
   await page.route('**/api/dias/*/confirmacoes', async (rota) => {
     await new Promise((pronto) => setTimeout(pronto, 600));
@@ -120,14 +120,16 @@ teste('8. tarefas: marcar → "1 de 4 feitas" e notificação; "Desfazer" → "0
   await semRolagemLateral(page);
 });
 
-teste('14. rodapé: trocar para o tema escuro e continuar escuro depois de recarregar', async ({ page }) => {
+teste('14. rodapé: trocar o tema e continuar trocado depois de recarregar @escuro', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
-  await page.getByRole('button', { name: 'Tema escuro' }).click();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  // Na primeira visita, o tema segue o aparelho (o projeto "tema escuro" começa escuro).
+  const inicial = await page.locator('html').getAttribute('data-theme');
+  const outro = inicial === 'dark' ? 'light' : 'dark';
+  await page.getByRole('button', { name: outro === 'dark' ? 'Tema escuro' : 'Tema claro' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', outro);
   await page.reload();
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-  await expect(page.getByRole('button', { name: 'Tema claro' })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', outro);
+  await expect(page.getByRole('button', { name: outro === 'dark' ? 'Tema claro' : 'Tema escuro' })).toBeVisible();
   await semRolagemLateral(page);
 });
 

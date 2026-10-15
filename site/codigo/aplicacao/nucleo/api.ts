@@ -8,8 +8,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom, type Observable } from 'rxjs';
 import {
-  ehCodigoDeErro, mensagemDoErro, ROTAS, type ConfirmacaoCriada, type DiaPublico,
-  type EntradaConfirmacao, type ErroApi, type Tarefa,
+  ehCodigoDeErro, mensagemDoErro, ROTAS, type ConfirmacaoCriada, type DiaCompleto, type DiaPublico,
+  type EntradaConfirmacao, type EntradaDia, type ErroApi, type PessoaCompleta, type SessaoCriada, type Tarefa,
 } from '@limpeza/compartilhado';
 import { URL_DA_API } from './ambiente';
 
@@ -80,5 +80,49 @@ export class Api {
 
   marcarTarefa(diaId: string, tarefaId: string, feita: boolean): Promise<Tarefa> {
     return this.pedir(this.http.patch<Tarefa>(this.url(ROTAS.tarefa(diaId, tarefaId)), { feita }));
+  }
+
+  // ---------- Organizador (o token vai no cabeçalho pelo interceptador, nucleo/organizador.ts) ----------
+
+  entrar(senha: string): Promise<SessaoCriada> {
+    return this.pedir(this.http.post<SessaoCriada>(this.url(ROTAS.organizador.entrar), { senha }));
+  }
+
+  sair(): Promise<void> {
+    return this.pedir(this.http.post<void>(this.url(ROTAS.organizador.sair), {}));
+  }
+
+  sextasDoOrganizador(): Promise<DiaCompleto[]> {
+    return this.pedir(this.http.get<DiaCompleto[]>(this.url(ROTAS.organizador.dias)));
+  }
+
+  sextaDoOrganizador(id: string): Promise<DiaCompleto> {
+    return this.pedir(this.http.get<DiaCompleto>(this.url(ROTAS.organizador.dia(id))));
+  }
+
+  sugestaoDeTarefas(): Promise<string[]> {
+    return this.pedir(this.http.get<string[]>(this.url(ROTAS.organizador.sugestaoTarefas)));
+  }
+
+  criarSexta(dados: EntradaDia): Promise<DiaCompleto> {
+    return this.pedir(this.http.post<DiaCompleto>(this.url(ROTAS.organizador.dias), dados));
+  }
+
+  editarSexta(id: string, dados: EntradaDia): Promise<DiaCompleto> {
+    return this.pedir(this.http.put<DiaCompleto>(this.url(ROTAS.organizador.dia(id)), dados));
+  }
+
+  apagarSexta(id: string): Promise<void> {
+    return this.pedir(this.http.delete<void>(this.url(ROTAS.organizador.dia(id))));
+  }
+
+  /** O5: devolve os dados da pessoa removida, para o "Desfazer". */
+  removerPessoa(diaId: string, pessoaId: string): Promise<PessoaCompleta> {
+    return this.pedir(this.http.delete<PessoaCompleta>(this.url(ROTAS.organizador.pessoa(diaId, pessoaId))));
+  }
+
+  /** O5, "Desfazer": recria a confirmação com os mesmos dados. */
+  desfazerRemocao(diaId: string, pessoa: EntradaConfirmacao): Promise<PessoaCompleta> {
+    return this.pedir(this.http.post<PessoaCompleta>(this.url(ROTAS.organizador.pessoas(diaId)), pessoa));
   }
 }

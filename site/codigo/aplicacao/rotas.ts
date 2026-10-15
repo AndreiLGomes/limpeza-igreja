@@ -1,7 +1,9 @@
 import type { Routes } from '@angular/router';
+import { exigirOrganizador, quemNaoEntrou } from './nucleo/organizador';
 
-/** Cada tela é carregada sob demanda (docs/06, "Telas e rotas"). A área do organizador entra na Etapa 8. */
+/** Cada tela é carregada sob demanda (docs/06, "Telas e rotas"). */
 export const rotas: Routes = [
+  // ---------- Parte pública ----------
   {
     path: '',
     pathMatch: 'full',
@@ -23,6 +25,38 @@ export const rotas: Routes = [
     title: 'Confirmar presença',
     loadComponent: () => import('./telas/confirmar/confirmar').then((modulo) => modulo.TelaConfirmar),
   },
+
+  // ---------- Área de quem organiza (O1–O7) ----------
+  {
+    path: 'organizar/entrar',
+    title: 'Área de quem organiza',
+    canActivate: [quemNaoEntrou],
+    loadComponent: () => import('./telas/organizar/entrar/entrar').then((modulo) => modulo.TelaEntrar),
+  },
+  {
+    path: 'organizar',
+    canActivate: [exigirOrganizador],
+    data: { area: 'organizador' },
+    children: [
+      {
+        path: '',
+        title: 'Sextas',
+        loadComponent: () => import('./telas/organizar/sextas/sextas').then((modulo) => modulo.TelaSextas),
+      },
+      {
+        path: 'sexta/nova',
+        title: 'Nova sexta',
+        loadComponent: () => import('./telas/organizar/sexta/sexta').then((modulo) => modulo.TelaSexta),
+      },
+      {
+        path: 'sexta/:id',
+        title: 'Editar sexta',
+        loadComponent: () => import('./telas/organizar/sexta/sexta').then((modulo) => modulo.TelaSexta),
+      },
+    ],
+  },
+
+  // ---------- Outras ----------
   {
     path: 'vitrine',
     title: 'Vitrine do Design System',

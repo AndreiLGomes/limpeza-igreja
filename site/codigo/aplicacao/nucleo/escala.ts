@@ -2,11 +2,11 @@
  * escala.ts: o estado da escala pública para todas as telas (docs/06) e as ações sobre ela.
  * Signals: dias, estado ('carregando' | 'pronto' | 'erro'), erro e proximo.
  */
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable } from '@angular/core';
 import { dataNaFrase, type DiaPublico, type EntradaConfirmacao, type Tarefa } from '@limpeza/compartilhado';
 import { Notificacoes } from '@componentes';
-import type { EstadoDaCarga } from '../comum/estado/estado';
 import { Api, FalhaNaApi } from './api';
+import { Carga } from './carga';
 import { MinhasConfirmacoes } from './minhas-confirmacoes';
 
 @Injectable({ providedIn: 'root' })
@@ -15,41 +15,28 @@ export class Escala {
   private readonly minhasConfirmacoes = inject(MinhasConfirmacoes);
   private readonly notificacoes = inject(Notificacoes);
 
-  private readonly _dias = signal<DiaPublico[]>([]);
-  readonly dias = this._dias.asReadonly();
-  readonly estado = signal<EstadoDaCarga>('carregando');
-  readonly erro = signal<string | null>(null);
+  /** A escala pública (S12); depois de cada carga, esquece as confirmações que sumiram (X6). */
+  private readonly carga = new Carga<DiaPublico[]>(() => this.api.escala(), [], (dias) =>
+    this.minhasConfirmacoes.limparSumidas(dias),
+  );
+  readonly dias = this.carga.dados.asReadonly();
+  readonly estado = this.carga.estado.asReadonly();
+  readonly erro = this.carga.erro.asReadonly();
 
   /** A próxima sexta (a escala já vem em ordem de data, de hoje em diante). */
-  readonly proximo = computed<DiaPublico | undefined>(() => this._dias()[0]);
+  readonly proximo = computed<DiaPublico | undefined>(() => this.dias()[0]);
 
-  async carregar(): Promise<void> {
-    this.estado.set('carregando');
-    try {
-      const dias = await this.api.escala();
-      this._dias.set(dias);
-      this.minhasConfirmacoes.limparSumidas(dias);
-      this.erro.set(null);
-      this.estado.set('pronto');
-    } catch (erro) {
-      this.erro.set(erro instanceof FalhaNaApi ? erro.message : 'Não foi possível carregar a escala.');
-      this.estado.set('erro');
-    }
+  carregar(): Promise<void> {
+    return this.carga.carregar();
   }
 
   /** Recarrega sem voltar às linhas cinzas (depois de confirmar, cancelar…). */
-  private async atualizar(): Promise<void> {
-    try {
-      const dias = await this.api.escala();
-      this._dias.set(dias);
-      this.minhasConfirmacoes.limparSumidas(dias);
-    } catch {
-      // Se falhar, a tela continua com o que já tinha; a próxima carga tenta de novo.
-    }
+  private atualizar(): Promise<void> {
+    return this.carga.atualizar();
   }
 
   buscar(diaId: string): DiaPublico | undefined {
-    return this._dias().find((dia) => dia.id === diaId);
+    return this.dias().find((dia) => dia.id === diaId);
   }
 
   /**
@@ -110,7 +97,7 @@ export class Escala {
   }
 
   private trocarTarefa(diaId: string, tarefaId: string, feita: boolean): void {
-    this._dias.update((dias) =>
+    this.carga.dados.update((dias) =>
       dias.map((dia) =>
         dia.id !== diaId
           ? dia

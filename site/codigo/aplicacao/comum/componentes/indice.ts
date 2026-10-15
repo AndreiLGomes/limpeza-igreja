@@ -5,6 +5,7 @@ export * from './barra/barra';
 export * from './botao/botao';
 export * from './campo/campo';
 export * from './campo/entrada';
+export * from './campo/estado-do-controle';
 export * from './campo-de-formulario';
 export * from './carregando/carregando';
 export * from './cartao/cartao';

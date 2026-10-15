@@ -26,6 +26,12 @@ export default defineConfig({
       name: 'tema claro',
       use: { ...devices['Desktop Chrome'], viewport: { width: 375, height: 800 }, colorScheme: 'light' },
     },
+    {
+      // Repete no tema escuro os cenários marcados com @escuro (1, 4, 9 e 14; docs/08, Etapa 8).
+      name: 'tema escuro',
+      grep: /@escuro/,
+      use: { ...devices['Desktop Chrome'], viewport: { width: 375, height: 800 }, colorScheme: 'dark' },
+    },
   ],
   webServer: [
     {

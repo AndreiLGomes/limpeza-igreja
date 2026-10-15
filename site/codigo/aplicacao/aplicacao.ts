@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRouteSnapshot, NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet, type ActivatedRouteSnapshot, type Data } from '@angular/router';
 import { filter, map } from 'rxjs';
 import { AreaDeNotificacoes, Barra, Rodape, type AbaDaBarra } from '@componentes';
+import { Organizador } from '@nucleo/organizador';
 import { ServicoDeTema } from '@nucleo/tema';
 
 /** Abas da parte pública (docs/06, "Barra superior"). */
@@ -12,23 +13,33 @@ const ABAS_PUBLICAS: AbaDaBarra[] = [
   { rotulo: 'Tarefas', rota: '/tarefas' },
 ];
 
-/** A tela mais interna da rota atual (onde ficam os `data` da rota). */
-function telaAtual(rota: ActivatedRouteSnapshot): ActivatedRouteSnapshot {
-  return rota.firstChild ? telaAtual(rota.firstChild) : rota;
+/** Abas da área de quem organiza; "Sair" fica no rodapé (TelaOrganizar). */
+const ABAS_DO_ORGANIZADOR: AbaDaBarra[] = [
+  { rotulo: 'Sextas', rota: '/organizar' },
+  { rotulo: 'Ver como todos', rota: '/' },
+];
+
+/** Junta os `data` da rota inteira, da raiz até a tela atual (a tela mais interna vence). */
+function dadosDaRota(rota: ActivatedRouteSnapshot | null, juntos: Data = {}): Data {
+  return rota ? dadosDaRota(rota.firstChild, { ...juntos, ...rota.data }) : juntos;
 }
 
 @Component({
   selector: 'app-raiz',
   imports: [AreaDeNotificacoes, Barra, Rodape, RouterOutlet],
   template: `
-    @if (comMoldura()) {
-      <app-barra [abas]="abas" />
+    @if (dados()['moldura'] !== false) {
+      @if (naAreaDoOrganizador()) {
+        <app-barra [abas]="abasDoOrganizador" etiqueta="Organizador" inicio="/organizar" />
+      } @else {
+        <app-barra [abas]="abasPublicas" />
+      }
     }
     <main class="principal">
       <router-outlet />
     </main>
-    @if (comMoldura()) {
-      <app-rodape />
+    @if (dados()['moldura'] !== false) {
+      <app-rodape [organizador]="naAreaDoOrganizador()" (sair)="organizador.sair()" />
     }
     <app-area-de-notificacoes />
   `,
@@ -48,16 +59,24 @@ function telaAtual(rota: ActivatedRouteSnapshot): ActivatedRouteSnapshot {
 export class Aplicacao {
   // Cria o ServicoDeTema logo na abertura, para aplicar o tema antes da primeira tela.
   protected readonly servicoDeTema = inject(ServicoDeTema);
+  protected readonly organizador = inject(Organizador);
   private readonly roteador = inject(Router);
 
-  protected readonly abas = ABAS_PUBLICAS;
+  protected readonly abasPublicas = ABAS_PUBLICAS;
+  protected readonly abasDoOrganizador = ABAS_DO_ORGANIZADOR;
 
-  /** Barra e rodapé aparecem em todas as telas, menos nas que pedem `data: { moldura: false }`. */
-  protected readonly comMoldura = toSignal(
+  /**
+   * Os `data` da rota atual. Até a primeira navegação, `moldura: false` evita mostrar a barra errada.
+   * - `moldura: false`: sem barra e rodapé (a vitrine);
+   * - `area: 'organizador'`: barra e rodapé da área de quem organiza.
+   */
+  protected readonly dados = toSignal(
     this.roteador.events.pipe(
       filter((evento) => evento instanceof NavigationEnd),
-      map(() => telaAtual(this.roteador.routerState.snapshot.root).data['moldura'] !== false),
+      map(() => dadosDaRota(this.roteador.routerState.snapshot.root)),
     ),
-    { initialValue: false },
+    { initialValue: { moldura: false } as Data },
   );
+
+  protected readonly naAreaDoOrganizador = computed(() => this.dados()['area'] === 'organizador');
 }
