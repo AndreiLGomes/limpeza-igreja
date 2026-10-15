@@ -40,7 +40,7 @@ teste('9. senha errada mostra a mensagem no campo; a certa abre a área com "Org
   await expect(page.getByRole('link', { name: '47 90000-0001' })).toBeVisible();
   await expect(page.getByRole('link', { name: '47 90000-0001' })).toHaveAttribute('href', 'tel:+5547900000001');
   await expect(page.getByText('"vou levar o rodo novo"')).toBeVisible();
-  await expect(page).toHaveTitle('Sextas · Escala de Limpeza');
+  await expect(page).toHaveTitle('Sextas · Limpeza na Sexta');
   await semRolagemLateral(page);
 });
 

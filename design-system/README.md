@@ -1,10 +1,10 @@
-# Escala de Limpeza
+# Limpeza na Sexta
 
-Sistema visual do app que organiza a limpeza da igreja às sextas-feiras: quem vem, quando vem e o que já foi feito. "Escala de Limpeza" é um nome provisório.
+Sistema visual do app que organiza a limpeza da igreja às sextas-feiras: quem vem, quando vem e o que já foi feito. "Limpeza na Sexta" é o nome atual (pode mudar).
 
 ## Logo
 
-O logo é o próprio nome, **Escala de Limpeza**, em Verdana negrito, sem símbolo (veja o componente **Wordmark**). Em fundo claro vai em `ink`; na barra azul, em `on-header`. O logotipo oficial da CCB não é usado.
+O logo é o próprio nome, **Limpeza na Sexta**, em Verdana negrito, sem símbolo (veja o componente **Wordmark**). Em fundo claro vai em `ink`; na barra azul, em `on-header`. O logotipo oficial da CCB não é usado.
 
 ## De onde vêm as cores
 

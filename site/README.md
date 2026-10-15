@@ -1,4 +1,4 @@
-# Site — Escala de Limpeza
+# Site — Limpeza na Sexta
 
 As telas do app em Angular 22 (componentes *standalone*, *signals*, sem zone.js).
 

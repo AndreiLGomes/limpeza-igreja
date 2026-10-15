@@ -1,4 +1,4 @@
-# Servidor — Escala de Limpeza
+# Servidor — Limpeza na Sexta
 
 A API: Node 24 + Express 5 + TypeScript + PostgreSQL 18 (Drizzle).
 

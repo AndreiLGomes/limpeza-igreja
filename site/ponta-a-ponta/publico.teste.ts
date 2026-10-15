@@ -26,7 +26,7 @@ teste('1. a tela inicial mostra linhas cinzas e depois o cartão da próxima sex
   await expect(page.locator('.skeleton').first()).toBeVisible();
   await expect(cartao(page).locator('.card__title')).toHaveText(/^Sexta, \d+ de \w+/);
   await expect(page.locator('.skeleton')).toHaveCount(0);
-  await expect(page).toHaveTitle('Esta semana · Escala de Limpeza');
+  await expect(page).toHaveTitle('Esta semana · Limpeza na Sexta');
   await semRolagemLateral(page);
 });
 
