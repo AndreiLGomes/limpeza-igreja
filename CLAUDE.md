@@ -14,8 +14,12 @@ Responda e escreva os textos da interface em **português do Brasil**.
 
 ## Regras principais (o detalhe está em `docs/`)
 
+- **Tudo em português**: pastas, arquivos, classes, funções, variáveis e entradas dos componentes. Só fica
+  em inglês o que é obrigatório (nomes exigidos pelo Angular, Express, npm e bibliotecas, como `writeValue`,
+  `package.json`, `req`/`res` do pino-http, e as classes CSS e valores do `design-system/`). O prefixo das
+  tags do Angular continua `app-`. Testes terminam em `.teste.ts`.
 - **Reaproveite tudo: cada coisa é escrita uma vez só.** Tipos, validações, mensagens, datas,
-  telefone e regras puras ficam em `shared/` e são usados pelo front e pelo back. Middlewares,
+  telefone e regras puras ficam em `compartilhado/` e são usados pelo site e pelo servidor. Middlewares,
   mapeadores e fábricas de teste também são peças únicas. Antes de escrever, procure se já existe;
   se existe algo parecido, generalize. **Nunca copie e cole código.** Veja `docs/10-arquitetura-e-reaproveitamento.md`.
 - **`docs/02-regras-de-negocio.md` manda.** Não invente regra; o que não está escrito está em

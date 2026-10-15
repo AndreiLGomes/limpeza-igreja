@@ -1,0 +1,198 @@
+<app-barra [abas]="abas" />
+
+<main class="pagina">
+  <h1 class="display">Vitrine do Design System</h1>
+  <p class="small vitrine__aviso">
+    Todos os componentes de &#64;componentes com dados de exemplo. Confira a 375px, nos dois temas (troque no rodapé).
+  </p>
+
+  <!-- ===== Marca ===== -->
+  <section class="vitrine__secao" aria-labelledby="s-marca">
+    <h2 class="subtitle" id="s-marca">Marca</h2>
+    <div class="vitrine__caixa vitrine__coluna">
+      <app-marca tamanho="grande" />
+      <app-marca tamanho="medio" />
+      <app-marca tamanho="pequeno" />
+    </div>
+  </section>
+
+  <!-- ===== Botões ===== -->
+  <section class="vitrine__secao" aria-labelledby="s-botoes">
+    <h2 class="subtitle" id="s-botoes">Botões</h2>
+    <div class="vitrine__caixa vitrine__coluna">
+      <div class="vitrine__linha">
+        <button appBotao type="button">Confirmar presença</button>
+        <button appBotao variante="secundario" type="button">Ver escala</button>
+        <button appBotao variante="perigo" type="button">Cancelar presença</button>
+        <button appBotao variante="discreto" type="button">Ver tarefas</button>
+      </div>
+      <div class="vitrine__linha">
+        <button appBotao type="button" disabled>Desabilitado</button>
+        <button appBotao type="button" disabled aria-busy="true"><app-girando /> Salvando…</button>
+      </div>
+      <div class="vitrine__linha">
+        <button appBotao variante="discreto" icone type="button" aria-label="Editar sexta, 16 de outubro">
+          <app-icone nome="pencil" />
+        </button>
+        <button appBotao variante="perigo-discreto" icone type="button" aria-label="Remover Andrei Gomes">
+          <app-icone nome="trash-2" />
+        </button>
+        <button appBotao variante="secundario" icone type="button" aria-label="Adicionar">
+          <app-icone nome="plus" />
+        </button>
+        <button appBotao type="button"><app-icone nome="plus" /> Nova sexta</button>
+        <button appBotao variante="perigo-discreto" type="button"><app-icone nome="trash-2" /> Apagar sexta</button>
+      </div>
+      <button appBotao larguraToda type="button">Largura toda</button>
+    </div>
+  </section>
+
+  <!-- ===== Formulário ===== -->
+  <section class="vitrine__secao" aria-labelledby="s-formulario">
+    <h2 class="subtitle" id="s-formulario">Formulário</h2>
+    <form appFormulario class="card" [formGroup]="formulario" (ngSubmit)="enviar()">
+      <app-cabecalho-do-formulario titulo="Confirmar presença">
+        <p class="form__desc">
+          Escolha a sexta e conte como pode ajudar. Campos com <span class="form__required">*</span> são obrigatórios.
+        </p>
+      </app-cabecalho-do-formulario>
+
+      @if (resumo(); as titulo) {
+        <app-aviso tom="erro" [titulo]="titulo">Confira os campos marcados abaixo.</app-aviso>
+      }
+
+      <div appLinhaDoFormulario>
+        <app-campo rotulo="Seu nome" obrigatorio [controle]="formulario.controls.nome">
+          <input appEntrada formControlName="nome" autocomplete="name" placeholder="Ex.: Andrei Gomes" />
+        </app-campo>
+        <app-campo
+          rotulo="Telefone"
+          obrigatorio
+          dica="Só quem organiza vê seu telefone."
+          [controle]="formulario.controls.telefone"
+        >
+          <input appEntrada formControlName="telefone" type="tel" autocomplete="tel" placeholder="Ex.: 47 99999-9999" />
+        </app-campo>
+      </div>
+
+      <app-campo rotulo="Qual sexta?" obrigatorio [controle]="formulario.controls.dia">
+        <app-selecao formControlName="dia" [opcoes]="sextas" textoInicial="Escolha uma sexta" />
+      </app-campo>
+
+      <app-escolhas legenda="Quanto tempo você pode ficar?" formControlName="tempo" [opcoes]="tempos" />
+
+      <app-campo rotulo="Observação" [controle]="formulario.controls.observacao">
+        <textarea appEntrada formControlName="observacao" placeholder="Ex.: vou levar o rodo novo"></textarea>
+      </app-campo>
+
+      <app-campo rotulo="Data" obrigatorio [controle]="formulario.controls.data">
+        <input appEntrada type="date" formControlName="data" />
+      </app-campo>
+      <div appLinhaDoFormulario>
+        <app-campo rotulo="Começa às"><input appEntrada type="time" formControlName="inicio" /></app-campo>
+        <app-campo rotulo="Termina às"><input appEntrada type="time" formControlName="fim" /></app-campo>
+      </div>
+
+      <app-campo rotulo="Vagas" obrigatorio dica="Quantas pessoas são necessárias." [controle]="formulario.controls.vagas">
+        <app-contador formControlName="vagas" [minimo]="vagasMinimo" [maximo]="vagasMaximo" unidade="vagas" />
+      </app-campo>
+
+      <app-editor-de-tarefas legenda="Tarefas desta sexta" [lista]="formulario.controls.tarefas" />
+
+      <div appAcoesDoFormulario>
+        <button appBotao variante="discreto" type="button" (click)="limpar()">Cancelar</button>
+        <button appBotao type="submit" [disabled]="salvando()" [attr.aria-busy]="salvando()">
+          @if (salvando()) {
+            <app-girando /> Salvando…
+          } @else {
+            Confirmar presença
+          }
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ===== Conteúdo ===== -->
+  <section class="vitrine__secao" aria-labelledby="s-conteudo">
+    <h2 class="subtitle" id="s-conteudo">Conteúdo</h2>
+
+    <app-cartao titulo="Sexta, 16 de outubro" detalhes="19h às 21h · 3 de 5 vagas preenchidas">
+      <app-etiqueta situacaoDoCartao tom="pendente">Faltam 2</app-etiqueta>
+      <app-grupo-de-avatares [nomes]="nomes" [total]="5" />
+      <div acoesDoCartao>
+        <button appBotao type="button">Confirmar presença</button>
+        <button appBotao variante="discreto" type="button">Ver tarefas</button>
+      </div>
+    </app-cartao>
+
+    <div class="vitrine__caixa vitrine__linha">
+      <app-avatar nome="Andrei Gomes" />
+      <app-avatar nome="João Silva" tamanho="pequeno" />
+      <app-avatar />
+    </div>
+
+    <div class="vitrine__caixa vitrine__linha">
+      <app-etiqueta tom="ok">Limpeza feita</app-etiqueta>
+      <app-etiqueta tom="pendente">Em andamento</app-etiqueta>
+      <app-etiqueta tom="faltando">Ninguém confirmou</app-etiqueta>
+      <app-etiqueta>A fazer</app-etiqueta>
+    </div>
+
+    <app-cartao titulo="Tarefas" [detalhes]="quantasFeitas() + ' de ' + tarefas().length + ' feitas'">
+      @if (situacaoDasTarefas(); as situacao) {
+        <app-etiqueta situacaoDoCartao [tom]="situacao.tom">{{ situacao.texto }}</app-etiqueta>
+      }
+      <div class="vitrine__tarefas">
+        @for (tarefa of tarefas(); track tarefa.nome; let i = $index) {
+          <app-item-de-tarefa [tarefa]="tarefa.nome" [feita]="tarefa.feita" (feitaChange)="marcar(i, $event)" />
+        }
+      </div>
+    </app-cartao>
+
+    <app-cartao titulo="Sexta, 16 de outubro" detalhes="19h às 21h · 3 de 5 vagas · 4 tarefas">
+      <button situacaoDoCartao appBotao variante="discreto" icone type="button" aria-label="Editar sexta, 16 de outubro">
+        <app-icone nome="pencil" />
+      </button>
+      <app-lista-de-pessoas [pessoas]="pessoas" [total]="5" (remover)="removerPessoa($event)" />
+    </app-cartao>
+  </section>
+
+  <!-- ===== Retorno ===== -->
+  <section class="vitrine__secao" aria-labelledby="s-retorno">
+    <h2 class="subtitle" id="s-retorno">Retorno</h2>
+
+    <div class="vitrine__caixa vitrine__coluna">
+      <div class="vitrine__linha"><app-girando /> <app-girando tamanho="pequeno" /></div>
+      <app-carregando>Carregando a escala…</app-carregando>
+      <div class="vitrine__linha">
+        <button appBotao variante="secundario" type="button" (click)="mostrarNotificacao()">Mostrar notificação</button>
+        <button appBotao variante="secundario" type="button" (click)="mostrarErro()">Notificação de erro</button>
+        <button appBotao variante="perigo" type="button" (click)="janelaAberta.set(true)">Abrir janela</button>
+      </div>
+    </div>
+
+    <app-aviso titulo="Lembrete:">a chave fica com o porteiro.</app-aviso>
+    <app-aviso tom="sucesso" titulo="Tudo certo.">Sua presença está confirmada.</app-aviso>
+
+    <app-estado estado="carregando" />
+    <app-estado estado="erro" erro="Confira sua internet e tente de novo." />
+
+    <div class="card">
+      <app-vazio titulo="Nenhuma sexta marcada" texto="Quando quem organiza cadastrar as próximas limpezas, elas aparecem aqui.">
+        <button appBotao variante="secundario" type="button">Atualizar</button>
+      </app-vazio>
+    </div>
+  </section>
+</main>
+
+<app-rodape />
+
+<app-janela titulo="Cancelar sua presença?" [(aberta)]="janelaAberta">
+  <p class="dialog__text">Você sai da escala de sexta, 16 de outubro. A vaga fica livre para outra pessoa.</p>
+  <div acoesDaJanela>
+    <button appBotao variante="secundario" type="button" autofocus (click)="janelaAberta.set(false)">
+      Manter presença
+    </button>
+    <button appBotao variante="perigo" type="button" (click)="janelaAberta.set(false)">Cancelar presença</button>
+  </div>
+</app-janela>

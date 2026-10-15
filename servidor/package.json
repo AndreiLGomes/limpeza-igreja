@@ -1,0 +1,43 @@
+{
+  "name": "@limpeza/servidor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Servidor da Escala de Limpeza: Node + Express 5 + PostgreSQL.",
+  "type": "module",
+  "scripts": {
+    "desenvolver": "tsx watch --env-file-if-exists=.env codigo/servidor.ts",
+    "build": "tsc -p tsconfig.compilar.json",
+    "start": "node --env-file-if-exists=.env compilado/servidor.js",
+    "test": "vitest run",
+    "testes:acompanhar": "vitest",
+    "migracao:gerar": "drizzle-kit generate",
+    "migrar": "tsx --env-file-if-exists=.env codigo/banco/migrar.ts",
+    "dados-de-exemplo": "tsx --env-file-if-exists=.env codigo/banco/dados-de-exemplo.ts",
+    "gerar-hash-senha": "tsx codigo/comandos/gerar-hash-senha.ts"
+  },
+  "dependencies": {
+    "@limpeza/compartilhado": "*",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "drizzle-orm": "^0.45.4",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
+    "pg": "^8.23.1",
+    "pino": "^10.3.1",
+    "pino-http": "^11.0.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "~24.19.2",
+    "@types/pg": "^8.23.1",
+    "@types/supertest": "^7.2.1",
+    "drizzle-kit": "^0.31.11",
+    "supertest": "^7.3.0",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.2"
+  }
+}

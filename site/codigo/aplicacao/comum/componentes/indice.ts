@@ -1,0 +1,25 @@
+/** Componentes do Design System. Importe sempre de '@componentes'. */
+export * from './avatar/avatar';
+export * from './aviso/aviso';
+export * from './barra/barra';
+export * from './botao/botao';
+export * from './campo/campo';
+export * from './campo/entrada';
+export * from './campo-de-formulario';
+export * from './carregando/carregando';
+export * from './cartao/cartao';
+export * from './contador/contador';
+export * from './editor-de-tarefas/editor-de-tarefas';
+export * from './escolhas/escolhas';
+export * from './etiqueta/etiqueta';
+export * from './formulario/formulario';
+export * from './icone/icone';
+export type { NomeDoIcone } from './icone/icones.gerado';
+export * from './item-de-tarefa/item-de-tarefa';
+export * from './janela/janela';
+export * from './lista-de-pessoas/lista-de-pessoas';
+export * from './marca/marca';
+export * from './notificacoes/notificacoes';
+export * from './rodape/rodape';
+export * from './selecao/selecao';
+export * from './vazio/vazio';

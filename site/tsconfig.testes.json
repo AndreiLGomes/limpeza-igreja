@@ -1,0 +1,14 @@
+/* Configuração do TypeScript para os testes do site (Vitest). */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": [
+      "vitest/globals"
+    ]
+  },
+  "include": [
+    "codigo/**/*.d.ts",
+    "codigo/**/*.teste.ts",
+    "codigo/testes/**/*.ts"
+  ]
+}

@@ -1,0 +1,14 @@
+/* Configuração do TypeScript para o código do site (sem os testes). */
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": []
+  },
+  "include": [
+    "codigo/**/*.ts"
+  ],
+  "exclude": [
+    "codigo/**/*.teste.ts",
+    "codigo/testes/**"
+  ]
+}

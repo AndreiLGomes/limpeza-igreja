@@ -12,7 +12,10 @@ docs/
 .claude/
 .superpowers/
 
-# Gerados a partir de design-system/ (frontend/scripts/build-tokens.mjs)
-frontend/src/styles/_tokens.scss
-frontend/src/styles/_components.scss
-frontend/src/app/shared/ui/icon/icons.generated.ts
+# Gerados a partir de design-system/ (site/comandos/gerar-estilos.mjs)
+site/codigo/estilos/_variaveis.scss
+site/codigo/estilos/_componentes.scss
+site/codigo/aplicacao/comum/componentes/icone/icones.gerado.ts
+
+# Saídas da compilação
+compilado/

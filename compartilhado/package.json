@@ -1,0 +1,32 @@
+{
+  "name": "@limpeza/compartilhado",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Código puro usado pelo site e pelo servidor: tipos, esquemas, mensagens e regras.",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./compilado/indice.js",
+  "types": "./compilado/indice.d.ts",
+  "exports": {
+    ".": {
+      "types": "./compilado/indice.d.ts",
+      "default": "./compilado/indice.js"
+    }
+  },
+  "files": [
+    "compilado"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.compilar.json",
+    "prepare": "npm run build",
+    "test": "vitest run",
+    "testes:acompanhar": "vitest"
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.2"
+  }
+}
