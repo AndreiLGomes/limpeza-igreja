@@ -38,6 +38,15 @@ export async function apagar(id: string): Promise<void> {
   await db.delete(confirmacoes).where(eq(confirmacoes.id, id));
 }
 
+/** Apaga a pessoa daquela sexta e devolve os dados dela (para o "Desfazer", O5). */
+export async function apagarDoDia(diaId: string, pessoaId: string): Promise<Confirmacao | undefined> {
+  const [apagada] = await db
+    .delete(confirmacoes)
+    .where(and(eq(confirmacoes.id, pessoaId), eq(confirmacoes.diaId, diaId)))
+    .returning();
+  return apagada;
+}
+
 /** Apaga a confirmação desse telefone nessa sexta. Devolve se havia alguma. */
 export async function apagarPorTelefone(diaId: string, telefone: string): Promise<boolean> {
   const apagadas = await db

@@ -11,6 +11,7 @@ import { criarLog, registrarRequisicoes, type Log } from './http/log.js';
 import { rotaNaoEncontrada, tratarErros } from './http/tratar-erros.js';
 import { rotasDeConfirmacoes } from './modulos/confirmacoes/rotas.js';
 import { rotasDeDias } from './modulos/dias/rotas.js';
+import { rotasDoOrganizador } from './modulos/organizador/rotas.js';
 import { rotasDeSaude } from './modulos/saude/rotas.js';
 import { rotasDeTarefas } from './modulos/tarefas/rotas.js';
 
@@ -35,7 +36,7 @@ export function criarApp(opcoes: OpcoesDoApp = {}) {
   app.use(limitarEscritas(opcoes.escritasPorMinuto));
 
   const api = express.Router();
-  api.use(rotasDeSaude, rotasDeDias, rotasDeConfirmacoes, rotasDeTarefas);
+  api.use(rotasDeSaude, rotasDeDias, rotasDeConfirmacoes, rotasDeTarefas, rotasDoOrganizador);
   app.use(PREFIXO_API, api);
 
   app.use(rotaNaoEncontrada);

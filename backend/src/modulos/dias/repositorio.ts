@@ -1,5 +1,5 @@
 /** Leitura e gravação das sextas. Sem regra de negócio. */
-import { asc, eq, gte, inArray } from 'drizzle-orm';
+import { asc, desc, eq, gte, inArray } from 'drizzle-orm';
 import { db } from '../../banco/cliente.js';
 import { confirmacoes, dias, tarefas, type Dia, type DiaComTudo } from '../../banco/esquema.js';
 import type { Executor } from '../../banco/transacao.js';
@@ -42,6 +42,30 @@ export async function buscarCompleto(id: string): Promise<DiaComTudo | undefined
 export async function buscar(id: string, banco: Executor = db): Promise<Dia | undefined> {
   const [dia] = await banco.select().from(dias).where(eq(dias.id, id));
   return dia;
+}
+
+/** A sexta de data mais recente (passada ou não), com as tarefas. */
+export async function buscarMaisRecente(): Promise<DiaComTudo | undefined> {
+  const [dia] = await db.select().from(dias).orderBy(desc(dias.data)).limit(1);
+  return dia ? (await completar([dia]))[0] : undefined;
+}
+
+type CamposDaSexta = Pick<typeof dias.$inferInsert, 'data' | 'inicio' | 'fim' | 'vagas'>;
+
+export async function inserir(tx: Executor, valores: CamposDaSexta): Promise<Dia> {
+  const [dia] = await tx.insert(dias).values(valores).returning();
+  if (!dia) throw new Error('A sexta não foi gravada.');
+  return dia;
+}
+
+export async function atualizar(tx: Executor, id: string, valores: CamposDaSexta): Promise<void> {
+  await tx.update(dias).set(valores).where(eq(dias.id, id));
+}
+
+/** Apaga a sexta (as confirmações e tarefas vão junto, pelo CASCADE). Devolve se ela existia. */
+export async function apagar(id: string): Promise<boolean> {
+  const apagados = await db.delete(dias).where(eq(dias.id, id)).returning({ id: dias.id });
+  return apagados.length > 0;
 }
 
 /**

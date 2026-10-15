@@ -17,8 +17,10 @@ const esquemaAmbiente = z
     PORTA: z.coerce.number().int().min(1).max(65535).default(3000),
     DATABASE_URL: opcional(z.url()),
     DATABASE_URL_TESTE: opcional(z.url()),
-    // Obrigatória a partir da Etapa 5, quando a área do organizador existir.
-    SENHA_ORGANIZADOR_HASH: opcional(z.string().regex(FORMATO_BCRYPT)),
+    // Hash bcrypt, nunca a senha pura (O1). Gere com "npm run gerar-hash-senha".
+    SENHA_ORGANIZADOR_HASH: z.string({ error: 'obrigatória (gere com npm run gerar-hash-senha)' }).regex(FORMATO_BCRYPT, {
+      error: 'precisa ser um hash bcrypt (gere com npm run gerar-hash-senha), nunca a senha pura',
+    }),
     ORIGEM_FRONTEND: z.url(),
   })
   .superRefine((ambiente, ctx) => {

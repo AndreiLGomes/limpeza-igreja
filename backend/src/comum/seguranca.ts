@@ -1,7 +1,21 @@
 /**
- * Peças de segurança (docs/05-seguranca.md). A senha de organizador (bcrypt) entra na Etapa 5.
+ * Peças de segurança (docs/05-seguranca.md).
  */
 import { createHash, randomBytes } from 'node:crypto';
+import bcrypt from 'bcryptjs';
+
+/** Custo do bcrypt para a senha de organizador (docs/05-seguranca.md). */
+export const CUSTO_DO_HASH_DE_SENHA = 12;
+
+/** Hash bcrypt da senha de organizador. Usado só pelo comando gerar-hash-senha. */
+export function hashDeSenha(senha: string, custo = CUSTO_DO_HASH_DE_SENHA): Promise<string> {
+  return bcrypt.hash(senha, custo);
+}
+
+/** Confere a senha com o hash, em tempo constante (a própria biblioteca garante). */
+export function conferirSenha(senha: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(senha, hash);
+}
 
 /** Código de cancelamento: 128 bits (C7). */
 export const BYTES_DO_CODIGO = 16;

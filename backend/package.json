@@ -12,10 +12,12 @@
     "test:watch": "vitest",
     "migracao:gerar": "drizzle-kit generate",
     "migrar": "tsx --env-file-if-exists=.env src/banco/migrar.ts",
-    "seed": "tsx --env-file-if-exists=.env src/banco/seed.ts"
+    "seed": "tsx --env-file-if-exists=.env src/banco/seed.ts",
+    "gerar-hash-senha": "tsx src/comandos/gerar-hash-senha.ts"
   },
   "dependencies": {
     "@limpeza/shared": "*",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "drizzle-orm": "^0.45.4",
     "express": "^5.2.1",

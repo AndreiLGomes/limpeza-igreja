@@ -36,7 +36,7 @@ interface OpcoesDoLimite {
 }
 
 export function limitarTentativas(opcoes: OpcoesDoLimite) {
-  const chaveDe = (req: Request) => hashDeIp(req.ip ?? '');
+  const chaveDe = (req: Pick<Request, 'ip'>) => hashDeIp(req.ip ?? '');
   const doMesmoIp = (chave: string) =>
     and(eq(tentativasLogin.tipo, opcoes.tipo), eq(tentativasLogin.chave, chave));
 
@@ -76,7 +76,11 @@ export function limitarTentativas(opcoes: OpcoesDoLimite) {
    * Roda a ação. Se ela falhar com um dos códigos de "tentativa errada", conta a tentativa
    * e repassa o erro. Se der certo e `zerarAoAcertar`, apaga as tentativas erradas do IP.
    */
-  async function contando<T>(req: Request, errosQueContam: CodigoDeErro[], acao: () => Promise<T>): Promise<T> {
+  async function contando<T>(
+    req: Pick<Request, 'ip'>,
+    errosQueContam: CodigoDeErro[],
+    acao: () => Promise<T>,
+  ): Promise<T> {
     const chave = chaveDe(req);
     try {
       const resultado = await acao();
