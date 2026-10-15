@@ -21,6 +21,10 @@ export const CATALOGO_DE_ERROS = {
     status: 401,
     mensagem: 'Senha incorreta. Peça a senha para quem administra o app.',
   },
+  ROTA_NAO_ENCONTRADA: {
+    status: 404,
+    mensagem: 'Esse endereço não existe.',
+  },
   DIA_NAO_ENCONTRADO: {
     status: 404,
     mensagem: 'Essa sexta não foi encontrada. Ela pode ter sido apagada.',

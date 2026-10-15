@@ -1,0 +1,26 @@
+# PostgreSQL 18 só para desenvolvimento e testes, na máquina de quem programa.
+# Cria dois bancos: "limpeza" (desenvolvimento) e "limpeza_teste" (testes automáticos).
+# Usuário e senha abaixo valem só para este banco local; nunca use em produção.
+services:
+  banco:
+    image: postgres:18
+    container_name: limpeza-igreja-banco
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: limpeza
+      POSTGRES_PASSWORD: limpeza
+      POSTGRES_DB: limpeza
+    ports:
+      - "5432:5432"
+    volumes:
+      # A partir do PostgreSQL 18 a imagem guarda os dados dentro de /var/lib/postgresql.
+      - dados-banco:/var/lib/postgresql
+      - ./docker/postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U limpeza -d limpeza"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  dados-banco:
