@@ -2,6 +2,7 @@
  * Datas e horas puras, sem fuso (D3): datas "AAAA-MM-DD" e horas "HH:MM".
  * Nada aqui sabe qual é "hoje": quem chama passa a data de hoje (no servidor, vem de comum/tempo.ts, D1).
  */
+import { inicialMinuscula } from './textos.js';
 
 const DIAS_DA_SEMANA = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'] as const;
 
@@ -41,6 +42,11 @@ export function ehDataValida(data: string): boolean {
 export function dataPorExtenso(data: string): string {
   const { mes, dia } = partesDaData(data);
   return `${DIAS_DA_SEMANA[diaDaSemana(data)]}, ${dia} de ${MESES[mes - 1]}`;
+}
+
+/** A data por extenso no meio de uma frase: "2026-10-16" → "sexta, 16 de outubro". */
+export function dataNaFrase(data: string): string {
+  return inicialMinuscula(dataPorExtenso(data));
 }
 
 /** D4: "19:00" → "19h"; "19:30" → "19h30"; "07:05" → "7h05". */

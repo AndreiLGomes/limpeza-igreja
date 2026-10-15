@@ -10,6 +10,7 @@ Na raiz do projeto, `npm install` instala tudo. Dentro de `site/`:
 | --- | --- |
 | `npm start` | Sobe o site em `http://localhost:4200` (a vitrine fica em `/vitrine`) |
 | `npm test` | Roda os testes (Vitest); eles terminam em `.teste.ts` |
+| `npm run testes:ponta-a-ponta` | Testes de ponta a ponta (Playwright, em `ponta-a-ponta/`): sobem o servidor com o banco de teste e o site, e clicam nas telas a 375px. Precisam do Docker no ar e das portas 3000 e 4200 livres |
 | `npm run build` | Gera a versão de produção em `compilado/` |
 | `npm run gerar-estilos` | Gera os estilos e ícones a partir de `../design-system/` |
 

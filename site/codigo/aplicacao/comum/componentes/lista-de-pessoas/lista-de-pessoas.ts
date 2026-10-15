@@ -4,7 +4,7 @@
  * SÓ NA ÁREA DO ORGANIZADOR (LGPD). No fim, as vagas livres com o avatar tracejado.
  */
 import { Component, computed, input, output } from '@angular/core';
-import { soDigitos, TEXTO_DO_TEMPO, type PessoaCompleta } from '@limpeza/compartilhado';
+import { inicialMinuscula, soDigitos, TEXTO_DO_TEMPO, type PessoaCompleta } from '@limpeza/compartilhado';
 import { Avatar } from '../avatar/avatar';
 import { Botao } from '../botao/botao';
 import { Icone } from '../icone/icone';
@@ -76,7 +76,6 @@ export class ListaDePessoas {
 
   /** "o tempo todo" / "só a primeira hora", em minúscula no meio da frase. */
   protected tempo(pessoa: PessoaCompleta): string {
-    const texto = TEXTO_DO_TEMPO[pessoa.tempo];
-    return texto.charAt(0).toLocaleLowerCase('pt-BR') + texto.slice(1);
+    return inicialMinuscula(TEXTO_DO_TEMPO[pessoa.tempo]);
   }
 }

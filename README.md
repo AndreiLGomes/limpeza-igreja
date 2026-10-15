@@ -12,7 +12,7 @@ App para organizar a limpeza da igreja às sextas-feiras: quem vem, quando vem e
 | Design System (`design-system/`) | ✅ Pronto |
 | Pacote compartilhado (`compartilhado/`) | ✅ Pronto |
 | Servidor (`servidor/`: Node + Express + PostgreSQL) | ✅ Pronto (API pública e do organizador) |
-| Site (`site/`: Angular 22) | 🚧 Base e Design System prontos (vitrine em /vitrine); telas a construir |
+| Site (`site/`: Angular 22) | 🚧 Telas públicas prontas; área do organizador a construir |
 
 ## Como construir
 

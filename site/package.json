@@ -12,7 +12,8 @@
     "prebuild": "npm run gerar-estilos",
     "build": "ng build",
     "pretest": "npm run gerar-estilos",
-    "test": "ng test --watch=false"
+    "test": "ng test --watch=false",
+    "testes:ponta-a-ponta": "playwright test"
   },
   "dependencies": {
     "@angular/common": "^22.2.0",
@@ -30,6 +31,8 @@
     "@angular/build": "^22.2.2",
     "@angular/cli": "^22.2.2",
     "@angular/compiler-cli": "^22.2.0",
+    "@playwright/test": "~1.63.0",
+    "bcryptjs": "^3.0.3",
     "jsdom": "^30.0.0",
     "prettier": "^3.8.1",
     "typescript": "~6.0.3",

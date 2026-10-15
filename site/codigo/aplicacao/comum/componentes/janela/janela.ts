@@ -17,6 +17,12 @@ let proximoId = 0;
 
 @Component({
   selector: 'app-janela',
+  styles: `
+    /* Sem botões no encaixe, a linha de ações não ocupa espaço. */
+    .dialog__actions:empty {
+      display: none;
+    }
+  `,
   template: `
     <dialog #janela class="dialog" [attr.aria-labelledby]="idDoTitulo" (close)="aberta.set(false)">
       <h2 class="dialog__title" [id]="idDoTitulo">{{ titulo() }}</h2>

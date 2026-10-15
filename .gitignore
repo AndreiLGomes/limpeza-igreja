@@ -19,3 +19,7 @@ site/codigo/aplicacao/comum/componentes/icone/icones.gerado.ts
 
 # Saídas da compilação
 compilado/
+
+# Resultados dos testes de ponta a ponta (Playwright)
+site/ponta-a-ponta/resultados/
+site/playwright-report/

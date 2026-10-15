@@ -4,7 +4,7 @@
  * aparece a etiqueta "Organizador" ao lado do nome.
  */
 import { Component, input } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive, type IsActiveMatchOptions } from '@angular/router';
 import { NOME_DO_APP } from '@nucleo/nome-do-app';
 import { Icone } from '../icone/icone';
 
@@ -31,7 +31,7 @@ export interface AbaDaBarra {
             [routerLink]="aba.rota"
             routerLinkActive
             ariaCurrentWhenActive="page"
-            [routerLinkActiveOptions]="{ exact: true }"
+            [routerLinkActiveOptions]="opcoesDaAbaAtiva"
           >
             {{ aba.rotulo }}
           </a>
@@ -56,4 +56,12 @@ export class Barra {
   readonly etiqueta = input<string>();
 
   protected readonly nome = NOME_DO_APP;
+
+  /** A aba fica marcada pelo caminho, ignorando ?dia=… (ex.: /tarefas?dia=ID marca "Tarefas"). */
+  protected readonly opcoesDaAbaAtiva: IsActiveMatchOptions = {
+    paths: 'exact',
+    queryParams: 'ignored',
+    matrixParams: 'ignored',
+    fragment: 'ignored',
+  };
 }

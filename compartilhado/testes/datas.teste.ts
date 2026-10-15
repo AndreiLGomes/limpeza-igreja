@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  dataPorExtenso, ehDataValida, ehPassada, ehSexta, hora, horario, proximaSexta, somarDias,
+  dataNaFrase, dataPorExtenso, ehDataValida, ehPassada, ehSexta, hora, horario, proximaSexta, somarDias,
 } from '../codigo/datas.js';
 
 describe('datas (D2, D4, S6)', () => {
@@ -8,6 +8,10 @@ describe('datas (D2, D4, S6)', () => {
     expect(dataPorExtenso('2026-10-16')).toBe('Sexta, 16 de outubro');
     expect(dataPorExtenso('2026-10-17')).toBe('Sábado, 17 de outubro');
     expect(dataPorExtenso('2027-03-01')).toBe('Segunda, 1 de março');
+  });
+
+  it('escreve a data no meio da frase, em minúscula', () => {
+    expect(dataNaFrase('2026-10-16')).toBe('sexta, 16 de outubro');
   });
 
   it('escreve a hora curta', () => {
