@@ -1,6 +1,6 @@
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# Arquivos que o git ignora no front (veja também o .gitignore da raiz).
 
-# Compiled output
+# Saída da compilação
 /dist
 /tmp
 /out-tsc
@@ -11,7 +11,7 @@
 npm-debug.log
 yarn-error.log
 
-# IDEs and editors
+# IDEs e editores
 .idea/
 .project
 .classpath
@@ -29,7 +29,7 @@ yarn-error.log
 !.vscode/mcp.json
 .history/*
 
-# Miscellaneous
+# Outros
 /.angular/cache
 .sass-cache/
 /connect.lock
@@ -39,6 +39,6 @@ testem.log
 /typings
 __screenshots__/
 
-# System files
+# Arquivos do sistema
 .DS_Store
 Thumbs.db
