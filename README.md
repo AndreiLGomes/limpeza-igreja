@@ -11,7 +11,7 @@ App para organizar a limpeza da igreja às sextas-feiras: quem vem, quando vem e
 | Análise e documentação (`docs/`) | ✅ Pronta |
 | Design System (`design-system/`) | ✅ Pronto |
 | Pacote compartilhado (`shared/`) | ✅ Pronto |
-| Back-end (Node + Express + PostgreSQL) | 🚧 Servidor base pronto; banco e API a construir |
+| Back-end (Node + Express + PostgreSQL) | 🚧 Servidor base e banco prontos; API a construir |
 | Front-end (Angular 22) | ⏳ A construir |
 
 ## Como construir

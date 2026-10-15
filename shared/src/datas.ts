@@ -60,6 +60,18 @@ export function ehSexta(data: string): boolean {
   return diaDaSemana(data) === SEXTA_FEIRA;
 }
 
+/** "2026-10-16" + 7 → "2026-10-23" (aceita números negativos). */
+export function somarDias(data: string, quantos: number): string {
+  const { ano, mes, dia } = partesDaData(data);
+  return new Date(Date.UTC(ano, mes - 1, dia + quantos)).toISOString().slice(0, 10);
+}
+
+/** A primeira sexta-feira a partir da data (a própria data, se já for sexta). */
+export function proximaSexta(data: string): string {
+  const faltam = (SEXTA_FEIRA - diaDaSemana(data) + 7) % 7;
+  return somarDias(data, faltam);
+}
+
 /** D2: passada é a data anterior a hoje. No próprio dia ela ainda é atual. */
 export function ehPassada(data: string, hoje: string): boolean {
   return data < hoje;

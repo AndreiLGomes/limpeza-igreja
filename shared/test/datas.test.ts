@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { dataPorExtenso, ehDataValida, ehPassada, ehSexta, hora, horario } from '../src/datas.js';
+import {
+  dataPorExtenso, ehDataValida, ehPassada, ehSexta, hora, horario, proximaSexta, somarDias,
+} from '../src/datas.js';
 
 describe('datas (D2, D4, S6)', () => {
   it('escreve a data por extenso', () => {
@@ -24,6 +26,18 @@ describe('datas (D2, D4, S6)', () => {
     expect(ehPassada('2026-10-15', '2026-10-15')).toBe(false);
     expect(ehPassada('2026-10-14', '2026-10-15')).toBe(true);
     expect(ehPassada('2026-10-16', '2026-10-15')).toBe(false);
+  });
+
+  it('soma dias, virando mês e ano', () => {
+    expect(somarDias('2026-10-16', 7)).toBe('2026-10-23');
+    expect(somarDias('2026-12-30', 3)).toBe('2027-01-02');
+    expect(somarDias('2026-10-01', -1)).toBe('2026-09-30');
+  });
+
+  it('acha a próxima sexta (a própria data, se já for sexta)', () => {
+    expect(proximaSexta('2026-10-15')).toBe('2026-10-16');
+    expect(proximaSexta('2026-10-16')).toBe('2026-10-16');
+    expect(proximaSexta('2026-10-17')).toBe('2026-10-23');
   });
 
   it('confere se a data existe', () => {
