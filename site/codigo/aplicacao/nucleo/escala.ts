@@ -7,6 +7,7 @@ import { dataNaFrase, type DiaPublico, type EntradaConfirmacao, type Tarefa } fr
 import { Notificacoes } from '@componentes';
 import { Api, FalhaNaApi } from './api';
 import { Carga } from './carga';
+import { notificarFalha } from './falhas';
 import { MinhasConfirmacoes } from './minhas-confirmacoes';
 
 @Injectable({ providedIn: 'root' })
@@ -63,7 +64,7 @@ export class Escala {
         // X6: o código não existe mais (pessoa removida ou sexta apagada): esquece em silêncio.
         this.minhasConfirmacoes.esquecer(dia.id);
       } else {
-        this.notificarFalha(erro, () => this.cancelarMinhaPresenca(dia));
+        notificarFalha(this.notificacoes, erro, () => this.cancelarMinhaPresenca(dia));
       }
     }
     await this.atualizar();
@@ -92,7 +93,7 @@ export class Escala {
       }
     } catch (erro) {
       this.trocarTarefa(dia.id, tarefa.id, !feita);
-      this.notificarFalha(erro, () => this.marcarTarefa(dia, tarefa, feita));
+      notificarFalha(this.notificacoes, erro, () => this.marcarTarefa(dia, tarefa, feita));
     }
   }
 
@@ -106,9 +107,4 @@ export class Escala {
     );
   }
 
-  /** Erro de conexão ou do servidor: notificação de erro com "Tentar de novo" (regra 2 do docs/06). */
-  private notificarFalha(erro: unknown, tentarDeNovo: () => void): void {
-    const mensagem = erro instanceof FalhaNaApi ? erro.message : 'Algo deu errado. Tente de novo em instantes.';
-    this.notificacoes.erro(mensagem, { acao: 'Tentar de novo', aoAgir: tentarDeNovo });
-  }
 }

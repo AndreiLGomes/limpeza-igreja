@@ -11,10 +11,13 @@ import { RouterLink } from '@angular/router';
 import {
   dataNaFrase, dataPorExtenso, esquemaCancelarPorTelefone, horario, statusDoDia, vagasLivres, type DiaPublico,
 } from '@limpeza/compartilhado';
-import { Botao, Campo, Cartao, Entrada, Etiqueta, Girando, GrupoDeAvatares, Icone, Janela } from '@componentes';
+import {
+  Botao, Campo, Cartao, ConteudoDoBotao, Entrada, Etiqueta, GrupoDeAvatares, Icone, Janela,
+} from '@componentes';
 import { validadorZod } from '@formularios';
 import { FalhaNaApi } from '@nucleo/api';
 import { Escala } from '@nucleo/escala';
+import { mensagemDaFalha } from '@nucleo/falhas';
 import { MinhasConfirmacoes } from '@nucleo/minhas-confirmacoes';
 
 let proximoFormulario = 0;
@@ -22,7 +25,8 @@ let proximoFormulario = 0;
 @Component({
   selector: 'app-cartao-do-dia',
   imports: [
-    Botao, Campo, Cartao, Entrada, Etiqueta, Girando, GrupoDeAvatares, Icone, Janela, ReactiveFormsModule, RouterLink,
+    Botao, Campo, Cartao, ConteudoDoBotao, Entrada, Etiqueta, GrupoDeAvatares, Icone, Janela, ReactiveFormsModule,
+    RouterLink,
   ],
   template: `
     <app-cartao [titulo]="titulo()" [detalhes]="detalhes()">
@@ -57,15 +61,11 @@ let proximoFormulario = 0;
           appBotao
           variante="perigo"
           type="button"
+          [esperando]="cancelando()"
           [disabled]="cancelando()"
-          [attr.aria-busy]="cancelando()"
           (click)="cancelarMinhaPresenca()"
         >
-          @if (cancelando()) {
-            <app-girando /> Cancelando…
-          } @else {
-            Cancelar presença
-          }
+          <app-conteudo-do-botao [esperando]="cancelando()" textoDeEspera="Cancelando…">Cancelar presença</app-conteudo-do-botao>
         </button>
       </div>
     </app-janela>
@@ -89,14 +89,10 @@ let proximoFormulario = 0;
           variante="perigo"
           type="submit"
           [attr.form]="idDoFormulario"
+          [esperando]="cancelando()"
           [disabled]="cancelando()"
-          [attr.aria-busy]="cancelando()"
         >
-          @if (cancelando()) {
-            <app-girando /> Cancelando…
-          } @else {
-            Cancelar presença
-          }
+          <app-conteudo-do-botao [esperando]="cancelando()" textoDeEspera="Cancelando…">Cancelar presença</app-conteudo-do-botao>
         </button>
       </div>
     </app-janela>
@@ -168,10 +164,7 @@ export class CartaoDoDia {
       await this.escala.cancelarPorTelefone(this.dia(), this.formulario.controls.telefone.value);
       this.janelaDoTelefone.set(false);
     } catch (erro) {
-      const mensagem =
-        erro instanceof FalhaNaApi
-          ? (erro.dados.campos?.['telefone'] ?? erro.message)
-          : 'Algo deu errado. Tente de novo em instantes.';
+      const mensagem = (erro instanceof FalhaNaApi && erro.dados.campos?.['telefone']) || mensagemDaFalha(erro);
       this.formulario.controls.telefone.setErrors({ servidor: mensagem });
     } finally {
       this.cancelando.set(false);

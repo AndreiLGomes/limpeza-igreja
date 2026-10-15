@@ -5,8 +5,9 @@
 import { inject, Injectable } from '@angular/core';
 import { dataNaFrase, type DiaCompleto, type EntradaDia, type PessoaCompleta } from '@limpeza/compartilhado';
 import { Notificacoes } from '@componentes';
-import { Api, FalhaNaApi } from './api';
+import { Api } from './api';
 import { Carga } from './carga';
+import { notificarFalha } from './falhas';
 
 @Injectable({ providedIn: 'root' })
 export class Sextas {
@@ -59,7 +60,7 @@ export class Sextas {
         aoAgir: () => void this.desfazerRemocao(dia, removida),
       });
     } catch (erro) {
-      this.notificarFalha(erro);
+      notificarFalha(this.notificacoes, erro);
     }
     await this.carga.atualizar();
   }
@@ -73,12 +74,8 @@ export class Sextas {
         observacao: pessoa.observacao,
       });
     } catch (erro) {
-      this.notificarFalha(erro);
+      notificarFalha(this.notificacoes, erro);
     }
     await this.carga.atualizar();
-  }
-
-  private notificarFalha(erro: unknown): void {
-    this.notificacoes.erro(erro instanceof FalhaNaApi ? erro.message : 'Algo deu errado. Tente de novo em instantes.');
   }
 }

@@ -9,6 +9,7 @@ import { criarAplicacaoDeTeste } from './ajuda/aplicacao.js';
 import { SENHA_DE_TESTE } from './ajuda/ambiente.js';
 import { limparBanco } from './ajuda/banco.js';
 import { comoOrganizador } from './ajuda/organizador.js';
+import { ID_QUE_NAO_EXISTE } from './ajuda/fabricas.js';
 
 const aplicacao = criarAplicacaoDeTeste();
 const entrar = (senha: string) => request(aplicacao).post('/api/organizador/entrar').send({ senha });
@@ -104,7 +105,7 @@ describe('Sessão (O2, O4, O6)', () => {
   });
 
   it('O4: todos os endereços do organizador exigem a sessão', async () => {
-    const id = '6f1c1b0e-8a3e-4c1a-9b7d-2f4e5a6b7c8d';
+    const id = ID_QUE_NAO_EXISTE;
     const pedidos = [
       request(aplicacao).post('/api/organizador/sair'),
       request(aplicacao).get('/api/organizador/dias'),

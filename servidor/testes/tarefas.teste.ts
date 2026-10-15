@@ -5,7 +5,7 @@ import { bd } from '../codigo/banco/cliente.js';
 import { tarefas } from '../codigo/banco/esquema.js';
 import { criarAplicacaoDeTeste } from './ajuda/aplicacao.js';
 import { limparBanco } from './ajuda/banco.js';
-import { criarDia, criarDiaPassado, criarTarefa } from './ajuda/fabricas.js';
+import { criarDia, criarDiaPassado, criarTarefa, ID_QUE_NAO_EXISTE } from './ajuda/fabricas.js';
 
 const aplicacao = criarAplicacaoDeTeste();
 
@@ -42,7 +42,7 @@ describe('PATCH /api/dias/:id/tarefas/:tarefaId (T1, T2)', () => {
   it('tarefa de outra sexta ou que não existe → 404 TAREFA_NAO_ENCONTRADA', async () => {
     const dia = await criarDia();
     const tarefaDeOutroDia = await criarTarefa(await criarDia());
-    for (const tarefaId of [tarefaDeOutroDia.id, '6f1c1b0e-8a3e-4c1a-9b7d-2f4e5a6b7c8d', 'abc']) {
+    for (const tarefaId of [tarefaDeOutroDia.id, ID_QUE_NAO_EXISTE, 'abc']) {
       const resposta = await marcar(dia.id, tarefaId, { feita: true });
       expect(resposta.status, tarefaId).toBe(404);
       expect(resposta.body.codigo, tarefaId).toBe('TAREFA_NAO_ENCONTRADA');

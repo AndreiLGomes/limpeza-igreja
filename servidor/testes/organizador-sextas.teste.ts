@@ -7,7 +7,7 @@ import { confirmacoes, dias, tarefas } from '../codigo/banco/esquema.js';
 import { hoje } from '../codigo/comum/tempo.js';
 import { criarAplicacaoDeTeste } from './ajuda/aplicacao.js';
 import { limparBanco } from './ajuda/banco.js';
-import { criarConfirmacao, criarDia, criarDiaPassado, criarTarefa } from './ajuda/fabricas.js';
+import { criarConfirmacao, criarDia, criarDiaPassado, criarTarefa, ID_QUE_NAO_EXISTE } from './ajuda/fabricas.js';
 import { comoOrganizador } from './ajuda/organizador.js';
 
 const aplicacao = criarAplicacaoDeTeste();
@@ -48,7 +48,7 @@ describe('Listar (S13) e ver uma sexta', () => {
   it('uma sexta pelo id; 404 se não existe', async () => {
     const dia = await criarDia();
     expect((await org.get(`/api/organizador/dias/${dia.id}`)).body.id).toBe(dia.id);
-    expect((await org.get('/api/organizador/dias/6f1c1b0e-8a3e-4c1a-9b7d-2f4e5a6b7c8d')).status).toBe(404);
+    expect((await org.get(`/api/organizador/dias/${ID_QUE_NAO_EXISTE}`)).status).toBe(404);
   });
 });
 
@@ -185,7 +185,7 @@ describe('Editar sexta (S8, S9, S10)', () => {
   });
 
   it('sexta que não existe → 404', async () => {
-    expect((await org.put('/api/organizador/dias/6f1c1b0e-8a3e-4c1a-9b7d-2f4e5a6b7c8d', NOVA)).status).toBe(404);
+    expect((await org.put(`/api/organizador/dias/${ID_QUE_NAO_EXISTE}`, NOVA)).status).toBe(404);
   });
 });
 

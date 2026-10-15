@@ -10,8 +10,8 @@ import {
 } from '@limpeza/compartilhado';
 import { resumoDeErros, validadorZod } from '@formularios';
 import {
-  AcoesDoFormulario, Avatar, Aviso, Barra, Botao, CabecalhoDoFormulario, Campo, Carregando, Cartao, Contador,
-  EditorDeTarefas, Entrada, Escolhas, Etiqueta, Formulario, Girando, GrupoDeAvatares, Icone, ItemDeTarefa, Janela,
+  AcoesDoFormulario, Avatar, Aviso, Barra, Botao, CabecalhoDoFormulario, Campo, Carregando, Cartao, ConteudoDoBotao,
+  Contador, EditorDeTarefas, Entrada, Escolhas, Etiqueta, Formulario, Girando, GrupoDeAvatares, Icone, ItemDeTarefa, Janela,
   LinhaDoFormulario, linhaDeTarefa, ListaDePessoas, Marca, Notificacoes, Rodape, Selecao, Vazio, type Opcao,
 } from '@componentes';
 import { Estado } from '../../comum/estado/estado';
@@ -28,8 +28,8 @@ const PESSOAS: PessoaCompleta[] = [
 @Component({
   selector: 'app-vitrine',
   imports: [
-    AcoesDoFormulario, Avatar, Aviso, Barra, Botao, CabecalhoDoFormulario, Campo, Carregando, Cartao, Contador,
-    EditorDeTarefas, Entrada, Escolhas, Estado, Etiqueta, Formulario, Girando, GrupoDeAvatares, Icone, ItemDeTarefa,
+    AcoesDoFormulario, Avatar, Aviso, Barra, Botao, CabecalhoDoFormulario, Campo, Carregando, Cartao, ConteudoDoBotao,
+    Contador, EditorDeTarefas, Entrada, Escolhas, Estado, Etiqueta, Formulario, Girando, GrupoDeAvatares, Icone, ItemDeTarefa,
     Janela, LinhaDoFormulario, ListaDePessoas, Marca, ReactiveFormsModule, Rodape, Selecao, Vazio,
   ],
   templateUrl: './vitrine.html',

@@ -11,27 +11,22 @@ import {
   dataPorExtenso, esquemaConfirmacao, TEMPOS, TEXTO_DO_TEMPO, vagasLivres, type Tempo,
 } from '@limpeza/compartilhado';
 import {
-  AcoesDoFormulario, Aviso, Botao, CabecalhoDoFormulario, Campo, Entrada, Escolhas, Formulario, Girando,
+  AcoesDoFormulario, Aviso, Botao, CabecalhoDoFormulario, Campo, ConteudoDoBotao, Entrada, Escolhas, Formulario,
   LinhaDoFormulario, Notificacoes, Selecao, Vazio, type Opcao,
 } from '@componentes';
-import { resumoDeErros, validadorZod } from '@formularios';
+import { mostrarErrosNosCampos, resumoDeErros, validadorZod, type AvisoDoFormulario } from '@formularios';
 import { FalhaNaApi } from '@nucleo/api';
 import { Escala } from '@nucleo/escala';
+import { ehSemConexao, mensagemDaFalha, notificarFalha } from '@nucleo/falhas';
 import { Estado } from '../../comum/estado/estado';
-
-/** Aviso no topo do formulário. */
-interface AvisoDoFormulario {
-  titulo: string;
-  texto?: string;
-}
 
 const MENSAGEM_DIA_OBRIGATORIO = 'Escolha a sexta.';
 
 @Component({
   selector: 'app-tela-confirmar',
   imports: [
-    AcoesDoFormulario, Aviso, Botao, CabecalhoDoFormulario, Campo, Entrada, Escolhas, Estado, Formulario, Girando,
-    LinhaDoFormulario, ReactiveFormsModule, RouterLink, Selecao, Vazio,
+    AcoesDoFormulario, Aviso, Botao, CabecalhoDoFormulario, Campo, ConteudoDoBotao, Entrada, Escolhas, Estado,
+    Formulario, LinhaDoFormulario, ReactiveFormsModule, RouterLink, Selecao, Vazio,
   ],
   template: `
     <div class="pagina">
@@ -87,12 +82,8 @@ const MENSAGEM_DIA_OBRIGATORIO = 'Escolha a sexta.';
 
             <div appAcoesDoFormulario>
               <a appBotao variante="discreto" routerLink="/">Cancelar</a>
-              <button appBotao type="submit" [disabled]="salvando()" [attr.aria-busy]="salvando()">
-                @if (salvando()) {
-                  <app-girando /> Salvando…
-                } @else {
-                  Confirmar presença
-                }
+              <button appBotao type="submit" [esperando]="salvando()" [disabled]="salvando()">
+                <app-conteudo-do-botao [esperando]="salvando()">Confirmar presença</app-conteudo-do-botao>
               </button>
             </div>
           </form>
@@ -184,20 +175,15 @@ export class TelaConfirmar implements OnInit {
 
   /** Erros do servidor: no aviso do topo e, quando é de um campo, também embaixo dele. */
   private mostrarFalha(erro: unknown): void {
-    if (!(erro instanceof FalhaNaApi)) {
-      this.aviso.set({ titulo: 'Algo deu errado. Tente de novo em instantes.' });
+    if (ehSemConexao(erro)) {
+      notificarFalha(this.notificacoes, erro, () => void this.enviar());
       return;
     }
-    if (erro.codigo === 'SEM_CONEXAO') {
-      this.notificacoes.erro(erro.message, { acao: 'Tentar de novo', aoAgir: () => void this.enviar() });
-      return;
-    }
-    const campos = erro.dados.campos ?? {};
+    this.aviso.set({ titulo: mensagemDaFalha(erro) });
+    if (!(erro instanceof FalhaNaApi)) return;
+    const campos = { ...(erro.dados.campos ?? {}) };
     if (erro.codigo === 'TELEFONE_REPETIDO') campos['telefone'] = erro.message;
-    for (const [campo, mensagem] of Object.entries(campos)) {
-      this.formulario.get(campo)?.setErrors({ servidor: mensagem });
-    }
-    this.aviso.set({ titulo: erro.message });
+    mostrarErrosNosCampos(this.formulario, campos);
     // SEM_VAGA (C5): a sexta lotou nesse meio-tempo; a lista de sextas com vaga é atualizada.
     if (erro.codigo === 'SEM_VAGA') void this.escala.carregar();
   }

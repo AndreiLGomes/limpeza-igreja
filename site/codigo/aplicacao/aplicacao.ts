@@ -30,7 +30,7 @@ function dadosDaRota(rota: ActivatedRouteSnapshot | null, juntos: Data = {}): Da
   template: `
     @if (dados()['moldura'] !== false) {
       @if (naAreaDoOrganizador()) {
-        <app-barra [abas]="abasDoOrganizador" etiqueta="Organizador" inicio="/organizar" />
+        <app-barra [abas]="abasDoOrganizador" etiqueta="Organizador" />
       } @else {
         <app-barra [abas]="abasPublicas" />
       }

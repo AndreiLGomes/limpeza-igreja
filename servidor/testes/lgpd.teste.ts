@@ -9,12 +9,11 @@ import { ROTAS } from '@limpeza/compartilhado';
 import { criarRegistro } from '../codigo/http/registro.js';
 import { criarAplicacaoDeTeste } from './ajuda/aplicacao.js';
 import { limparBanco } from './ajuda/banco.js';
-import { criarConfirmacao, criarDia, criarDiaPassado, criarTarefa } from './ajuda/fabricas.js';
+import { criarConfirmacao, criarDia, criarDiaPassado, criarTarefa, ID_QUE_NAO_EXISTE } from './ajuda/fabricas.js';
 
 const TELEFONE = '47999991234';
 const TELEFONE_FORMATADO = '47 99999-1234';
 const OBSERVACAO = 'moro na rua das flores 123';
-const ID_INEXISTENTE = '6f1c1b0e-8a3e-4c1a-9b7d-2f4e5a6b7c8d';
 
 /** Procura chaves proibidas em qualquer nível, menos dentro de `campos` (nomes de campo com erro). */
 function chavesProibidas(valor: unknown, caminho = 'resposta'): string[] {
@@ -52,7 +51,7 @@ describe('P1, P2: nenhum endereço público devolve telefone nem observação', 
       [ROTAS.saude, 200, () => request(aplicacao).get('/api/saude')],
       [ROTAS.dias, 200, () => request(aplicacao).get('/api/dias')],
       [ROTAS.dia(':id'), 200, () => request(aplicacao).get(`/api/dias/${dia.id}`)],
-      [ROTAS.dia(':id'), 404, () => request(aplicacao).get(`/api/dias/${ID_INEXISTENTE}`)],
+      [ROTAS.dia(':id'), 404, () => request(aplicacao).get(`/api/dias/${ID_QUE_NAO_EXISTE}`)],
       [ROTAS.confirmar(':id'), 400, () => confirmar(dia.id, TELEFONE.slice(0, 9))],
       [ROTAS.confirmar(':id'), 409, () => confirmar(dia.id, TELEFONE)], // telefone repetido
       [ROTAS.confirmar(':id'), 409, () => confirmar(diaCheio.id, '47911111111')], // sem vaga
@@ -66,7 +65,7 @@ describe('P1, P2: nenhum endereço público devolve telefone nem observação', 
       [ROTAS.cancelarPorTelefone(':id'), 204, () => porTelefone(dia.id, outraPessoa.telefone)],
       [ROTAS.tarefa(':id', ':tarefaId'), 200, () => marcar(tarefa.id, { feita: true })],
       [ROTAS.tarefa(':id', ':tarefaId'), 400, () => marcar(tarefa.id, { feita: 'sim' })],
-      [ROTAS.tarefa(':id', ':tarefaId'), 404, () => marcar(ID_INEXISTENTE, { feita: true })],
+      [ROTAS.tarefa(':id', ':tarefaId'), 404, () => marcar(ID_QUE_NAO_EXISTE, { feita: true })],
       ['/nao-existe', 404, () => request(aplicacao).get('/api/nao-existe')],
       // Por último: a escala depois de tudo, com as pessoas novas.
       [ROTAS.dias, 200, () => request(aplicacao).get('/api/dias')],

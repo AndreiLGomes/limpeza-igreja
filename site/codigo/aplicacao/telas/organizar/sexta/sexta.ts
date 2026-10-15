@@ -15,28 +15,20 @@ import {
   mensagemDoErro, VAGAS_MAX, VAGAS_MIN, VAGAS_PADRAO, type EntradaDia,
 } from '@limpeza/compartilhado';
 import {
-  AcoesDoFormulario, Aviso, Botao, CabecalhoDoFormulario, Campo, Contador, EditorDeTarefas, Entrada,
-  estadoDoControle, Formulario, Girando, Icone, Janela, linhaDeTarefa, LinhaDoFormulario, Notificacoes,
-  type LinhaDeTarefa,
+  AcoesDoFormulario, Aviso, Botao, CabecalhoDoFormulario, Campo, ConteudoDoBotao, Contador, EditorDeTarefas, Entrada,
+  estadoDoControle, Formulario, Icone, Janela, linhaDeTarefa, LinhaDoFormulario, Notificacoes, type LinhaDeTarefa,
 } from '@componentes';
-import { resumoDeErros, validadorZod } from '@formularios';
+import { mostrarErrosNosCampos, resumoDeErros, validadorZod, type AvisoDoFormulario } from '@formularios';
 import { FalhaNaApi } from '@nucleo/api';
+import { ehSemConexao, mensagemDaFalha, notificarFalha } from '@nucleo/falhas';
 import { Sextas } from '@nucleo/sextas';
 import { Estado, type EstadoDaCarga } from '../../../comum/estado/estado';
-
-interface AvisoDoFormulario {
-  titulo: string;
-  texto?: string;
-}
-
-/** Campos do formulário que recebem erro do esquema ou do servidor. */
-const CAMPOS = ['data', 'inicio', 'fim', 'vagas'] as const;
 
 @Component({
   selector: 'app-tela-sexta',
   imports: [
-    AcoesDoFormulario, Aviso, Botao, CabecalhoDoFormulario, Campo, Contador, EditorDeTarefas, Entrada, Estado,
-    Formulario, Girando, Icone, Janela, LinhaDoFormulario, ReactiveFormsModule, RouterLink,
+    AcoesDoFormulario, Aviso, Botao, CabecalhoDoFormulario, Campo, ConteudoDoBotao, Contador, EditorDeTarefas, Entrada,
+    Estado, Formulario, Icone, Janela, LinhaDoFormulario, ReactiveFormsModule, RouterLink,
   ],
   template: `
     <div class="pagina">
@@ -81,14 +73,10 @@ const CAMPOS = ['data', 'inicio', 'fim', 'vagas'] as const;
             <button
               appBotao
               type="submit"
+              [esperando]="salvando()"
               [disabled]="salvando() || vagasAbaixoDosConfirmados()"
-              [attr.aria-busy]="salvando()"
             >
-              @if (salvando()) {
-                <app-girando /> Salvando…
-              } @else {
-                Salvar sexta
-              }
+              <app-conteudo-do-botao [esperando]="salvando()">Salvar sexta</app-conteudo-do-botao>
             </button>
           </div>
         </form>
@@ -206,7 +194,7 @@ export class TelaSexta implements OnInit {
       }
       this.estado.set('pronto');
     } catch (erro) {
-      this.erro.set(erro instanceof FalhaNaApi ? erro.message : 'Algo deu errado. Tente de novo em instantes.');
+      this.erro.set(mensagemDaFalha(erro));
       this.estado.set('erro');
     }
   }
@@ -268,12 +256,8 @@ export class TelaSexta implements OnInit {
 
   /** Erros por campo (do esquema ou do servidor): embaixo do campo e resumo no aviso do topo. */
   private mostrarErros(campos: Record<string, string>, titulo?: string): void {
-    const outros: string[] = [];
-    for (const [campo, mensagem] of Object.entries(campos)) {
-      const controle = CAMPOS.find((nome) => nome === campo);
-      if (controle) this.formulario.controls[controle].setErrors({ servidor: mensagem });
-      else outros.push(mensagem); // ex.: tarefa repetida ou longa demais
-    }
+    // O que não tem campo próprio (ex.: tarefa repetida ou longa demais) vai no texto do aviso.
+    const outros = mostrarErrosNosCampos(this.formulario, campos).filter(Boolean);
     const quantos = Object.keys(campos).length;
     const textoDosCampos = quantos > outros.length ? 'Confira os campos marcados abaixo.' : '';
     this.aviso.set({
@@ -283,12 +267,12 @@ export class TelaSexta implements OnInit {
   }
 
   private mostrarFalha(erro: unknown): void {
-    if (!(erro instanceof FalhaNaApi)) {
-      this.aviso.set({ titulo: 'Algo deu errado. Tente de novo em instantes.' });
+    if (ehSemConexao(erro)) {
+      notificarFalha(this.notificacoes, erro, () => void this.salvar());
       return;
     }
-    if (erro.codigo === 'SEM_CONEXAO') {
-      this.notificacoes.erro(erro.message, { acao: 'Tentar de novo', aoAgir: () => void this.salvar() });
+    if (!(erro instanceof FalhaNaApi)) {
+      this.aviso.set({ titulo: mensagemDaFalha(erro) });
       return;
     }
     const campos: Record<string, string> = { ...(erro.dados.campos ?? {}) };

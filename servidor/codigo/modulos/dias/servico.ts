@@ -3,7 +3,7 @@ import { ehPassada, ESCALA_MAX_DIAS, type DadosDia, type DiaCompleto, type DiaPu
 import type { DiaComTudo } from '../../banco/esquema.js';
 import { emTransacao } from '../../banco/transacao.js';
 import { ErroDeRegra } from '../../comum/erros.js';
-import { violouUnico } from '../../comum/erros-do-banco.js';
+import { comRestricaoUnica } from '../../comum/erros-do-banco.js';
 import { paraDiaCompleto, paraDiaPublico } from '../../comum/mapeadores.js';
 import { hoje } from '../../comum/tempo.js';
 import * as repositorioDeConfirmacoes from '../confirmacoes/repositorio.js';
@@ -23,13 +23,8 @@ async function buscarOu404(id: string): Promise<DiaComTudo> {
 }
 
 /** S2: a data repetida é recusada pelo banco (restrição única), também em edições simultâneas. */
-async function comDataUnica<T>(acao: () => Promise<T>): Promise<T> {
-  try {
-    return await acao();
-  } catch (erro) {
-    if (violouUnico(erro, 'dias_data_unica')) throw new ErroDeRegra('DATA_REPETIDA');
-    throw erro;
-  }
+function comDataUnica<T>(acao: () => Promise<T>): Promise<T> {
+  return comRestricaoUnica('dias_data_unica', 'DATA_REPETIDA', acao);
 }
 
 // ---------- Parte pública ----------

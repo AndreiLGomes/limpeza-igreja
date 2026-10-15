@@ -101,12 +101,8 @@
 
       <div appAcoesDoFormulario>
         <button appBotao variante="discreto" type="button" (click)="limpar()">Cancelar</button>
-        <button appBotao type="submit" [disabled]="salvando()" [attr.aria-busy]="salvando()">
-          @if (salvando()) {
-            <app-girando /> Salvando…
-          } @else {
-            Confirmar presença
-          }
+        <button appBotao type="submit" [esperando]="salvando()" [disabled]="salvando()">
+          <app-conteudo-do-botao [esperando]="salvando()">Confirmar presença</app-conteudo-do-botao>
         </button>
       </div>
     </form>

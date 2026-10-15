@@ -4,12 +4,10 @@
  * cada sexta com 4 tarefas. O banco volta a esse estado antes de cada teste.
  */
 import type { Page } from '@playwright/test';
-import { expect, semRolagemLateral, teste } from './ajuda/teste';
+import { expect, notificacao, semRolagemLateral, teste } from './ajuda/teste';
 
 /** O cartão da próxima sexta na tela inicial. */
 const cartao = (pagina: Page) => pagina.locator('app-cartao-do-dia').first();
-/** A notificação com este texto (pode haver mais de uma na tela ao mesmo tempo, até 3). */
-const notificacao = (pagina: Page, texto: string | RegExp) => pagina.locator('.toast').filter({ hasText: texto });
 
 /** Confirma presença pelo formulário (sem esperar o fim). */
 async function preencherConfirmacao(pagina: Page, nome: string, telefone: string): Promise<void> {

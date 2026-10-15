@@ -7,17 +7,17 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { esquemaEntrar } from '@limpeza/compartilhado';
 import {
-  AcoesDoFormulario, Botao, CabecalhoDoFormulario, Campo, Entrada, Formulario, Girando, Icone, Notificacoes,
+  AcoesDoFormulario, Botao, CabecalhoDoFormulario, Campo, ConteudoDoBotao, Entrada, Formulario, Icone, Notificacoes,
 } from '@componentes';
 import { validadorZod } from '@formularios';
-import { FalhaNaApi } from '@nucleo/api';
+import { ehSemConexao, mensagemDaFalha, notificarFalha } from '@nucleo/falhas';
 import { Organizador } from '@nucleo/organizador';
 
 @Component({
   selector: 'app-tela-entrar',
   imports: [
-    AcoesDoFormulario, Botao, CabecalhoDoFormulario, Campo, Entrada, Formulario, Girando, Icone, ReactiveFormsModule,
-    RouterLink,
+    AcoesDoFormulario, Botao, CabecalhoDoFormulario, Campo, ConteudoDoBotao, Entrada, Formulario, Icone,
+    ReactiveFormsModule, RouterLink,
   ],
   template: `
     <div class="pagina">
@@ -32,12 +32,8 @@ import { Organizador } from '@nucleo/organizador';
         </app-campo>
         <div appAcoesDoFormulario>
           <a appBotao variante="discreto" routerLink="/">Voltar</a>
-          <button appBotao type="submit" [disabled]="entrando()" [attr.aria-busy]="entrando()">
-            @if (entrando()) {
-              <app-girando /> Entrando…
-            } @else {
-              Entrar
-            }
+          <button appBotao type="submit" [esperando]="entrando()" [disabled]="entrando()">
+            <app-conteudo-do-botao [esperando]="entrando()" textoDeEspera="Entrando…">Entrar</app-conteudo-do-botao>
           </button>
         </div>
       </form>
@@ -62,12 +58,11 @@ export class TelaEntrar {
       await this.organizador.entrar(this.formulario.controls.senha.value);
       await this.roteador.navigateByUrl('/organizar');
     } catch (erro) {
-      if (erro instanceof FalhaNaApi && erro.codigo === 'SEM_CONEXAO') {
-        this.notificacoes.erro(erro.message, { acao: 'Tentar de novo', aoAgir: () => void this.entrar() });
+      if (ehSemConexao(erro)) {
+        notificarFalha(this.notificacoes, erro, () => void this.entrar());
       } else {
         // O3: senha incorreta ou muitas tentativas: a mensagem do servidor vai embaixo do campo.
-        const mensagem = erro instanceof FalhaNaApi ? erro.message : 'Algo deu errado. Tente de novo em instantes.';
-        this.formulario.controls.senha.setErrors({ servidor: mensagem });
+        this.formulario.controls.senha.setErrors({ servidor: mensagemDaFalha(erro) });
       }
     } finally {
       this.entrando.set(false);

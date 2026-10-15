@@ -5,7 +5,7 @@
  */
 import { signal, type WritableSignal } from '@angular/core';
 import type { EstadoDaCarga } from '../comum/estado/estado';
-import { FalhaNaApi } from './api';
+import { mensagemDaFalha } from './falhas';
 
 export class Carga<T> {
   readonly dados: WritableSignal<T>;
@@ -29,7 +29,7 @@ export class Carga<T> {
       this.erro.set(null);
       this.estado.set('pronto');
     } catch (erro) {
-      this.erro.set(erro instanceof FalhaNaApi ? erro.message : 'Algo deu errado. Tente de novo em instantes.');
+      this.erro.set(mensagemDaFalha(erro));
       this.estado.set('erro');
     }
   }

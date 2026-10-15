@@ -3,7 +3,7 @@ import { vagasLivres, type DadosConfirmacao, type PessoaCompleta } from '@limpez
 import type { Confirmacao } from '../../banco/esquema.js';
 import { emTransacao } from '../../banco/transacao.js';
 import { ErroDeRegra } from '../../comum/erros.js';
-import { violouUnico } from '../../comum/erros-do-banco.js';
+import { comRestricaoUnica } from '../../comum/erros-do-banco.js';
 import { paraPessoaCompleta } from '../../comum/mapeadores.js';
 import { BYTES_DO_CODIGO, gerarToken, hashDeToken } from '../../comum/seguranca.js';
 import * as repositorioDeDias from '../dias/repositorio.js';
@@ -21,8 +21,9 @@ export async function adicionarPessoa(
   dados: DadosConfirmacao,
 ): Promise<{ pessoa: Confirmacao; codigo: string }> {
   const codigo = gerarToken(BYTES_DO_CODIGO);
-  try {
-    return await emTransacao(async (tx) => {
+  // Garantia extra do banco (C4), caso duas confirmações iguais cheguem juntas.
+  return comRestricaoUnica('confirmacoes_telefone_unico_no_dia', 'TELEFONE_REPETIDO', () =>
+    emTransacao(async (tx) => {
       const dia = await repositorioDeDias.buscarTravando(tx, diaId);
       exigirNaoPassada(dia);
       if (await repositorio.telefoneJaConfirmado(tx, diaId, dados.telefone)) {
@@ -34,12 +35,8 @@ export async function adicionarPessoa(
       }
       const pessoa = await repositorio.inserir(tx, { ...dados, diaId, codigoCancelamentoHash: hashDeToken(codigo) });
       return { pessoa, codigo };
-    });
-  } catch (erro) {
-    // Garantia extra do banco (C4), caso duas confirmações iguais cheguem juntas.
-    if (violouUnico(erro, 'confirmacoes_telefone_unico_no_dia')) throw new ErroDeRegra('TELEFONE_REPETIDO');
-    throw erro;
-  }
+    }),
+  );
 }
 
 /** X1: cancelar pelo código guardado no celular. */

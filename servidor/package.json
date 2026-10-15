@@ -13,7 +13,8 @@
     "migracao:gerar": "drizzle-kit generate",
     "migrar": "tsx --env-file-if-exists=.env codigo/banco/migrar.ts",
     "dados-de-exemplo": "tsx --env-file-if-exists=.env codigo/banco/dados-de-exemplo.ts",
-    "gerar-hash-senha": "tsx codigo/comandos/gerar-hash-senha.ts"
+    "gerar-hash-senha": "tsx codigo/comandos/gerar-hash-senha.ts",
+    "conferir-configuracao": "tsx --env-file-if-exists=.env codigo/comandos/conferir-configuracao.ts"
   },
   "dependencies": {
     "@limpeza/compartilhado": "*",

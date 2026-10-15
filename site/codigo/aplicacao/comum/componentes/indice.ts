@@ -3,6 +3,7 @@ export * from './avatar/avatar';
 export * from './aviso/aviso';
 export * from './barra/barra';
 export * from './botao/botao';
+export * from './botao/conteudo-do-botao';
 export * from './campo/campo';
 export * from './campo/entrada';
 export * from './campo/estado-do-controle';

@@ -11,6 +11,9 @@ import {
 import { BYTES_DO_CODIGO, gerarToken, hashDeToken } from '../../codigo/comum/seguranca.js';
 import { hoje } from '../../codigo/comum/tempo.js';
 
+/** Um id no formato certo (UUID) que não existe no banco: para os testes de 404. */
+export const ID_QUE_NAO_EXISTE = '6f1c1b0e-8a3e-4c1a-9b7d-2f4e5a6b7c8d';
+
 /** Contador para gerar datas, nomes e telefones diferentes a cada chamada. */
 let sequencia = 0;
 const proximo = () => ++sequencia;

@@ -7,7 +7,7 @@ import { confirmacoes } from '../codigo/banco/esquema.js';
 import { hashDeToken } from '../codigo/comum/seguranca.js';
 import { criarAplicacaoDeTeste } from './ajuda/aplicacao.js';
 import { limparBanco } from './ajuda/banco.js';
-import { criarConfirmacao, criarDia, criarDiaPassado } from './ajuda/fabricas.js';
+import { criarConfirmacao, criarDia, criarDiaPassado, ID_QUE_NAO_EXISTE } from './ajuda/fabricas.js';
 
 const aplicacao = criarAplicacaoDeTeste();
 
@@ -78,7 +78,7 @@ describe('POST /api/dias/:id/confirmacoes', () => {
   });
 
   it('sexta que não existe → 404', async () => {
-    const resposta = await confirmar('6f1c1b0e-8a3e-4c1a-9b7d-2f4e5a6b7c8d');
+    const resposta = await confirmar(ID_QUE_NAO_EXISTE);
     expect(resposta.status).toBe(404);
     expect(resposta.body.codigo).toBe('DIA_NAO_ENCONTRADO');
   });

@@ -4,7 +4,7 @@ import { somarDias } from '@limpeza/compartilhado';
 import { hoje } from '../codigo/comum/tempo.js';
 import { criarAplicacaoDeTeste } from './ajuda/aplicacao.js';
 import { limparBanco } from './ajuda/banco.js';
-import { criarConfirmacao, criarDia, criarDiaPassado, criarTarefa } from './ajuda/fabricas.js';
+import { criarConfirmacao, criarDia, criarDiaPassado, criarTarefa, ID_QUE_NAO_EXISTE } from './ajuda/fabricas.js';
 
 const aplicacao = criarAplicacaoDeTeste();
 
@@ -63,7 +63,7 @@ describe('GET /api/dias/:id', () => {
   });
 
   it('404 DIA_NAO_ENCONTRADO para id que não existe ou que nem é um id', async () => {
-    for (const id of ['6f1c1b0e-8a3e-4c1a-9b7d-2f4e5a6b7c8d', 'abc']) {
+    for (const id of [ID_QUE_NAO_EXISTE, 'abc']) {
       const resposta = await request(aplicacao).get(`/api/dias/${id}`);
       expect(resposta.status, id).toBe(404);
       expect(resposta.body.codigo, id).toBe('DIA_NAO_ENCONTRADO');

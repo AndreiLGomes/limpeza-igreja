@@ -6,14 +6,13 @@
 import type { Page } from '@playwright/test';
 import { dataPorExtenso, proximaSexta, somarDias } from '@limpeza/compartilhado';
 import { SENHA_DOS_TESTES } from './ajuda/ambiente';
-import { expect, semRolagemLateral, teste } from './ajuda/teste';
+import { expect, notificacao, semRolagemLateral, teste } from './ajuda/teste';
 
 const TAREFAS_DE_EXEMPLO = ['Varrer o salão', 'Limpar os banheiros', 'Passar pano nos bancos', 'Tirar o lixo'];
 
 /** Hoje em São Paulo, no formato AAAA-MM-DD (igual ao servidor, D1). */
 const hoje = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
 
-const notificacao = (pagina: Page, texto: string | RegExp) => pagina.locator('.toast').filter({ hasText: texto });
 const cartaoDaSexta = (pagina: Page, data: string) =>
   pagina.locator('app-cartao').filter({ has: pagina.getByRole('heading', { name: dataPorExtenso(data) }) });
 

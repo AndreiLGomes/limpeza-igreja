@@ -11,6 +11,8 @@
     "node": "^22.22.3 || >=24.15.0"
   },
   "scripts": {
-    "test": "npm test --workspaces --if-present"
+    "desenvolver": "node comandos/desenvolver.mjs",
+    "test": "npm test --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present"
   }
 }

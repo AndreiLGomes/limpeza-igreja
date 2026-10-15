@@ -4,7 +4,7 @@
  * - nenhuma rolagem lateral (largura da página ≤ 375).
  * Antes de cada teste, o banco de teste volta aos dados de exemplo.
  */
-import { expect, test as base, type Page } from '@playwright/test';
+import { expect, test as base, type Locator, type Page } from '@playwright/test';
 import { reiniciarDados } from './ambiente';
 
 /**
@@ -34,6 +34,11 @@ teste.beforeEach(() => reiniciarDados());
 export async function semRolagemLateral(pagina: Page): Promise<void> {
   const largura = await pagina.evaluate(() => document.documentElement.scrollWidth);
   expect(largura, 'largura da página (rolagem lateral)').toBeLessThanOrEqual(375);
+}
+
+/** A notificação com este texto (pode haver mais de uma na tela ao mesmo tempo, até 3). */
+export function notificacao(pagina: Page, texto: string | RegExp): Locator {
+  return pagina.locator('.toast').filter({ hasText: texto });
 }
 
 export { expect };

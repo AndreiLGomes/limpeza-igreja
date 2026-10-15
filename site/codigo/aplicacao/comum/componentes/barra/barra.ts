@@ -1,7 +1,8 @@
 /**
  * <app-barra>: barra superior azul com o nome do app (logo) e as abas (AppBar do Design System).
  * A aba atual ganha aria-current="page" sozinha (routerLinkActive). Na área do organizador,
- * aparece a etiqueta "Organizador" ao lado do nome.
+ * aparece a etiqueta "Organizador" ao lado do nome. Como no Design System, o nome é só texto (não é
+ * link): a primeira aba já leva ao início, e assim não sobra um alvo de toque menor que 44px.
  */
 import { Component, input } from '@angular/core';
 import { RouterLink, RouterLinkActive, type IsActiveMatchOptions } from '@angular/router';
@@ -18,12 +19,12 @@ export interface AbaDaBarra {
   imports: [Icone, RouterLink, RouterLinkActive],
   template: `
     <header class="appbar">
-      <a class="appbar__title wordmark wordmark--on-header" [routerLink]="inicio()">
+      <span class="appbar__title wordmark wordmark--on-header">
         {{ nome }}
         @if (etiqueta()) {
           <span class="appbar__tag"><app-icone nome="lock" [tamanho]="12" /> {{ etiqueta() }}</span>
         }
-      </a>
+      </span>
       <nav class="appbar__nav" [attr.aria-label]="etiqueta() ? 'Organização' : 'Principal'">
         @for (aba of abas(); track aba.rota) {
           <a
@@ -43,15 +44,10 @@ export interface AbaDaBarra {
     :host {
       display: block;
     }
-    .appbar__title {
-      text-decoration: none;
-    }
   `,
 })
 export class Barra {
   readonly abas = input.required<AbaDaBarra[]>();
-  /** Para onde o nome do app leva. */
-  readonly inicio = input('/');
   /** Etiqueta ao lado do nome, ex.: "Organizador". */
   readonly etiqueta = input<string>();
 
