@@ -1,0 +1,25 @@
+/** Componentes do Design System. Importe sempre de '@ui'. */
+export * from './alert/alert';
+export * from './app-bar/app-bar';
+export * from './avatar/avatar';
+export * from './button/button';
+export * from './campo-de-formulario';
+export * from './card/card';
+export * from './checklist-item/checklist-item';
+export * from './choice-group/choice-group';
+export * from './dialog/dialog';
+export * from './empty-state/empty-state';
+export * from './field/field';
+export * from './field/input';
+export * from './footer/footer';
+export * from './form/form';
+export * from './icon/icon';
+export type { IconName } from './icon/icons.generated';
+export * from './person-list/person-list';
+export * from './select/select';
+export * from './spinner/spinner';
+export * from './status-badge/status-badge';
+export * from './stepper/stepper';
+export * from './task-editor/task-editor';
+export * from './toast/toast';
+export * from './wordmark/wordmark';

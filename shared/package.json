@@ -4,6 +4,7 @@
   "private": true,
   "description": "Código puro usado pelo front-end e pelo back-end: tipos, esquemas, mensagens e regras.",
   "type": "module",
+  "sideEffects": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
