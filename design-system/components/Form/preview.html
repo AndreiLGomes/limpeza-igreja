@@ -1,0 +1,52 @@
+<!-- @dsCard group="Formulários" height=760 subtitle="Formulário completo: confirmar presença na limpeza" -->
+<div class="ds-root" style="padding:24px">
+  <form class="form" onsubmit="return false" novalidate>
+    <div class="form__head">
+      <h2 class="form__title">Confirmar presença</h2>
+      <p class="form__desc">Escolha a sexta e conte como pode ajudar. Campos com <span class="form__required">*</span> são obrigatórios.</p>
+    </div>
+
+    <div class="alert alert--error" role="alert">
+      <div><span class="alert__title">Falta 1 informação.</span> Confira o telefone abaixo.</div>
+    </div>
+
+    <div class="form__row">
+      <label class="field">
+        <span class="field__label">Seu nome <span class="form__required">*</span></span>
+        <input class="field__input" value="Andrei Gomes">
+      </label>
+      <label class="field field--error">
+        <span class="field__label">Telefone <span class="form__required">*</span></span>
+        <input class="field__input" value="47 9999" aria-invalid="true">
+        <span class="field__hint">Digite com DDD, ex.: 47 99999-9999.</span>
+      </label>
+    </div>
+
+    <label class="field">
+      <span class="field__label">Qual sexta? <span class="form__required">*</span></span>
+      <span class="select">
+        <select class="field__input">
+          <option>Sexta, 16 de outubro</option>
+          <option>Sexta, 23 de outubro</option>
+          <option>Sexta, 30 de outubro</option>
+        </select>
+      </span>
+    </label>
+
+    <fieldset class="choices choices--row">
+      <legend class="choices__legend">Quanto tempo você pode ficar?</legend>
+      <label class="choice"><input type="radio" name="tempo" checked> O tempo todo</label>
+      <label class="choice"><input type="radio" name="tempo"> Só a primeira hora</label>
+    </fieldset>
+
+    <label class="field">
+      <span class="field__label">Observação</span>
+      <textarea class="field__input" placeholder="Ex.: vou levar o rodo novo"></textarea>
+    </label>
+
+    <div class="form__actions">
+      <button type="button" class="btn btn--ghost">Cancelar</button>
+      <button type="submit" class="btn btn--primary">Confirmar presença</button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,16 @@
+{
+  "name": "limpeza-igreja",
+  "private": true,
+  "description": "App para organizar a limpeza da igreja às sextas-feiras.",
+  "workspaces": [
+    "shared",
+    "backend",
+    "frontend"
+  ],
+  "engines": {
+    "node": "^22.22.3 || >=24.15.0"
+  },
+  "scripts": {
+    "test": "npm test --workspaces --if-present"
+  }
+}

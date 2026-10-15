@@ -1,0 +1,16 @@
+<!-- @dsCard group="Telas" page width=375 height=640 subtitle="Cancelar presença sem login: confirma pelo telefone" -->
+<div class="ds-root" style="background:var(--surface-alt);min-height:100%;position:relative">
+<header class="appbar"><span class="appbar__title wordmark wordmark--on-header">Escala de Limpeza</span><nav class="appbar__nav" aria-label="Principal"><a class="appbar__link" href="#">Esta semana</a><a class="appbar__link" href="#">Escala</a><a class="appbar__link" href="#">Tarefas</a></nav></header>
+<main style="padding:24px 16px;display:flex;flex-direction:column;gap:24px;opacity:.35" aria-hidden="true">
+  <h1 class="display" style="margin:0">Limpeza de sexta-feira</h1>
+  <div class="card"><h3 class="card__title">Sexta, 16 de outubro</h3><p class="card__meta">19h às 21h</p></div>
+</main>
+<div style="position:absolute;inset:0;background:var(--scrim);display:flex;align-items:center;padding:16px">
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="ct" style="margin:0 auto">
+    <h2 class="dialog__title" id="ct">Cancelar sua presença?</h2>
+    <p class="dialog__text">Para confirmar que é você, digite o telefone que usou ao confirmar presença na sexta, 16 de outubro.</p>
+    <label class="field"><span class="field__label">Seu telefone</span><input class="field__input" type="tel" placeholder="Ex.: 47 99999-9999" autocomplete="tel"></label>
+    <div class="dialog__actions"><button class="btn btn--secondary">Manter presença</button><button class="btn btn--danger">Cancelar presença</button></div>
+  </div>
+</div>
+</div>

@@ -1,0 +1,18 @@
+<!-- @dsCard group="Telas" page width=375 height=1180 subtitle="Formulário no celular, depois de tentar enviar com erro" -->
+<div class="ds-root" style="background:var(--surface-alt);min-height:100%">
+<header class="appbar"><span class="appbar__title wordmark wordmark--on-header">Escala de Limpeza</span><nav class="appbar__nav" aria-label="Principal"><a class="appbar__link" href="#">Esta semana</a><a class="appbar__link" href="#">Escala</a><a class="appbar__link" href="#">Tarefas</a></nav></header>
+<main style="padding:24px 16px 48px">
+  <form class="form card" onsubmit="return false" novalidate style="padding:24px 16px">
+    <div class="form__head"><h2 class="form__title">Confirmar presença</h2><p class="form__desc">Escolha a sexta e conte como pode ajudar. Campos com <span class="form__required">*</span> são obrigatórios.</p></div>
+    <div class="alert alert--error" role="alert"><div><span class="alert__title">Falta 1 informação.</span> Confira os campos marcados abaixo.</div></div>
+    <div class="form__row">
+      <label class="field"><span class="field__label">Seu nome <span class="form__required">*</span></span><input class="field__input" value="Andrei Gomes"></label>
+      <label class="field field--error"><span class="field__label">Telefone <span class="form__required">*</span></span><input class="field__input" value="47 9999" aria-invalid="true"><span class="field__hint">Digite o número com DDD, ex.: 47 99999-9999.</span></label>
+    </div>
+    <label class="field"><span class="field__label">Qual sexta? <span class="form__required">*</span></span><span class="select"><select class="field__input"><option>Sexta, 16 de outubro</option></select></span></label>
+    <fieldset class="choices"><legend class="choices__legend">Quanto tempo você pode ficar?</legend><label class="choice"><input type="radio" name="t" checked> O tempo todo</label><label class="choice"><input type="radio" name="t"> Só a primeira hora</label></fieldset>
+    <label class="field"><span class="field__label">Observação</span><textarea class="field__input" placeholder="Ex.: vou levar o rodo novo"></textarea></label>
+    <div class="form__actions"><button type="button" class="btn btn--ghost">Cancelar</button><button type="submit" class="btn btn--primary">Confirmar presença</button></div>
+  </form>
+</main>
+</div>

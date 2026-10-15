@@ -1,0 +1,17 @@
+<!-- @dsCard group="Formulários" height=300 subtitle="Campo de texto, com dica e com erro" -->
+<div class="ds-root" style="padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px">
+  <label class="field">
+    <span class="field__label">Seu nome</span>
+    <input class="field__input" placeholder="Ex.: Andrei Gomes">
+    <span class="field__hint">Aparece para quem vê a escala.</span>
+  </label>
+  <label class="field field--error">
+    <span class="field__label">Telefone</span>
+    <input class="field__input" value="47 9999" aria-invalid="true">
+    <span class="field__hint">Digite o número com DDD, ex.: 47 99999-9999.</span>
+  </label>
+  <label class="field" style="grid-column:1/-1">
+    <span class="field__label">Observação</span>
+    <textarea class="field__input" placeholder="Ex.: vou chegar às 19h30"></textarea>
+  </label>
+</div>

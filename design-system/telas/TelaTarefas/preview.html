@@ -1,0 +1,17 @@
+<!-- @dsCard group="Telas" page width=375 height=720 subtitle="Lista de tarefas, logo depois de marcar uma como feita" -->
+<div class="ds-root" style="background:var(--surface-alt);min-height:100%;position:relative">
+<header class="appbar"><span class="appbar__title wordmark wordmark--on-header">Escala de Limpeza</span><nav class="appbar__nav" aria-label="Principal"><a class="appbar__link" href="#">Esta semana</a><a class="appbar__link" href="#">Escala</a><a class="appbar__link" href="#" aria-current="page">Tarefas</a></nav></header>
+<main style="padding:24px 16px 96px;display:flex;flex-direction:column;gap:24px">
+  <h1 class="title" style="margin:0">Tarefas</h1>
+  <article class="card">
+    <div class="card__head"><div><h3 class="card__title">Sexta, 16 de outubro</h3><p class="card__meta">1 de 4 feitas</p></div><span class="status status--pending">Em andamento</span></div>
+    <div style="margin:0 -16px">
+      <label class="check"><input type="checkbox" checked><span class="check__text"><span class="check__task">Varrer o salão</span></span></label>
+      <label class="check"><input type="checkbox"><span class="check__text"><span class="check__task">Limpar os banheiros</span></span></label>
+      <label class="check"><input type="checkbox"><span class="check__text"><span class="check__task">Passar pano nos bancos</span></span></label>
+      <label class="check" style="border-bottom:0"><input type="checkbox"><span class="check__text"><span class="check__task">Tirar o lixo</span></span></label>
+    </div>
+  </article>
+</main>
+<div style="position:absolute;left:16px;right:16px;bottom:16px;display:flex;justify-content:center"><div class="toast" role="status"><span class="toast__text">Tarefa marcada como feita.</span><button class="btn btn--ghost">Desfazer</button></div></div>
+</div>

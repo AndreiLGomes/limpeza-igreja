@@ -1,0 +1,13 @@
+<!-- @dsCard group="Telas" page width=375 height=900 subtitle="A tela Escala carregando, vazia e com erro de conexão" -->
+<div class="ds-root" style="background:var(--surface-alt);min-height:100%">
+<header class="appbar"><span class="appbar__title wordmark wordmark--on-header">Escala de Limpeza</span><nav class="appbar__nav" aria-label="Principal"><a class="appbar__link" href="#">Esta semana</a><a class="appbar__link" href="#" aria-current="page">Escala</a><a class="appbar__link" href="#">Tarefas</a></nav></header>
+<main style="padding:24px 16px 48px;display:flex;flex-direction:column;gap:24px">
+  <p class="label" style="margin:0;color:var(--ink)">1. Carregando</p>
+  <article class="card" aria-hidden="true"><span class="skeleton" style="width:60%;height:22px"></span><span class="skeleton" style="width:80%"></span><span class="skeleton" style="width:40%;height:40px"></span></article>
+  <p class="label" style="margin:0;color:var(--ink)">2. Nenhuma sexta cadastrada</p>
+  <div class="card"><div class="empty" style="padding:16px 0"><span class="empty__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg></span><h3 class="empty__title">Nenhuma sexta marcada</h3><p class="empty__text">Quando quem organiza cadastrar as próximas limpezas, elas aparecem aqui.</p><button class="btn btn--secondary">Atualizar</button></div></div>
+  <p class="label" style="margin:0;color:var(--ink)">3. Sem conexão</p>
+  <div class="alert alert--error" role="alert"><div><span class="alert__title">Não foi possível carregar a escala.</span> Confira sua internet e tente de novo.</div></div>
+  <button class="btn btn--secondary btn--block">Tentar de novo</button>
+</main>
+</div>

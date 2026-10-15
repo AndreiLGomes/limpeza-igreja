@@ -1,0 +1,13 @@
+# Dependências e builds
+node_modules/
+dist/
+.angular/
+
+# Segredos e logs
+.env
+*.log
+
+# Planejamento e trabalho interno (regra do Andrei: não vão para o GitHub)
+docs/
+.claude/
+.superpowers/

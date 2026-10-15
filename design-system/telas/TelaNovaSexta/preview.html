@@ -1,0 +1,25 @@
+<!-- @dsCard group="Telas" page width=375 height=1160 subtitle="Criar ou editar uma sexta: data, horário, vagas e tarefas" -->
+<div class="ds-root" style="background:var(--surface-alt);min-height:100%;position:relative">
+<header class="appbar"><span class="appbar__title wordmark wordmark--on-header">Escala de Limpeza <span class="appbar__tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Organizador</span></span><nav class="appbar__nav" aria-label="Organização"><a class="appbar__link" href="#" aria-current="page">Sextas</a><a class="appbar__link" href="#">Ver como todos</a><a class="appbar__link" href="#">Sair</a></nav></header>
+<main style="padding:24px 16px 48px">
+  <form class="form card" onsubmit="return false" style="padding:24px 16px">
+    <div class="form__head"><h2 class="form__title">Nova sexta</h2><p class="form__desc">Depois de salvar, ela aparece para todo mundo na escala.</p></div>
+    <label class="field"><span class="field__label">Data <span class="form__required">*</span></span><input class="field__input" type="date" value="2026-10-30"></label>
+    <div class="form__row">
+      <label class="field"><span class="field__label">Começa às</span><input class="field__input" type="time" value="19:00"></label>
+      <label class="field"><span class="field__label">Termina às</span><input class="field__input" type="time" value="21:00"></label>
+    </div>
+    <div class="field"><label class="field__label" for="v">Vagas <span class="form__required">*</span></label><div class="stepper"><button class="btn btn--ghost btn--icon" type="button" aria-label="Menos uma vaga"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/></svg></button><input class="stepper__value" id="v" type="number" value="5"><button class="btn btn--ghost btn--icon" type="button" aria-label="Mais uma vaga"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button></div></div>
+    <fieldset class="choices" style="gap:8px">
+      <legend class="choices__legend">Tarefas</legend>
+      <div class="editlist">
+        <div class="editlist__row"><input class="field__input" value="Varrer o salão" aria-label="Tarefa 1"><button class="btn btn--danger-ghost btn--icon" type="button" aria-label="Remover tarefa 1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>
+        <div class="editlist__row"><input class="field__input" value="Limpar os banheiros" aria-label="Tarefa 2"><button class="btn btn--danger-ghost btn--icon" type="button" aria-label="Remover tarefa 2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>
+        <div class="editlist__row"><input class="field__input" value="Passar pano nos bancos" aria-label="Tarefa 3"><button class="btn btn--danger-ghost btn--icon" type="button" aria-label="Remover tarefa 3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>
+        <button class="btn btn--secondary editlist__add" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg> Adicionar tarefa</button>
+      </div>
+    </fieldset>
+    <div class="form__actions"><button type="button" class="btn btn--ghost">Cancelar</button><button type="submit" class="btn btn--primary">Salvar sexta</button></div>
+  </form>
+</main>
+</div>
