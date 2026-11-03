@@ -14,6 +14,10 @@ export const TELEFONE_MAX_DIGITOS = 11;
 /** Observação opcional da confirmação. */
 export const OBSERVACAO_MAX = 200;
 
+/** L4: nº de adesão e código da função, só números. */
+export const ADESAO_MAX_DIGITOS = 6;
+export const CODIGO_FUNCAO_MAX_DIGITOS = 6;
+
 /** S4: vagas de uma limpeza. */
 export const VAGAS_MIN = 1;
 export const VAGAS_MAX = 30;

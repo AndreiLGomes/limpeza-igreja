@@ -9,7 +9,7 @@ import { Component, computed, inject, input, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
-  dataNaFrase, dataPorExtenso, esquemaCancelarPorTelefone, horario, statusDoDia, vagasLivres, type DiaPublico,
+  dataNaFrase, dataPorExtenso, esquemaTelefone, hoje, horario, statusDoDia, vagasLivres, type DiaPublico,
 } from '@limpeza/compartilhado';
 import {
   Botao, Campo, Cartao, ConteudoDoBotao, Entrada, Etiqueta, GrupoDeAvatares, Icone, Janela,
@@ -36,12 +36,17 @@ let proximoFormulario = 0;
         <p class="cartao-do-dia__eu-vou"><app-icone nome="calendar-check" /> Você vai nesta limpeza</p>
       }
       <div acoesDoCartao>
+        @if (ehHoje()) {
+          <a appBotao routerLink="/presenca" [queryParams]="{ dia: dia().id }">Marcar presença</a>
+        }
         @if (euVou()) {
           <button appBotao variante="perigo-discreto" type="button" (click)="janelaDaMinha.set(true)">
             Cancelar minha presença
           </button>
         } @else if (temVaga()) {
-          <a appBotao routerLink="/confirmar" [queryParams]="{ dia: dia().id }">Confirmar presença</a>
+          <a appBotao [variante]="ehHoje() ? 'secundario' : 'primario'" routerLink="/confirmar" [queryParams]="{ dia: dia().id }">
+            Confirmar presença
+          </a>
         }
         <a appBotao variante="discreto" routerLink="/tarefas" [queryParams]="{ dia: dia().id }">Ver tarefas</a>
         @if (dia().pessoas.length > 0) {
@@ -127,6 +132,8 @@ export class CartaoDoDia {
   protected readonly nomes = computed(() => this.dia().pessoas.map((pessoa) => pessoa.nome));
   protected readonly euVou = computed(() => this.minhasConfirmacoes.confirmouEm(this.dia()));
   protected readonly temVaga = computed(() => vagasLivres(this.dia()) > 0);
+  /** L1: no dia da limpeza, o cartão oferece "Marcar presença" como ação principal. */
+  protected readonly ehHoje = computed(() => this.dia().data === hoje());
 
   protected readonly janelaDaMinha = signal(false);
   protected readonly janelaDoTelefone = signal(false);
@@ -136,7 +143,7 @@ export class CartaoDoDia {
   protected readonly formulario = new FormGroup({
     telefone: new FormControl('', {
       nonNullable: true,
-      validators: validadorZod(esquemaCancelarPorTelefone.shape.telefone),
+      validators: validadorZod(esquemaTelefone.shape.telefone),
     }),
   });
 

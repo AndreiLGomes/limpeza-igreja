@@ -6,6 +6,10 @@ describe('rotas (docs/04-api.md)', () => {
     expect(ROTAS.confirmar('abc')).toBe('/dias/abc/confirmacoes');
     expect(ROTAS.tarefa('d1', 't1')).toBe('/dias/d1/tarefas/t1');
     expect(ROTAS.organizador.pessoa('d1', 'p1')).toBe('/organizador/dias/d1/pessoas/p1');
+    expect(ROTAS.presenca.entrada('d1')).toBe('/dias/d1/presenca/entrada');
+    expect(ROTAS.organizador.presenca('d1', 'p1')).toBe('/organizador/dias/d1/pessoas/p1/presenca');
+    expect(ROTAS.organizador.encerrar('d1')).toBe('/organizador/dias/d1/encerrar');
+    expect(ROTAS.organizador.presencaNova('d1')).toBe('/organizador/dias/d1/presenca');
   });
 
   it('servem para o Express quando recebem o nome do parâmetro', () => {

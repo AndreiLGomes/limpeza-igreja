@@ -7,7 +7,7 @@
  */
 import type { RequestHandler } from 'express';
 import type { z } from 'zod';
-import { errosPorCampo, type CodigoDeErro } from '@limpeza/compartilhado';
+import { errosPorCampo, esquemaParametrosDia, type CodigoDeErro } from '@limpeza/compartilhado';
 import { ErroDeRegra } from '../comum/erros.js';
 
 interface Esquemas {
@@ -16,6 +16,9 @@ interface Esquemas {
   /** Código do 404 quando um id do endereço não é válido. */
   naoEncontrado?: CodigoDeErro;
 }
+
+/** Parâmetro `:id` de uma limpeza; id que não é UUID responde 404 DIA_NAO_ENCONTRADO. */
+export const DIA_VALIDO = { parametros: esquemaParametrosDia, naoEncontrado: 'DIA_NAO_ENCONTRADO' } as const;
 
 export function validar({ corpo, parametros, naoEncontrado = 'ROTA_NAO_ENCONTRADA' }: Esquemas): RequestHandler {
   return (requisicao, _resposta, proximo) => {

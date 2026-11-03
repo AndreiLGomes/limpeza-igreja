@@ -1,11 +1,11 @@
 /**
- * LGPD (P1, P2, P4).
- * - Nenhuma resposta pública devolve telefone nem observação, INCLUSIVE as de erro.
+ * LGPD (P1, P2, P4, L12).
+ * - Nenhuma resposta pública devolve telefone, observação, adesão, código nem EPI, INCLUSIVE as de erro.
  * - O log do servidor não guarda nome, telefone nem código de cancelamento.
  */
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ROTAS } from '@limpeza/compartilhado';
+import { hoje, ROTAS } from '@limpeza/compartilhado';
 import { criarRegistro } from '../codigo/http/registro.js';
 import { criarAplicacaoDeTeste } from './ajuda/aplicacao.js';
 import { limparBanco } from './ajuda/banco.js';
@@ -15,13 +15,16 @@ const TELEFONE = '47999991234';
 const TELEFONE_FORMATADO = '47 99999-1234';
 const OBSERVACAO = 'moro na rua das flores 123';
 
+/** Nunca saem pela parte pública (P1, P2, L12). */
+const CHAVES_PROIBIDAS = ['telefone', 'observacao', 'numeroAdesao', 'codigoFuncao', 'recebeuEpi'];
+
 /** Procura chaves proibidas em qualquer nível, menos dentro de `campos` (nomes de campo com erro). */
 function chavesProibidas(valor: unknown, caminho = 'resposta'): string[] {
   if (Array.isArray(valor)) return valor.flatMap((item, i) => chavesProibidas(item, `${caminho}[${i}]`));
   if (typeof valor !== 'object' || valor === null) return [];
   return Object.entries(valor).flatMap(([chave, filho]) => {
     if (chave === 'campos') return [];
-    const aqui = ['telefone', 'observacao'].includes(chave) ? [`${caminho}.${chave}`] : [];
+    const aqui = CHAVES_PROIBIDAS.includes(chave) ? [`${caminho}.${chave}`] : [];
     return [...aqui, ...chavesProibidas(filho, `${caminho}.${chave}`)];
   });
 }
@@ -37,12 +40,22 @@ describe('P1, P2: nenhum endereço público devolve telefone nem observação', 
     const tarefa = await criarTarefa(dia);
     await criarConfirmacao(dia, { telefone: TELEFONE, observacao: OBSERVACAO });
     await criarConfirmacao(diaCheio, { telefone: TELEFONE, observacao: OBSERVACAO });
-    const outraPessoa = await criarConfirmacao(dia, { telefone: '47900000009' });
+    const OUTRO_TELEFONE = '47900000009';
+    await criarConfirmacao(dia, { telefone: OUTRO_TELEFONE });
+    const diaDeHoje = await criarDia({ data: hoje() });
+    await criarConfirmacao(diaDeHoje, { telefone: TELEFONE, observacao: OBSERVACAO });
 
     const confirmar = (id: string, telefone: string) =>
       request(aplicacao).post(`/api/dias/${id}/confirmacoes`).send({ nome: 'Ana Souza', telefone, observacao: OBSERVACAO });
     const porTelefone = (id: string, telefone: string) =>
       request(aplicacao).post(`/api/dias/${id}/confirmacoes/cancelar-por-telefone`).send({ telefone });
+    const presenca = { numeroAdesao: '08', codigoFuncao: '222', recebeuEpi: true };
+    const consultar = (id: string, telefone: string) =>
+      request(aplicacao).post(`/api/dias/${id}/presenca/consultar`).send({ telefone });
+    const chegar = (id: string, telefone: string) =>
+      request(aplicacao).post(`/api/dias/${id}/presenca/entrada`).send({ telefone, ...presenca });
+    const sair = (id: string, telefone: string) =>
+      request(aplicacao).post(`/api/dias/${id}/presenca/saida`).send({ telefone });
     const marcar = (tarefaId: string, corpo: object) =>
       request(aplicacao).patch(`/api/dias/${dia.id}/tarefas/${tarefaId}`).send(corpo);
 
@@ -62,10 +75,16 @@ describe('P1, P2: nenhum endereço público devolve telefone nem observação', 
       [ROTAS.cancelarPorTelefone(':id'), 400, () => porTelefone(dia.id, '123')],
       [ROTAS.cancelarPorTelefone(':id'), 404, () => porTelefone(dia.id, '47988887777')],
       [ROTAS.cancelarPorTelefone(':id'), 409, () => porTelefone(diaPassado.id, TELEFONE)],
-      [ROTAS.cancelarPorTelefone(':id'), 204, () => porTelefone(dia.id, outraPessoa.telefone)],
+      [ROTAS.cancelarPorTelefone(':id'), 204, () => porTelefone(dia.id, OUTRO_TELEFONE)],
       [ROTAS.tarefa(':id', ':tarefaId'), 200, () => marcar(tarefa.id, { feita: true })],
       [ROTAS.tarefa(':id', ':tarefaId'), 400, () => marcar(tarefa.id, { feita: 'sim' })],
       [ROTAS.tarefa(':id', ':tarefaId'), 404, () => marcar(ID_QUE_NAO_EXISTE, { feita: true })],
+      [ROTAS.presenca.consultar(':id'), 200, () => consultar(diaDeHoje.id, TELEFONE)],
+      [ROTAS.presenca.entrada(':id'), 400, () => chegar(diaDeHoje.id, '123')],
+      [ROTAS.presenca.entrada(':id'), 409, () => chegar(dia.id, TELEFONE)], // não é hoje
+      [ROTAS.presenca.entrada(':id'), 200, () => chegar(diaDeHoje.id, TELEFONE)],
+      [ROTAS.presenca.saida(':id'), 404, () => sair(diaDeHoje.id, '47988887777')],
+      [ROTAS.presenca.saida(':id'), 200, () => sair(diaDeHoje.id, TELEFONE)],
       ['/nao-existe', 404, () => request(aplicacao).get('/api/nao-existe')],
       // Por último: a escala depois de tudo, com as pessoas novas.
       [ROTAS.dias, 200, () => request(aplicacao).get('/api/dias')],
@@ -84,10 +103,23 @@ describe('P1, P2: nenhum endereço público devolve telefone nem observação', 
     // Todos os endereços públicos do docs/04 foram visitados.
     const publicos = [
       ROTAS.saude, ROTAS.dias, ROTAS.dia(':id'), ROTAS.confirmar(':id'), ROTAS.cancelarPorCodigo,
-      ROTAS.cancelarPorTelefone(':id'), ROTAS.tarefa(':id', ':tarefaId'),
+      ROTAS.cancelarPorTelefone(':id'), ROTAS.tarefa(':id', ':tarefaId'), ROTAS.presenca.consultar(':id'),
+      ROTAS.presenca.entrada(':id'), ROTAS.presenca.saida(':id'),
     ];
     const visitados = new Set(casos.map(([endereco]) => endereco));
     expect(publicos.filter((endereco) => !visitados.has(endereco))).toEqual([]);
+  });
+});
+
+describe('L12: a escala pública não traz nada da lista de presença', () => {
+  it('nem adesão, código, EPI, nem horários', async () => {
+    const aplicacao = criarAplicacaoDeTeste();
+    const dia = await criarDia({ data: hoje() });
+    await criarConfirmacao(dia, { numeroAdesao: '08', codigoFuncao: '222', recebeuEpi: true, entrada: '19:30' });
+    const texto = JSON.stringify((await request(aplicacao).get('/api/dias')).body);
+    for (const campo of ['numeroAdesao', 'codigoFuncao', 'recebeuEpi', 'entrada', 'saida', 'assinadoEm']) {
+      expect(texto).not.toContain(campo);
+    }
   });
 });
 

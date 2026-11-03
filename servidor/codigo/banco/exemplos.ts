@@ -2,7 +2,7 @@
  * Os dados de exemplo, num lugar só: usados pelo comando "dados-de-exemplo" e pelos testes de ponta a ponta.
  * Os telefones são fictícios (4790000000X), nunca números reais.
  */
-import { proximoDiaDaSemana, type DiaDaSemana, type Tempo } from '@limpeza/compartilhado';
+import { proximoDiaDaSemana, somarDias, type DiaDaSemana, type Tempo } from '@limpeza/compartilhado';
 
 /** O dia da semana das limpezas de exemplo (hoje, a limpeza da igreja é na quinta). */
 export const DIA_DOS_EXEMPLOS: DiaDaSemana = 'Quinta';
@@ -28,7 +28,10 @@ export const PESSOAS_POR_LIMPEZA: PessoaDeExemplo[][] = [
   [{ nome: 'Paulo Souza', telefone: '47900000004', tempo: 'todo' }],
 ];
 
-/** A data da primeira limpeza de exemplo: a próxima quinta a partir de hoje (a própria data, se for quinta). */
+/**
+ * A data da primeira limpeza de exemplo: a próxima quinta DEPOIS de hoje (nunca hoje), para os testes de ponta
+ * a ponta poderem criar a "limpeza de hoje" sem esbarrar na data repetida (S2).
+ */
 export function primeiraLimpezaDeExemplo(hojeEmSaoPaulo: string): string {
-  return proximoDiaDaSemana(hojeEmSaoPaulo, DIA_DOS_EXEMPLOS);
+  return proximoDiaDaSemana(somarDias(hojeEmSaoPaulo, 1), DIA_DOS_EXEMPLOS);
 }

@@ -12,7 +12,7 @@ import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular
 import { Router, RouterLink } from '@angular/router';
 import {
   dataNaFrase, dataPorExtenso, errosPorCampo, esquemaDia, FIM_PADRAO, INICIO_PADRAO,
-  mensagemDoErro, VAGAS_MAX, VAGAS_MIN, VAGAS_PADRAO, type EntradaDia,
+  mensagemDoErro, VAGAS_MAX, VAGAS_MIN, VAGAS_PADRAO, type DiaCompleto, type EntradaDia,
 } from '@limpeza/compartilhado';
 import {
   AcoesDoFormulario, Aviso, Botao, CabecalhoDoFormulario, Campo, ConteudoDoBotao, Contador, EditorDeTarefas, Entrada,
@@ -23,12 +23,13 @@ import { FalhaNaApi } from '@nucleo/api';
 import { ehSemConexao, mensagemDaFalha, notificarFalha } from '@nucleo/falhas';
 import { Limpezas } from '@nucleo/limpezas';
 import { Estado, type EstadoDaCarga } from '../../../comum/estado/estado';
+import { ListaDePresenca } from './lista-de-presenca';
 
 @Component({
   selector: 'app-tela-limpeza',
   imports: [
     AcoesDoFormulario, Aviso, Botao, CabecalhoDoFormulario, Campo, ConteudoDoBotao, Contador, EditorDeTarefas, Entrada,
-    Estado, Formulario, Icone, Janela, LinhaDoFormulario, ReactiveFormsModule, RouterLink,
+    Estado, Formulario, Icone, Janela, LinhaDoFormulario, ListaDePresenca, ReactiveFormsModule, RouterLink,
   ],
   template: `
     <div class="pagina">
@@ -77,6 +78,10 @@ import { Estado, type EstadoDaCarga } from '../../../comum/estado/estado';
             </button>
           </div>
         </form>
+
+        @if (dia(); as limpeza) {
+          <app-lista-de-presenca [dia]="limpeza" (mudou)="trocarDia($event)" />
+        }
 
         @if (editando()) {
           <div class="apagar">
@@ -130,6 +135,8 @@ export class TelaLimpeza implements OnInit {
   protected readonly aviso = signal<AvisoDoFormulario | null>(null);
   protected readonly salvando = signal(false);
   protected readonly janelaDeApagar = signal(false);
+  /** A limpeza carregada (só na edição), para a lista de presença. */
+  protected readonly dia = signal<DiaCompleto | null>(null);
 
   /** Data original e confirmados da limpeza que está sendo editada. */
   private readonly original = signal<{ data: string; confirmados: number } | null>(null);
@@ -177,6 +184,7 @@ export class TelaLimpeza implements OnInit {
       const id = this.id();
       if (id) {
         const dia = await this.limpezas.buscar(id);
+        this.dia.set(dia);
         this.formulario.patchValue({ data: dia.data, inicio: dia.inicio, fim: dia.fim, vagas: dia.vagas });
         this.trocarTarefas(dia.tarefas.map((tarefa) => linhaDeTarefa(tarefa.nome, tarefa.id)));
         this.original.set({ data: dia.data, confirmados: dia.pessoas.length });
@@ -190,6 +198,10 @@ export class TelaLimpeza implements OnInit {
       this.erro.set(mensagemDaFalha(erro));
       this.estado.set('erro');
     }
+  }
+
+  protected trocarDia(novo: DiaCompleto): void {
+    this.dia.set(novo);
   }
 
   private trocarTarefas(linhas: LinhaDeTarefa[]): void {

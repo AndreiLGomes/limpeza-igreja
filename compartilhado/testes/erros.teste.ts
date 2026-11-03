@@ -16,6 +16,12 @@ const CODIGOS_DA_API = {
   DATA_REPETIDA: 409,
   VAGAS_MENOR_QUE_CONFIRMADOS: 409,
   MUITAS_TENTATIVAS: 429,
+  NOME_OBRIGATORIO: 400,
+  NAO_E_HOJE: 409,
+  JA_ASSINOU: 409,
+  SEM_ENTRADA: 409,
+  PRESENCA_MARCADA: 409,
+  HORARIO_INVALIDO: 409,
   ERRO_INTERNO: 500,
 } as const;
 
@@ -52,6 +58,17 @@ describe('catálogo de erros', () => {
   it('S8: a mensagem diz quantos já confirmaram', () => {
     expect(mensagemDoErro('VAGAS_MENOR_QUE_CONFIRMADOS', { confirmados: 4 })).toContain('4 pessoas');
     expect(mensagemDoErro('VAGAS_MENOR_QUE_CONFIRMADOS', { confirmados: 1 })).toContain('1 pessoa confirmou');
+  });
+
+  it('L13: a mensagem diz quem chegou depois da hora escolhida', () => {
+    expect(mensagemDoErro('HORARIO_INVALIDO', { pessoas: [{ nome: 'Matheus', entrada: '20:50' }] })).toBe(
+      'Matheus chegou às 20:50, depois dessa hora.',
+    );
+    expect(
+      mensagemDoErro('HORARIO_INVALIDO', {
+        pessoas: [{ nome: 'Matheus', entrada: '20:50' }, { nome: 'Célia', entrada: '20:55' }],
+      }),
+    ).toBe('Matheus (20:50) e Célia (20:55) chegaram depois dessa hora.');
   });
 
   it('recusa código que não existe', () => {

@@ -8,7 +8,7 @@ import {
   boolean, check, date, index, pgTable, smallint, time, timestamp, unique, uuid, varchar,
 } from 'drizzle-orm/pg-core';
 import {
-  NOME_MAX, NOME_MIN, OBSERVACAO_MAX, TAREFA_NOME_MAX, TAREFA_NOME_MIN, TELEFONE_MAX_DIGITOS,
+  ADESAO_MAX_DIGITOS, CODIGO_FUNCAO_MAX_DIGITOS, NOME_MAX, NOME_MIN, OBSERVACAO_MAX, TAREFA_NOME_MAX, TAREFA_NOME_MIN, TELEFONE_MAX_DIGITOS,
   TELEFONE_MIN_DIGITOS, TEMPOS, VAGAS_MAX, VAGAS_MIN,
 } from '@limpeza/compartilhado';
 
@@ -58,11 +58,20 @@ export const confirmacoes = pgTable(
       .notNull()
       .references(() => dias.id, { onDelete: 'cascade' }), // S11
     nome: varchar('nome', { length: NOME_MAX }).notNull(),
-    telefone: varchar('telefone', { length: TELEFONE_MAX_DIGITOS }).notNull(),
+    /** C2 no "confirmar"; vazio só para quem o organizador cadastra sem celular (L14). */
+    telefone: varchar('telefone', { length: TELEFONE_MAX_DIGITOS }),
     tempo: varchar('tempo', { length: 20 }).notNull(),
     observacao: varchar('observacao', { length: OBSERVACAO_MAX }),
     /** Hash do código devolvido ao celular (C7, X1). Nunca o código puro. */
     codigoCancelamentoHash: varchar('codigo_cancelamento_hash').notNull(),
+    /** Lista de presença (L4–L7). Tudo vazio até a pessoa chegar. */
+    numeroAdesao: varchar('numero_adesao', { length: ADESAO_MAX_DIGITOS }),
+    codigoFuncao: varchar('codigo_funcao', { length: CODIGO_FUNCAO_MAX_DIGITOS }),
+    recebeuEpi: boolean('recebeu_epi'),
+    entrada: time('entrada'),
+    saida: time('saida'),
+    /** Quando o PRÓPRIO voluntário tocou em "Confirmo" (L6). O organizador só pode apagar, nunca criar. */
+    assinadoEm: timestamp('assinado_em', { withTimezone: true }),
   },
   (t) => [
     unique('confirmacoes_telefone_unico_no_dia').on(t.diaId, t.telefone), // C4
@@ -77,6 +86,20 @@ export const confirmacoes = pgTable(
       sql`${t.telefone} ~ ${literal(`^[0-9]{${TELEFONE_MIN_DIGITOS},${TELEFONE_MAX_DIGITOS}}$`)}`,
     ), // C2
     check('confirmacoes_tempo_valido', sql`${t.tempo} IN (${listaLiteral(TEMPOS)})`),
+    // Num CHECK, valor vazio passa: as duas primeiras não barram adesão e código em branco.
+    check(
+      'confirmacoes_adesao_so_digitos',
+      sql`${t.numeroAdesao} ~ ${literal(`^[0-9]{1,${ADESAO_MAX_DIGITOS}}$`)}`,
+    ), // L4
+    check(
+      'confirmacoes_codigo_funcao_so_digitos',
+      sql`${t.codigoFuncao} ~ ${literal(`^[0-9]{1,${CODIGO_FUNCAO_MAX_DIGITOS}}$`)}`,
+    ), // L4
+    check(
+      'confirmacoes_saida_depois_da_entrada',
+      sql`${t.saida} IS NULL OR (${t.entrada} IS NOT NULL AND ${t.saida} >= ${t.entrada})`,
+    ), // L6, L8
+    check('confirmacoes_assinatura_com_saida', sql`${t.assinadoEm} IS NULL OR ${t.saida} IS NOT NULL`), // L6
   ],
 );
 

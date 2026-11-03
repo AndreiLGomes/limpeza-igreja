@@ -65,7 +65,7 @@ npm run dados-de-exemplo --workspace servidor
 npm run desenvolver
 ```
 
-Esse comando sobe o banco, confere o `servidor/.env`, e liga o servidor (porta 3000) e o site
+Esse comando sobe o banco, confere o `servidor/.env`, aplica as migrações e liga o servidor (porta 3000) e o site
 (<http://localhost:4200>) juntos. `Ctrl+C` para os dois. A área de quem organiza fica em
 <http://localhost:4200/organizar>.
 

@@ -69,6 +69,37 @@ export const CATALOGO_DE_ERROS = {
       return `Já ${pessoas}. As vagas não podem ser menos que isso.`;
     },
   },
+  NOME_OBRIGATORIO: {
+    status: 400,
+    mensagem: 'Você ainda não está na lista desta limpeza. Escreva seu nome.',
+  },
+  NAO_E_HOJE: {
+    status: 409,
+    mensagem: 'A presença só pode ser marcada no dia da limpeza.',
+  },
+  JA_ASSINOU: {
+    status: 409,
+    mensagem: 'Sua presença já foi assinada. Para mudar algo, fale com quem organiza.',
+  },
+  SEM_ENTRADA: {
+    status: 409,
+    mensagem: 'Marque a chegada antes da saída.',
+  },
+  PRESENCA_MARCADA: {
+    status: 409,
+    mensagem: 'Essa pessoa já marcou presença. Para tirá-la da lista, apague a entrada em "Corrigir presença" primeiro.',
+  },
+  HORARIO_INVALIDO: {
+    status: 409,
+    mensagem: (extras) => {
+      const pessoas = (extras['pessoas'] ?? []) as { nome: string; entrada: string }[];
+      const [unica] = pessoas;
+      if (pessoas.length === 1 && unica) return `${unica.nome} chegou às ${unica.entrada}, depois dessa hora.`;
+      if (pessoas.length === 0) return 'Alguém chegou depois dessa hora.';
+      const nomes = new Intl.ListFormat('pt-BR').format(pessoas.map((p) => `${p.nome} (${p.entrada})`));
+      return `${nomes} chegaram depois dessa hora.`;
+    },
+  },
   MUITAS_TENTATIVAS: {
     status: 429,
     mensagem: 'Muitas tentativas erradas. Espere um pouco e tente de novo.',

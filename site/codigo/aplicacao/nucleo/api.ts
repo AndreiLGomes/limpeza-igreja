@@ -9,7 +9,8 @@ import { inject, Injectable } from '@angular/core';
 import { firstValueFrom, type Observable } from 'rxjs';
 import {
   ehCodigoDeErro, mensagemDoErro, ROTAS, type ConfirmacaoCriada, type DiaCompleto, type DiaPublico,
-  type EntradaConfirmacao, type EntradaDia, type ErroApi, type PessoaCompleta, type SessaoCriada, type Tarefa,
+  type EntradaConfirmacao, type EntradaCorrecaoPresenca, type EntradaDia, type EntradaPessoaNaPresenca,
+  type EntradaPresenca, type ErroApi, type PessoaCompleta, type Presenca, type SessaoCriada, type Tarefa,
 } from '@limpeza/compartilhado';
 import { URL_DA_API } from './ambiente';
 
@@ -82,6 +83,19 @@ export class Api {
     return this.pedir(this.http.patch<Tarefa>(this.url(ROTAS.tarefa(diaId, tarefaId)), { feita }));
   }
 
+  /** L12: estado e primeiro nome. O telefone vai no corpo, nunca no endereço. */
+  consultarPresenca(diaId: string, telefone: string): Promise<Presenca> {
+    return this.pedir(this.http.post<Presenca>(this.url(ROTAS.presenca.consultar(diaId)), { telefone }));
+  }
+
+  marcarEntrada(diaId: string, dados: EntradaPresenca): Promise<Presenca> {
+    return this.pedir(this.http.post<Presenca>(this.url(ROTAS.presenca.entrada(diaId)), dados));
+  }
+
+  marcarSaida(diaId: string, telefone: string): Promise<Presenca> {
+    return this.pedir(this.http.post<Presenca>(this.url(ROTAS.presenca.saida(diaId)), { telefone }));
+  }
+
   // ---------- Organizador (o token vai no cabeçalho pelo interceptador, nucleo/organizador.ts) ----------
 
   entrar(senha: string): Promise<SessaoCriada> {
@@ -124,5 +138,20 @@ export class Api {
   /** O5, "Desfazer": recria a confirmação com os mesmos dados. */
   desfazerRemocao(diaId: string, pessoa: EntradaConfirmacao): Promise<PessoaCompleta> {
     return this.pedir(this.http.post<PessoaCompleta>(this.url(ROTAS.organizador.pessoas(diaId)), pessoa));
+  }
+
+  /** L8: corrigir a presença de uma pessoa. */
+  corrigirPresenca(diaId: string, pessoaId: string, dados: EntradaCorrecaoPresenca): Promise<PessoaCompleta> {
+    return this.pedir(this.http.put<PessoaCompleta>(this.url(ROTAS.organizador.presenca(diaId, pessoaId)), dados));
+  }
+
+  /** L13: saída para quem não saiu, sem assinar. Sem hora, vale a de agora. */
+  encerrarLimpeza(diaId: string, saida?: string): Promise<DiaCompleto> {
+    return this.pedir(this.http.post<DiaCompleto>(this.url(ROTAS.organizador.encerrar(diaId)), saida ? { saida } : {}));
+  }
+
+  /** L14: o organizador cadastra quem chegou sem confirmar e sem celular. */
+  adicionarNaPresenca(diaId: string, dados: EntradaPessoaNaPresenca): Promise<PessoaCompleta> {
+    return this.pedir(this.http.post<PessoaCompleta>(this.url(ROTAS.organizador.presencaNova(diaId)), dados));
   }
 }

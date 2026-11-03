@@ -14,6 +14,11 @@ export const ROTAS = {
   cancelarPorCodigo: '/confirmacoes/cancelar',
   cancelarPorTelefone: (diaId: string) => `/dias/${diaId}/confirmacoes/cancelar-por-telefone`,
   tarefa: (diaId: string, tarefaId: string) => `/dias/${diaId}/tarefas/${tarefaId}`,
+  presenca: {
+    consultar: (diaId: string) => `/dias/${diaId}/presenca/consultar`,
+    entrada: (diaId: string) => `/dias/${diaId}/presenca/entrada`,
+    saida: (diaId: string) => `/dias/${diaId}/presenca/saida`,
+  },
   organizador: {
     entrar: '/organizador/entrar',
     sair: '/organizador/sair',
@@ -22,5 +27,8 @@ export const ROTAS = {
     sugestaoTarefas: '/organizador/sugestao-tarefas',
     pessoas: (diaId: string) => `/organizador/dias/${diaId}/pessoas`,
     pessoa: (diaId: string, pessoaId: string) => `/organizador/dias/${diaId}/pessoas/${pessoaId}`,
+    presenca: (diaId: string, pessoaId: string) => `/organizador/dias/${diaId}/pessoas/${pessoaId}/presenca`,
+    presencaNova: (diaId: string) => `/organizador/dias/${diaId}/presenca`,
+    encerrar: (diaId: string) => `/organizador/dias/${diaId}/encerrar`,
   },
 } as const;

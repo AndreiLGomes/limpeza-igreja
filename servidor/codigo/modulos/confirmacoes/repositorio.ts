@@ -1,5 +1,5 @@
 /** Leitura e gravação das confirmações de presença. Sem regra de negócio. */
-import { and, count, eq } from 'drizzle-orm';
+import { and, count, eq, isNotNull, isNull } from 'drizzle-orm';
 import { bd } from '../../banco/cliente.js';
 import { confirmacoes, dias, type Confirmacao } from '../../banco/esquema.js';
 import type { Executor } from '../../banco/transacao.js';
@@ -9,13 +9,18 @@ export async function contarDoDia(banco: Executor, diaId: string): Promise<numbe
   return linha?.total ?? 0;
 }
 
-export async function telefoneJaConfirmado(banco: Executor, diaId: string, telefone: string): Promise<boolean> {
-  const achadas = await banco
-    .select({ id: confirmacoes.id })
+/** A confirmação desse telefone nessa limpeza, se houver (C4, X2, L2). */
+export async function buscarPorTelefone(
+  banco: Executor,
+  diaId: string,
+  telefone: string,
+): Promise<Confirmacao | undefined> {
+  const [achada] = await banco
+    .select()
     .from(confirmacoes)
     .where(and(eq(confirmacoes.diaId, diaId), eq(confirmacoes.telefone, telefone)))
     .limit(1);
-  return achadas.length > 0;
+  return achada;
 }
 
 export async function inserir(banco: Executor, valores: typeof confirmacoes.$inferInsert): Promise<Confirmacao> {
@@ -54,4 +59,31 @@ export async function apagarPorTelefone(diaId: string, telefone: string): Promis
     .where(and(eq(confirmacoes.diaId, diaId), eq(confirmacoes.telefone, telefone)))
     .returning({ id: confirmacoes.id });
   return apagadas.length > 0;
+}
+
+/** A pessoa daquela limpeza pelo id (L8). */
+export async function buscarDoDia(banco: Executor, diaId: string, pessoaId: string): Promise<Confirmacao | undefined> {
+  const [achada] = await banco
+    .select()
+    .from(confirmacoes)
+    .where(and(eq(confirmacoes.id, pessoaId), eq(confirmacoes.diaId, diaId)));
+  return achada;
+}
+
+export async function atualizar(
+  banco: Executor,
+  id: string,
+  valores: Partial<typeof confirmacoes.$inferInsert>,
+): Promise<Confirmacao> {
+  const [atualizada] = await banco.update(confirmacoes).set(valores).where(eq(confirmacoes.id, id)).returning();
+  if (!atualizada) throw new Error('A confirmação não foi atualizada.');
+  return atualizada;
+}
+
+/** L13: quem marcou entrada e ainda não saiu, naquela limpeza. */
+export function semSaida(banco: Executor, diaId: string): Promise<Confirmacao[]> {
+  return banco
+    .select()
+    .from(confirmacoes)
+    .where(and(eq(confirmacoes.diaId, diaId), isNotNull(confirmacoes.entrada), isNull(confirmacoes.saida)));
 }

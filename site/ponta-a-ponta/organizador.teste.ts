@@ -7,20 +7,13 @@ import type { Page } from '@playwright/test';
 import { dataPorExtenso, hoje, proximoDiaDaSemana, somarDias } from '@limpeza/compartilhado';
 import { primeiraLimpezaDeExemplo, TAREFAS_DE_EXEMPLO } from '../../servidor/codigo/banco/exemplos';
 import { SENHA_DOS_TESTES } from './ajuda/ambiente';
-import { expect, notificacao, semRolagemLateral, teste } from './ajuda/teste';
+import { entrarComoOrganizador, expect, notificacao, semRolagemLateral, teste } from './ajuda/teste';
 
 /** A primeira limpeza dos dados de exemplo (o banco volta a eles antes de cada teste). */
 const primeiraLimpeza = () => primeiraLimpezaDeExemplo(hoje());
 
 const cartaoDaLimpeza = (pagina: Page, data: string) =>
   pagina.locator('app-cartao').filter({ has: pagina.getByRole('heading', { name: dataPorExtenso(data) }) });
-
-async function entrar(pagina: Page): Promise<void> {
-  await pagina.goto('/organizar/entrar');
-  await pagina.getByLabel('Senha de organizador').fill(SENHA_DOS_TESTES);
-  await pagina.getByRole('button', { name: 'Entrar' }).click();
-  await expect(pagina).toHaveURL(/\/organizar$/);
-}
 
 teste('9. senha errada mostra a mensagem no campo; a certa abre a área com "Organizador" e telefones @escuro', async ({
   page,
@@ -44,7 +37,7 @@ teste('9. senha errada mostra a mensagem no campo; a certa abre a área com "Org
 });
 
 teste('10. remover pessoa: janela com foco em "Manter", notificação e "Desfazer" devolve a pessoa', async ({ page }) => {
-  await entrar(page);
+  await entrarComoOrganizador(page);
   await page.getByRole('button', { name: 'Remover Andrei Gomes' }).click();
   const janela = page.getByRole('dialog', { name: 'Remover Andrei Gomes?' });
   await expect(janela).toBeVisible();
@@ -63,7 +56,7 @@ teste('10. remover pessoa: janela com foco em "Manter", notificação e "Desfaze
 teste('11. nova limpeza: tarefas sugeridas, qualquer dia, contador, foco na tarefa nova e salvar', async ({
   page,
 }) => {
-  await entrar(page);
+  await entrarComoOrganizador(page);
   await page.getByRole('link', { name: 'Nova limpeza' }).click();
   await expect(page).toHaveURL(/\/organizar\/limpeza\/nova$/);
   await expect(page.getByRole('heading', { name: 'Nova limpeza' })).toBeVisible();
@@ -101,7 +94,7 @@ teste('11. nova limpeza: tarefas sugeridas, qualquer dia, contador, foco na tare
 });
 
 teste('12. editar: vagas abaixo dos confirmados mostram o aviso e bloqueiam "Salvar"', async ({ page }) => {
-  await entrar(page);
+  await entrarComoOrganizador(page);
   const primeira = primeiraLimpeza();
   await cartaoDaLimpeza(page, primeira).getByRole('link', { name: /^Editar / }).click();
   await expect(page.getByRole('heading', { name: 'Editar limpeza' })).toBeVisible();
@@ -118,7 +111,7 @@ teste('12. editar: vagas abaixo dos confirmados mostram o aviso e bloqueiam "Sal
 });
 
 teste('13. apagar limpeza: janela e a limpeza some da lista', async ({ page }) => {
-  await entrar(page);
+  await entrarComoOrganizador(page);
   const quartaLimpeza = somarDias(primeiraLimpeza(), 21);
   await expect(page.locator('app-cartao')).toHaveCount(4);
   await cartaoDaLimpeza(page, quartaLimpeza).getByRole('link', { name: /^Editar / }).click();
@@ -136,7 +129,7 @@ teste('13. apagar limpeza: janela e a limpeza some da lista', async ({ page }) =
 });
 
 teste('15. "Sair" no rodapé: abrir /organizar pede a senha de novo', async ({ page }) => {
-  await entrar(page);
+  await entrarComoOrganizador(page);
   await page.getByRole('button', { name: 'Sair' }).click();
   await expect(page).toHaveURL(/localhost:4200\/$/);
   await expect(page.getByRole('link', { name: 'Área de quem organiza' })).toBeVisible();

@@ -1,11 +1,11 @@
 import { Router, type Request } from 'express';
 import {
   CANCELAMENTO_BLOQUEIO_SEGUNDOS, CANCELAMENTO_JANELA_SEGUNDOS, CANCELAMENTO_TENTATIVAS_MAX,
-  esquemaCancelarPorCodigo, esquemaCancelarPorTelefone, esquemaConfirmacao, esquemaParametrosDia, ROTAS,
+  esquemaCancelarPorCodigo, esquemaTelefone, esquemaConfirmacao, ROTAS,
   type ConfirmacaoCriada, type DadosConfirmacao,
 } from '@limpeza/compartilhado';
 import { limitarTentativas } from '../../http/limitar-tentativas.js';
-import { validar } from '../../http/validar.js';
+import { DIA_VALIDO, validar } from '../../http/validar.js';
 import * as servico from './servico.js';
 
 export const rotasDeConfirmacoes = Router();
@@ -18,11 +18,9 @@ const limiteDeCancelamento = limitarTentativas({
   bloqueioSegundos: CANCELAMENTO_BLOQUEIO_SEGUNDOS,
 });
 
-const diaValido = { parametros: esquemaParametrosDia, naoEncontrado: 'DIA_NAO_ENCONTRADO' } as const;
-
 rotasDeConfirmacoes.post(
   ROTAS.confirmar(':id'),
-  validar({ ...diaValido, corpo: esquemaConfirmacao }),
+  validar({ ...DIA_VALIDO, corpo: esquemaConfirmacao }),
   async (requisicao: Request<{ id: string }, unknown, DadosConfirmacao>, resposta) => {
     const { pessoa, codigo } = await servico.adicionarPessoa(requisicao.params.id, requisicao.body);
     const criada: ConfirmacaoCriada = { pessoaId: pessoa.id, codigoCancelamento: codigo };
@@ -42,7 +40,7 @@ rotasDeConfirmacoes.post(
 rotasDeConfirmacoes.post(
   ROTAS.cancelarPorTelefone(':id'),
   limiteDeCancelamento.verificar,
-  validar({ ...diaValido, corpo: esquemaCancelarPorTelefone }),
+  validar({ ...DIA_VALIDO, corpo: esquemaTelefone }),
   async (requisicao: Request<{ id: string }, unknown, { telefone: string }>, resposta) => {
     await limiteDeCancelamento.contando(requisicao, ['TELEFONE_NAO_CONFERE'], () =>
       servico.cancelarPorTelefone(requisicao.params.id, requisicao.body.telefone),

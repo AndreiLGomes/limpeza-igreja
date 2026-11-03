@@ -11,6 +11,7 @@ import { criarRegistro, registrarRequisicoes, type Registro } from './http/regis
 import { rotaNaoEncontrada, tratarErros } from './http/tratar-erros.js';
 import { rotasDeConfirmacoes } from './modulos/confirmacoes/rotas.js';
 import { rotasDeDias } from './modulos/dias/rotas.js';
+import { rotasDePresenca } from './modulos/presenca/rotas.js';
 import { rotasDoOrganizador } from './modulos/organizador/rotas.js';
 import { rotasDeSaude } from './modulos/saude/rotas.js';
 import { rotasDeTarefas } from './modulos/tarefas/rotas.js';
@@ -36,7 +37,7 @@ export function criarAplicacao(opcoes: OpcoesDaAplicacao = {}) {
   aplicacao.use(limitarEscritas(opcoes.escritasPorMinuto));
 
   const api = express.Router();
-  api.use(rotasDeSaude, rotasDeDias, rotasDeConfirmacoes, rotasDeTarefas, rotasDoOrganizador);
+  api.use(rotasDeSaude, rotasDeDias, rotasDeConfirmacoes, rotasDePresenca, rotasDeTarefas, rotasDoOrganizador);
   aplicacao.use(PREFIXO_API, api);
 
   aplicacao.use(rotaNaoEncontrada);

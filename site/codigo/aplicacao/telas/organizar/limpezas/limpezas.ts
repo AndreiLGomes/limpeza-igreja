@@ -62,13 +62,26 @@ interface Remocao {
 
     <app-janela [titulo]="'Remover ' + (remocao()?.pessoa?.nome ?? '') + '?'" [(aberta)]="janelaAberta">
       @if (remocao(); as remocao) {
-        <p class="dialog__text">
-          {{ remocao.pessoa.nome }} sai da escala de {{ dataNaFrase(remocao.dia.data) }}. Você pode desfazer logo depois.
-        </p>
+        @if (remocao.pessoa.entrada) {
+          <p class="dialog__text">
+            {{ remocao.pessoa.nome }} já marcou presença. Para tirá-la da lista, apague a entrada em "Corrigir
+            presença", na tela da limpeza.
+          </p>
+        } @else {
+          <p class="dialog__text">
+            {{ remocao.pessoa.nome }} sai da escala de {{ dataNaFrase(remocao.dia.data) }}.{{
+              remocao.pessoa.telefone ? ' Você pode desfazer logo depois.' : ''
+            }}
+          </p>
+        }
       }
       <div acoesDaJanela>
-        <button appBotao variante="secundario" type="button" autofocus (click)="janelaAberta.set(false)">Manter</button>
-        <button appBotao variante="perigo" type="button" (click)="remover()">Remover</button>
+        <button appBotao variante="secundario" type="button" autofocus (click)="janelaAberta.set(false)">
+          {{ remocao()?.pessoa?.entrada ? 'Entendi' : 'Manter' }}
+        </button>
+        @if (!remocao()?.pessoa?.entrada) {
+          <button appBotao variante="perigo" type="button" (click)="remover()">Remover</button>
+        }
       </div>
     </app-janela>
   `,

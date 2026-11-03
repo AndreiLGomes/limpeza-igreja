@@ -3,7 +3,8 @@
  * 1. o banco (docker compose), esperando ficar pronto;
  * 2. o pacote compartilhado compilado (o servidor e o site usam a versão compilada);
  * 3. a configuração do servidor (servidor/.env), que para tudo logo se faltar algo, como a senha;
- * 4. o servidor (porta 3000) e o site (porta 4200) juntos, com a saída de cada um marcada.
+ * 4. as migrações do banco (o banco de desenvolvimento recebe as tabelas e colunas novas sozinho);
+ * 5. o servidor (porta 3000) e o site (porta 4200) juntos, com a saída de cada um marcada.
  * Ctrl+C encerra os dois. Sem dependência nova: só o Node.
  */
 import { spawn, spawnSync } from 'node:child_process';
@@ -57,6 +58,7 @@ process.on('SIGTERM', () => encerrar());
 rodarAteOFim('Subir o banco', 'docker compose up -d --wait');
 rodarAteOFim('Compilar o pacote compartilhado', 'npm run build --workspace compartilhado');
 rodarAteOFim('Conferir a configuração do servidor', 'npm run conferir-configuracao --workspace servidor --silent');
+rodarAteOFim('Aplicar as migrações do banco', 'npm run migrar --workspace servidor --silent');
 
 console.log('\n▶ Ligando o servidor e o site. O site abre em http://localhost:4200 (Ctrl+C para parar).\n');
 processos.push(ligar('servidor', 'npm run desenvolver --workspace servidor'));

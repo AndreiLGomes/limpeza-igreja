@@ -25,6 +25,11 @@ export const rotas: Routes = [
     title: 'Confirmar presença',
     loadComponent: () => import('./telas/confirmar/confirmar').then((modulo) => modulo.TelaConfirmar),
   },
+  {
+    path: 'presenca',
+    title: 'Marcar presença',
+    loadComponent: () => import('./telas/presenca/presenca').then((modulo) => modulo.TelaPresenca),
+  },
 
   // ---------- Área de quem organiza (O1–O7) ----------
   {

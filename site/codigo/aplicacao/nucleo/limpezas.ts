@@ -3,7 +3,10 @@
  * Mesmo padrão da escala pública: a Carga cuida de carregando / pronto / erro.
  */
 import { inject, Injectable } from '@angular/core';
-import { dataNaFrase, type DiaCompleto, type EntradaDia, type PessoaCompleta } from '@limpeza/compartilhado';
+import {
+  dataNaFrase, type DiaCompleto, type EntradaCorrecaoPresenca, type EntradaDia, type EntradaPessoaNaPresenca,
+  type PessoaCompleta,
+} from '@limpeza/compartilhado';
 import { Notificacoes } from '@componentes';
 import { Api } from './api';
 import { Carga } from './carga';
@@ -55,17 +58,19 @@ export class Limpezas {
   async removerPessoa(dia: DiaCompleto, pessoa: PessoaCompleta): Promise<void> {
     try {
       const removida = await this.api.removerPessoa(dia.id, pessoa.id);
-      this.notificacoes.mostrar(`${removida.nome} foi removido(a) da escala.`, {
-        acao: 'Desfazer',
-        aoAgir: () => void this.desfazerRemocao(dia, removida),
-      });
+      const telefone = removida.telefone;
+      // Sem telefone (L14), o "Desfazer" não tem como recriar a confirmação: o "confirmar" exige telefone (C2).
+      this.notificacoes.mostrar(
+        `${removida.nome} foi removido(a) da escala.`,
+        telefone ? { acao: 'Desfazer', aoAgir: () => void this.desfazerRemocao(dia, { ...removida, telefone }) } : {},
+      );
     } catch (erro) {
       notificarFalha(this.notificacoes, erro);
     }
     await this.carga.atualizar();
   }
 
-  private async desfazerRemocao(dia: DiaCompleto, pessoa: PessoaCompleta): Promise<void> {
+  private async desfazerRemocao(dia: DiaCompleto, pessoa: PessoaCompleta & { telefone: string }): Promise<void> {
     try {
       await this.api.desfazerRemocao(dia.id, {
         nome: pessoa.nome,
@@ -77,5 +82,26 @@ export class Limpezas {
       notificarFalha(this.notificacoes, erro);
     }
     await this.carga.atualizar();
+  }
+
+  /** L8: corrige e avisa. Erros seguem para a janela mostrar embaixo dos campos. */
+  async corrigirPresenca(dia: DiaCompleto, pessoa: PessoaCompleta, dados: EntradaCorrecaoPresenca): Promise<PessoaCompleta> {
+    const corrigida = await this.api.corrigirPresenca(dia.id, pessoa.id, dados);
+    this.notificacoes.mostrar(`Presença de ${corrigida.nome} corrigida.`);
+    return corrigida;
+  }
+
+  /** L13: "Encerrar limpeza". Devolve a limpeza atualizada. */
+  async encerrar(dia: DiaCompleto, saida?: string): Promise<DiaCompleto> {
+    const atualizado = await this.api.encerrarLimpeza(dia.id, saida);
+    this.notificacoes.mostrar('Saída marcada para quem ainda não tinha saído.');
+    return atualizado;
+  }
+
+  /** L14: cadastra na lista de presença quem chegou sem confirmar e sem celular. */
+  async adicionarNaPresenca(dia: DiaCompleto, dados: EntradaPessoaNaPresenca): Promise<PessoaCompleta> {
+    const nova = await this.api.adicionarNaPresenca(dia.id, dados);
+    this.notificacoes.mostrar(`${nova.nome} entrou na lista de presença.`);
+    return nova;
   }
 }

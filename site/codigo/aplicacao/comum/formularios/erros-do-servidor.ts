@@ -15,7 +15,11 @@ export function mostrarErrosNosCampos(formulario: FormGroup, campos: Record<stri
   const semCampo: string[] = [];
   for (const [campo, mensagem] of Object.entries(campos)) {
     const controle = formulario.get(campo);
-    if (controle) controle.setErrors({ servidor: mensagem });
+    if (controle) {
+      controle.setErrors({ servidor: mensagem });
+      // O app-campo só mostra erro de campo tocado; erro do servidor tem que aparecer sempre.
+      controle.markAsTouched();
+    }
     else semCampo.push(mensagem);
   }
   return semCampo;

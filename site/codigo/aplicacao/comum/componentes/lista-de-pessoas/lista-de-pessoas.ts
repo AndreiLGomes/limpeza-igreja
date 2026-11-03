@@ -20,7 +20,11 @@ import { Icone } from '../icone/icone';
           <div class="list__main">
             <span class="list__title">{{ pessoa.nome }}</span>
             <span class="list__sub">
-              <a [href]="'tel:+55' + digitos(pessoa.telefone)">{{ pessoa.telefone }}</a>
+              @if (pessoa.telefone; as telefone) {
+                <a [href]="'tel:+55' + digitos(telefone)">{{ telefone }}</a>
+              } @else {
+                sem telefone
+              }
               · {{ tempo(pessoa) }}
               @if (pessoa.observacao) {
                 · "{{ pessoa.observacao }}"

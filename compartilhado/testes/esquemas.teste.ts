@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { z } from 'zod';
 import {
-  errosPorCampo, esquemaCancelarPorCodigo, esquemaCancelarPorTelefone, esquemaConfirmacao, esquemaDia,
+  errosPorCampo, esquemaCancelarPorCodigo, esquemaConfirmacao, esquemaCorrecaoPresenca, esquemaDia, esquemaEncerrar,
+  esquemaEntrada, esquemaPessoaNaPresenca, esquemaTelefone,
   esquemaEntrar, esquemaMarcarTarefa, esquemaParametrosDia, MENSAGENS,
 } from '../codigo/esquemas.js';
 
@@ -128,8 +129,8 @@ describe('outros esquemas', () => {
   });
 
   it('cancelar pelo telefone (X2)', () => {
-    expect(esquemaCancelarPorTelefone.parse({ telefone: '(47) 99999-1234' })).toEqual({ telefone: '47999991234' });
-    expect(campos(esquemaCancelarPorTelefone, { telefone: '123' }).telefone).toBe(MENSAGENS.telefoneInvalido);
+    expect(esquemaTelefone.parse({ telefone: '(47) 99999-1234' })).toEqual({ telefone: '47999991234' });
+    expect(campos(esquemaTelefone, { telefone: '123' }).telefone).toBe(MENSAGENS.telefoneInvalido);
   });
 
   it('marcar tarefa (T1)', () => {
@@ -145,5 +146,92 @@ describe('outros esquemas', () => {
   it('id do endereço precisa ser um uuid', () => {
     expect(esquemaParametrosDia.parse({ id: UUID })).toEqual({ id: UUID });
     expect(campos(esquemaParametrosDia, { id: '123' }).id).toBe(MENSAGENS.idInvalido);
+  });
+});
+
+const ENTRADA = { telefone: '47 99999-1234', numeroAdesao: '08', codigoFuncao: '222', recebeuEpi: true };
+
+describe('esquemaEntrada (L3, L4)', () => {
+  it('aceita sem nome e mantém o zero da frente da adesão', () => {
+    expect(esquemaEntrada.parse(ENTRADA)).toEqual({
+      telefone: '47999991234', numeroAdesao: '08', codigoFuncao: '222', recebeuEpi: true,
+    });
+  });
+
+  it('aceita com nome (quem não confirmou antes)', () => {
+    expect(esquemaEntrada.parse({ ...ENTRADA, nome: '  Célia Gomes ' }).nome).toBe('Célia Gomes');
+  });
+
+  it('adesão e código: só números, de 1 a 6 dígitos', () => {
+    expect(campos(esquemaEntrada, { ...ENTRADA, numeroAdesao: '' })).toEqual({ numeroAdesao: MENSAGENS.adesaoObrigatoria });
+    expect(campos(esquemaEntrada, { ...ENTRADA, numeroAdesao: '08a' })).toEqual({ numeroAdesao: MENSAGENS.adesaoInvalida });
+    expect(campos(esquemaEntrada, { ...ENTRADA, codigoFuncao: '1234567' })).toEqual({
+      codigoFuncao: MENSAGENS.codigoFuncaoInvalido,
+    });
+  });
+
+  it('EPI é obrigatório', () => {
+    const { recebeuEpi, ...semEpi } = ENTRADA;
+    expect(campos(esquemaEntrada, semEpi)).toEqual({ recebeuEpi: MENSAGENS.epiObrigatorio });
+  });
+});
+
+describe('esquemaCorrecaoPresenca (L8)', () => {
+  const CORRECAO = { numeroAdesao: '08', codigoFuncao: '222', recebeuEpi: true, entrada: '19:30', saida: '20:45' };
+
+  it('aceita, com hora vazia virando null e desfazerAssinatura falso por padrão', () => {
+    expect(esquemaCorrecaoPresenca.parse({ ...CORRECAO, saida: '' })).toEqual({
+      ...CORRECAO, saida: null, desfazerAssinatura: false,
+    });
+  });
+
+  it('saída no mesmo minuto da entrada vale; antes, não', () => {
+    expect(esquemaCorrecaoPresenca.parse({ ...CORRECAO, saida: '19:30' }).saida).toBe('19:30');
+    expect(campos(esquemaCorrecaoPresenca, { ...CORRECAO, saida: '19:00' })).toEqual({
+      saida: MENSAGENS.saidaAntesDaEntrada,
+    });
+  });
+
+  it('saída sem entrada não vale', () => {
+    expect(campos(esquemaCorrecaoPresenca, { ...CORRECAO, entrada: '' })).toEqual({
+      saida: MENSAGENS.saidaSemEntrada,
+    });
+  });
+
+  it('não existe campo para criar assinatura: "assinado" é ignorado', () => {
+    expect(esquemaCorrecaoPresenca.parse({ ...CORRECAO, assinado: true })).not.toHaveProperty('assinado');
+  });
+
+  it('adesão e código apagados viram null, como a hora', () => {
+    const apagados = esquemaCorrecaoPresenca.parse({
+      numeroAdesao: '', codigoFuncao: '', recebeuEpi: null, entrada: '', saida: '',
+    });
+    expect(apagados).toMatchObject({ numeroAdesao: null, codigoFuncao: null, entrada: null, saida: null });
+  });
+});
+
+describe('esquemaPessoaNaPresenca (L14)', () => {
+  const NOVA = { nome: 'Dona Maria', numeroAdesao: '12', codigoFuncao: '222', recebeuEpi: true, entrada: '19:30' };
+
+  it('telefone opcional: vazio ou ausente vira null; com telefone, só os números', () => {
+    expect(esquemaPessoaNaPresenca.parse(NOVA)).toMatchObject({ telefone: null, saida: null });
+    expect(esquemaPessoaNaPresenca.parse({ ...NOVA, telefone: '' }).telefone).toBeNull();
+    expect(esquemaPessoaNaPresenca.parse({ ...NOVA, telefone: '47 99999-1234' }).telefone).toBe('47999991234');
+  });
+
+  it('nome e entrada são obrigatórios; telefone, se vier, tem que ser válido', () => {
+    expect(campos(esquemaPessoaNaPresenca, { ...NOVA, nome: '' })).toEqual({ nome: MENSAGENS.nomeObrigatorio });
+    expect(campos(esquemaPessoaNaPresenca, { ...NOVA, entrada: '' })).toEqual({ entrada: MENSAGENS.horaObrigatoria });
+    expect(campos(esquemaPessoaNaPresenca, { ...NOVA, telefone: '123' })).toEqual({
+      telefone: MENSAGENS.telefoneInvalido,
+    });
+  });
+});
+
+describe('esquemaEncerrar (L13)', () => {
+  it('sem hora (a hora de agora) ou com hora válida', () => {
+    expect(esquemaEncerrar.parse({})).toEqual({});
+    expect(esquemaEncerrar.parse({ saida: '20:45' })).toEqual({ saida: '20:45' });
+    expect(campos(esquemaEncerrar, { saida: '25:00' })).toEqual({ saida: MENSAGENS.horaInvalida });
   });
 });

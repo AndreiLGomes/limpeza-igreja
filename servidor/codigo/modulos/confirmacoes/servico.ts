@@ -1,5 +1,6 @@
 /** Regras de confirmação e cancelamento de presença (C1–C8, X1–X6). */
 import { vagasLivres, type DadosConfirmacao, type PessoaCompleta } from '@limpeza/compartilhado';
+import { bd } from '../../banco/cliente.js';
 import type { Confirmacao } from '../../banco/esquema.js';
 import { emTransacao } from '../../banco/transacao.js';
 import { ErroDeRegra } from '../../comum/erros.js';
@@ -26,7 +27,7 @@ export async function adicionarPessoa(
     emTransacao(async (tx) => {
       const dia = await repositorioDeDias.buscarTravando(tx, diaId);
       exigirNaoPassada(dia);
-      if (await repositorio.telefoneJaConfirmado(tx, diaId, dados.telefone)) {
+      if (await repositorio.buscarPorTelefone(tx, diaId, dados.telefone)) {
         throw new ErroDeRegra('TELEFONE_REPETIDO');
       }
       const confirmados = await repositorio.contarDoDia(tx, diaId);
@@ -46,8 +47,15 @@ export async function cancelarPorCodigo(codigo: string): Promise<void> {
   await repositorio.apagar(confirmacao.id);
 }
 
-/** O5: o organizador tira alguém da escala. Devolve os dados removidos, para o "Desfazer". */
+/**
+ * O5: o organizador tira alguém da escala. Quem já marcou presença não sai: remover e "Desfazer" apagaria
+ * adesão, EPI, horários e a assinatura, que nem o organizador pode recriar (L7). Primeiro ele apaga a entrada
+ * em "Corrigir presença". Devolve os dados removidos, para o "Desfazer".
+ */
 export async function removerPessoa(diaId: string, pessoaId: string): Promise<PessoaCompleta> {
+  const pessoa = await repositorio.buscarDoDia(bd, diaId, pessoaId);
+  if (!pessoa) throw new ErroDeRegra('PESSOA_NAO_ENCONTRADA');
+  if (pessoa.entrada) throw new ErroDeRegra('PRESENCA_MARCADA');
   const removida = await repositorio.apagarDoDia(diaId, pessoaId);
   if (!removida) throw new ErroDeRegra('PESSOA_NAO_ENCONTRADA');
   return paraPessoaCompleta(removida);

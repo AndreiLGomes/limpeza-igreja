@@ -19,11 +19,20 @@ export interface PessoaPublica {
 
 /** Pessoa como o organizador vê. */
 export interface PessoaCompleta extends PessoaPublica {
-  /** Formatado para exibir: "47 99999-1234". */
-  telefone: string;
+  /** Formatado para exibir: "47 99999-1234". Vazio só para quem o organizador cadastrou sem celular (L14). */
+  telefone: string | null;
   observacao: string | null;
   /** Data e hora ISO. */
   criadoEm: string;
+  /** Lista de presença (L4–L8). Tudo null enquanto a pessoa não chegou. */
+  numeroAdesao: string | null;
+  codigoFuncao: string | null;
+  recebeuEpi: boolean | null;
+  /** "19:32" */
+  entrada: string | null;
+  saida: string | null;
+  /** Data e hora ISO da assinatura no app. Só o próprio voluntário assina (L6). */
+  assinadoEm: string | null;
 }
 
 export interface Tarefa {
@@ -70,4 +79,22 @@ export type Tom = 'ok' | 'pendente' | 'faltando' | 'neutro';
 export interface Status {
   tom: Tom;
   texto: string;
+}
+
+/** L12: em que pé está a presença de alguém na limpeza de hoje. */
+export const ESTADOS_DA_PRESENCA = ['fora', 'chegou', 'assinou'] as const;
+export type EstadoDaPresenca = (typeof ESTADOS_DA_PRESENCA)[number];
+
+/**
+ * Resposta dos endereços públicos da presença (L5, L6, L12). Os horários só vêm para quem acabou de
+ * tocar em "Cheguei" pela primeira vez ou em "Saí"; no consultar, vêm null.
+ */
+export interface Presenca {
+  estado: EstadoDaPresenca;
+  /** Só o primeiro nome, para a pessoa conferir que é ela ("Olá, Célia"). */
+  primeiroNome: string | null;
+  entrada: string | null;
+  saida: string | null;
+  /** Data e hora ISO. */
+  assinadoEm: string | null;
 }

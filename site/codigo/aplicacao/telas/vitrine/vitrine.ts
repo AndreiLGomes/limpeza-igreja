@@ -16,11 +16,16 @@ import {
 } from '@componentes';
 import { Estado } from '../../comum/estado/estado';
 
+/** Sem nada da lista de presença (ninguém chegou ainda). */
+const SEM_PRESENCA = {
+  numeroAdesao: null, codigoFuncao: null, recebeuEpi: null, entrada: null, saida: null, assinadoEm: null,
+};
+
 const PESSOAS: PessoaCompleta[] = [
-  { id: '1', nome: 'Andrei Gomes', tempo: 'todo', telefone: '47 90000-0001', observacao: null, criadoEm: '' },
-  { id: '2', nome: 'João Silva', tempo: 'primeira-hora', telefone: '47 90000-0002', observacao: null, criadoEm: '' },
+  { id: '1', ...SEM_PRESENCA, nome: 'Andrei Gomes', tempo: 'todo', telefone: '47 90000-0001', observacao: null, criadoEm: '' },
+  { id: '2', ...SEM_PRESENCA, nome: 'João Silva', tempo: 'primeira-hora', telefone: '47 90000-0002', observacao: null, criadoEm: '' },
   {
-    id: '3', nome: 'Maria Rocha', tempo: 'todo', telefone: '47 90000-0003',
+    id: '3', ...SEM_PRESENCA, nome: 'Maria Rocha', tempo: 'todo', telefone: '47 90000-0003',
     observacao: 'vou levar o rodo novo', criadoEm: '',
   },
 ];

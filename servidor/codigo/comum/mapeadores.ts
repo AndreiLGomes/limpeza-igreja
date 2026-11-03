@@ -4,13 +4,15 @@
  * pelo formato, e não por cuidado em cada rota.
  */
 import {
-  formatarTelefone, type DiaCompleto, type DiaPublico, type PessoaCompleta, type PessoaPublica, type Tarefa,
-  type Tempo,
+  formatarTelefone, type DiaCompleto, type DiaPublico, type PessoaCompleta, type PessoaPublica, type Presenca,
+  type Tarefa, type Tempo,
 } from '@limpeza/compartilhado';
 import type { Confirmacao, DiaComTudo, TarefaDoBanco } from '../banco/esquema.js';
 
 /** O banco devolve "19:00:00"; a API usa "19:00" (D3). */
 const horaCurta = (hora: string) => hora.slice(0, 5);
+/** "19:30:00" → "19:30"; vazio continua vazio. Usada também pela presença para comparar horários. */
+export const horaOuNada = (hora: string | null) => (hora === null ? null : horaCurta(hora));
 
 export function paraTarefa(tarefa: TarefaDoBanco): Tarefa {
   return { id: tarefa.id, nome: tarefa.nome, feita: tarefa.feita };
@@ -23,9 +25,15 @@ export function paraPessoaPublica(pessoa: Confirmacao): PessoaPublica {
 export function paraPessoaCompleta(pessoa: Confirmacao): PessoaCompleta {
   return {
     ...paraPessoaPublica(pessoa),
-    telefone: formatarTelefone(pessoa.telefone),
+    telefone: pessoa.telefone === null ? null : formatarTelefone(pessoa.telefone),
     observacao: pessoa.observacao,
     criadoEm: pessoa.criadoEm.toISOString(),
+    numeroAdesao: pessoa.numeroAdesao,
+    codigoFuncao: pessoa.codigoFuncao,
+    recebeuEpi: pessoa.recebeuEpi,
+    entrada: horaOuNada(pessoa.entrada),
+    saida: horaOuNada(pessoa.saida),
+    assinadoEm: pessoa.assinadoEm?.toISOString() ?? null,
   };
 }
 
@@ -47,4 +55,21 @@ export function paraDiaPublico(dia: DiaComTudo): DiaPublico {
 
 export function paraDiaCompleto(dia: DiaComTudo): DiaCompleto {
   return { ...camposDoDia(dia), pessoas: dia.pessoas.map(paraPessoaCompleta) };
+}
+
+/**
+ * L12: o que a parte pública vê da presença. Sem horários (só com `comHorarios`, para quem acabou de agir),
+ * sem adesão, código, EPI, telefone ou nome completo.
+ */
+export function paraPresenca(pessoa: Confirmacao | undefined, comHorarios: boolean): Presenca {
+  const estado = pessoa?.assinadoEm ? 'assinou' : pessoa?.entrada ? 'chegou' : 'fora';
+  const primeiroNome = pessoa ? (pessoa.nome.split(' ')[0] ?? pessoa.nome) : null;
+  if (!pessoa || !comHorarios) return { estado, primeiroNome, entrada: null, saida: null, assinadoEm: null };
+  return {
+    estado,
+    primeiroNome,
+    entrada: horaOuNada(pessoa.entrada),
+    saida: horaOuNada(pessoa.saida),
+    assinadoEm: pessoa.assinadoEm?.toISOString() ?? null,
+  };
 }
