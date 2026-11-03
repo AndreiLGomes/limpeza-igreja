@@ -1,4 +1,4 @@
-/** Presença do voluntário, sem senha (L1–L7, L12). */
+/** Presença do voluntário, sem senha (L1–L7, L12). A assinatura é feita na CHEGADA (L5). */
 import { eq } from 'drizzle-orm';
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -31,13 +31,23 @@ async function limpezaDeHojeComCelia() {
 beforeEach(limparBanco);
 
 describe('Cheguei (L1, L3, L4, L5)', () => {
-  it('confirmada: grava adesão, código, EPI e a entrada pelo relógio do servidor', async () => {
+  it('confirmada: grava adesão, código, EPI, a entrada pelo relógio do servidor e a ASSINATURA', async () => {
     const { dia, celia } = await limpezaDeHojeComCelia();
     const resposta = await chegar(dia.id);
     expect(resposta.status).toBe(200);
-    expect(resposta.body).toMatchObject({ estado: 'chegou', primeiroNome: 'Célia', saida: null, assinadoEm: null });
+    expect(resposta.body).toMatchObject({ estado: 'chegou', primeiroNome: 'Célia', saida: null });
     expect(resposta.body.entrada).toMatch(FORMATO_HORA);
+    expect(Date.parse(resposta.body.assinadoEm)).not.toBeNaN();
     expect(await linha(celia.id)).toMatchObject({ numeroAdesao: '08', codigoFuncao: '222', recebeuEpi: true });
+    expect((await linha(celia.id)).assinadoEm).not.toBeNull();
+  });
+
+  it('o organizador marcou a chegada (sem assinatura): o Cheguei assina e mantém a entrada dele', async () => {
+    const { dia, celia } = await limpezaDeHojeComCelia();
+    await bd.update(confirmacoes).set({ entrada: '19:10' }).where(eq(confirmacoes.id, celia.id));
+    const resposta = await chegar(dia.id);
+    expect(resposta.body).toMatchObject({ estado: 'chegou', entrada: '19:10' });
+    expect((await linha(celia.id)).assinadoEm).not.toBeNull();
   });
 
   it('sem confirmar e sem nome → 400 NOME_OBRIGATORIO com campos.nome; com nome, entra na lista', async () => {
@@ -82,19 +92,20 @@ describe('Cheguei (L1, L3, L4, L5)', () => {
   });
 });
 
-describe('Saí → Confirmo (L6, L7)', () => {
-  it('grava a saída e o "assinado em"; depois disso, nada muda (JA_ASSINOU)', async () => {
+describe('Saí (L6, L7)', () => {
+  it('grava só a saída (a assinatura foi na chegada); tocar de novo → JA_SAIU', async () => {
     const { dia, celia } = await limpezaDeHojeComCelia();
-    await chegar(dia.id);
+    const chegada = await chegar(dia.id);
     const resposta = await sair(dia.id);
     expect(resposta.status).toBe(200);
-    expect(resposta.body.estado).toBe('assinou');
+    expect(resposta.body.estado).toBe('saiu');
     expect(resposta.body.saida).toMatch(FORMATO_HORA);
-    expect(Date.parse(resposta.body.assinadoEm)).not.toBeNaN();
-    expect((await linha(celia.id)).assinadoEm).not.toBeNull();
+    expect(resposta.body.assinadoEm).toBe(chegada.body.assinadoEm);
 
-    expect((await sair(dia.id)).body.codigo).toBe('JA_ASSINOU');
-    expect((await chegar(dia.id)).body.codigo).toBe('JA_ASSINOU');
+    expect((await sair(dia.id)).body.codigo).toBe('JA_SAIU');
+    const deNovo = await chegar(dia.id);
+    expect(deNovo.body).toMatchObject({ estado: 'saiu', entrada: null, saida: null });
+    expect((await linha(celia.id)).saida).not.toBeNull();
   });
 
   it('sem entrada → 409 SEM_ENTRADA; telefone fora da lista → 404 TELEFONE_NAO_CONFERE', async () => {
@@ -103,11 +114,11 @@ describe('Saí → Confirmo (L6, L7)', () => {
     expect((await sair(dia.id, '47 98888-7777')).body.codigo).toBe('TELEFONE_NAO_CONFERE');
   });
 
-  it('se o "Encerrar limpeza" já gravou a saída, mantém a saída e só assina (L13)', async () => {
+  it('se o "Encerrar limpeza" já gravou a saída, o Saí responde JA_SAIU e a saída fica (L13)', async () => {
     const { dia, celia } = await limpezaDeHojeComCelia();
     await bd.update(confirmacoes).set({ entrada: '19:30', saida: '20:45' }).where(eq(confirmacoes.id, celia.id));
-    const resposta = await sair(dia.id);
-    expect(resposta.body).toMatchObject({ estado: 'assinou', entrada: '19:30', saida: '20:45' });
+    expect((await sair(dia.id)).body.codigo).toBe('JA_SAIU');
+    expect((await linha(celia.id)).saida).toBe('20:45:00');
   });
 });
 

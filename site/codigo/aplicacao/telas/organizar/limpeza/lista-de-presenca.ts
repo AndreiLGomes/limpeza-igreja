@@ -50,7 +50,7 @@ import { Limpezas } from '@nucleo/limpezas';
 
     <app-janela [titulo]="tituloDaJanela()" [(aberta)]="janelaDaPessoa">
       @if (emCorrecao()?.assinadoEm) {
-        <p class="dialog__text">Mudar o horário ou o EPI desfaz a assinatura desta pessoa. Ela vai assinar no papel.</p>
+        <p class="dialog__text">Mudar a entrada ou o EPI desfaz a assinatura desta pessoa. Ela vai assinar no papel.</p>
       }
       <form id="presenca-da-pessoa" [formGroup]="formulario" (ngSubmit)="salvar()" novalidate>
         @if (!emCorrecao()) {

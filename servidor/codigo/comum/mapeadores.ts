@@ -62,7 +62,7 @@ export function paraDiaCompleto(dia: DiaComTudo): DiaCompleto {
  * sem adesão, código, EPI, telefone ou nome completo.
  */
 export function paraPresenca(pessoa: Confirmacao | undefined, comHorarios: boolean): Presenca {
-  const estado = pessoa?.assinadoEm ? 'assinou' : pessoa?.entrada ? 'chegou' : 'fora';
+  const estado = pessoa?.saida ? 'saiu' : pessoa?.entrada ? 'chegou' : 'fora';
   const primeiroNome = pessoa ? (pessoa.nome.split(' ')[0] ?? pessoa.nome) : null;
   if (!pessoa || !comHorarios) return { estado, primeiroNome, entrada: null, saida: null, assinadoEm: null };
   return {

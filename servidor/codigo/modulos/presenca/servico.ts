@@ -27,21 +27,28 @@ export async function consultar(diaId: string, telefone: string): Promise<Presen
 }
 
 /**
- * "Cheguei" (L3–L5). Na primeira vez grava adesão, código, EPI e a hora do servidor, e devolve os horários.
- * Tocar de novo não muda nada e não devolve horários (L12). Quem não confirmou antes precisa do nome.
+ * "Cheguei → Confirmo" (L3–L5): grava adesão, código, EPI, a hora do servidor e a ASSINATURA (ela é feita na
+ * chegada e comprova a chegada e o EPI). Já assinou ou já saiu: tocar de novo não muda nada e não devolve
+ * horários (L12). Quem não confirmou antes precisa do nome.
  */
 export function marcarEntrada(diaId: string, dados: DadosEntrada): Promise<Presenca> {
-  const presenca = { numeroAdesao: dados.numeroAdesao, codigoFuncao: dados.codigoFuncao, recebeuEpi: dados.recebeuEpi };
+  const assinatura = {
+    numeroAdesao: dados.numeroAdesao,
+    codigoFuncao: dados.codigoFuncao,
+    recebeuEpi: dados.recebeuEpi,
+    assinadoEm: new Date(),
+  };
   // Duas chegadas iguais ao mesmo tempo: a restrição única do telefone (C4) deixa só uma linha.
   return comRestricaoUnica('confirmacoes_telefone_unico_no_dia', 'TELEFONE_REPETIDO', () =>
     emTransacao(async (tx) => {
       exigirQueSejaHoje(await repositorioDeDias.buscarTravando(tx, diaId));
       const existente = await repositorio.buscarPorTelefone(tx, diaId, dados.telefone);
-      if (existente?.assinadoEm) throw new ErroDeRegra('JA_ASSINOU');
-      if (existente?.entrada) return paraPresenca(existente, false);
+      if (existente?.assinadoEm || existente?.saida) return paraPresenca(existente, false);
+      // O organizador já marcou a chegada (L8): a pessoa assina, e a entrada que ele marcou continua valendo.
+      if (existente?.entrada) return paraPresenca(await repositorio.atualizar(tx, existente.id, assinatura), true);
 
       const entrada = horaAgora();
-      if (existente) return paraPresenca(await repositorio.atualizar(tx, existente.id, { ...presenca, entrada }), true);
+      if (existente) return paraPresenca(await repositorio.atualizar(tx, existente.id, { ...assinatura, entrada }), true);
 
       if (!dados.nome) {
         // A mesma frase vai no aviso e embaixo do campo Nome, que a tela passa a mostrar.
@@ -55,7 +62,7 @@ export function marcarEntrada(diaId: string, dados: DadosEntrada): Promise<Prese
         telefone: dados.telefone,
         tempo: 'todo',
         codigoCancelamentoHash: codigoSemDono(),
-        ...presenca,
+        ...assinatura,
         entrada,
       });
       return paraPresenca(criada, true);
@@ -64,32 +71,31 @@ export function marcarEntrada(diaId: string, dados: DadosEntrada): Promise<Prese
 }
 
 /**
- * "Saí → Confirmo" (L6, L7): grava a saída e o "assinado em". Se o "Encerrar limpeza" já gravou a saída,
- * ela é mantida e só a assinatura é gravada (L13).
+ * "Saí" (L6, L7): grava só a hora de saída; a assinatura já foi feita na chegada. Já saiu (pelo app ou pelo
+ * "Encerrar limpeza", L13): JA_SAIU, e a saída gravada fica.
  */
 export async function marcarSaida(diaId: string, telefone: string): Promise<Presenca> {
   exigirQueSejaHoje(await repositorioDeDias.buscar(diaId));
   const pessoa = await repositorio.buscarPorTelefone(bd, diaId, telefone);
   if (!pessoa) throw new ErroDeRegra('TELEFONE_NAO_CONFERE');
-  if (pessoa.assinadoEm) throw new ErroDeRegra('JA_ASSINOU');
   if (!pessoa.entrada) throw new ErroDeRegra('SEM_ENTRADA');
+  if (pessoa.saida) throw new ErroDeRegra('JA_SAIU');
   const agora = horaAgora();
   const entrada = hora(pessoa.entrada)!;
   // A saída nunca fica antes da entrada (o organizador pode ter corrigido a entrada para mais tarde).
-  const saida = pessoa.saida ?? (agora < entrada ? entrada : agora);
-  return paraPresenca(await repositorio.atualizar(bd, pessoa.id, { saida, assinadoEm: new Date() }), true);
+  const saida = agora < entrada ? entrada : agora;
+  return paraPresenca(await repositorio.atualizar(bd, pessoa.id, { saida }), true);
 }
 
 /**
  * L8: o organizador corrige adesão, código, EPI, entrada e saída, em qualquer limpeza. Ele pode desfazer
- * uma assinatura, mas nunca cria uma. Mudar entrada, saída ou EPI de quem assinou desfaz a assinatura,
- * porque é justamente o que a folha comprova.
+ * uma assinatura, mas nunca cria uma. A assinatura é da chegada: mudar a entrada ou o EPI de quem assinou
+ * desfaz a assinatura; mudar só a saída, a adesão ou o código, não.
  */
 export async function corrigir(diaId: string, pessoaId: string, dados: DadosCorrecaoPresenca): Promise<PessoaCompleta> {
   const pessoa = await repositorio.buscarDoDia(bd, diaId, pessoaId);
   if (!pessoa) throw new ErroDeRegra('PESSOA_NAO_ENCONTRADA');
-  const mudouOQueFoiAssinado =
-    hora(pessoa.entrada) !== dados.entrada || hora(pessoa.saida) !== dados.saida || pessoa.recebeuEpi !== dados.recebeuEpi;
+  const mudouOQueFoiAssinado = hora(pessoa.entrada) !== dados.entrada || pessoa.recebeuEpi !== dados.recebeuEpi;
   const { desfazerAssinatura, ...campos } = dados;
   const atualizada = await repositorio.atualizar(bd, pessoa.id, {
     ...campos,

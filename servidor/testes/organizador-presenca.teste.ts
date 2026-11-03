@@ -40,7 +40,7 @@ describe('Corrigir presença (L8)', () => {
     expect(await assinadoEm(pessoa.id)).toBeNull();
   });
 
-  it('mudar horário ou EPI de quem assinou desfaz a assinatura; mudar só adesão ou código, não', async () => {
+  it('mudar o EPI de quem assinou desfaz a assinatura; mudar só adesão ou código, não', async () => {
     const dia = await criarDia();
     const pessoa = await criarConfirmacao(dia, { ...ASSINADA, assinadoEm: new Date() });
 
@@ -51,14 +51,17 @@ describe('Corrigir presença (L8)', () => {
     expect(await assinadoEm(pessoa.id)).toBeNull();
   });
 
-  it('mudar a saída de quem assinou também desfaz; desfazerAssinatura desfaz sem mudar nada', async () => {
+  it('mudar a entrada desfaz; mudar só a saída NÃO (a assinatura é da chegada); desfazerAssinatura desfaz', async () => {
     const dia = await criarDia();
-    const uma = await criarConfirmacao(dia, { ...ASSINADA, assinadoEm: new Date() });
-    const outra = await criarConfirmacao(dia, { ...ASSINADA, assinadoEm: new Date() });
-    await corrigir(dia.id, uma.id, { ...ASSINADA, saida: '21:00' });
-    await corrigir(dia.id, outra.id, { ...ASSINADA, desfazerAssinatura: true });
-    expect(await assinadoEm(uma.id)).toBeNull();
-    expect(await assinadoEm(outra.id)).toBeNull();
+    const entrada = await criarConfirmacao(dia, { ...ASSINADA, assinadoEm: new Date() });
+    const saida = await criarConfirmacao(dia, { ...ASSINADA, assinadoEm: new Date() });
+    const desfazer = await criarConfirmacao(dia, { ...ASSINADA, assinadoEm: new Date() });
+    await corrigir(dia.id, entrada.id, { ...ASSINADA, entrada: '19:00' });
+    await corrigir(dia.id, saida.id, { ...ASSINADA, saida: '21:00' });
+    await corrigir(dia.id, desfazer.id, { ...ASSINADA, desfazerAssinatura: true });
+    expect(await assinadoEm(entrada.id)).toBeNull();
+    expect(await assinadoEm(saida.id)).not.toBeNull();
+    expect(await assinadoEm(desfazer.id)).toBeNull();
   });
 
   it('saída antes da entrada → 400 com campos.saida; pessoa de outra limpeza → 404', async () => {

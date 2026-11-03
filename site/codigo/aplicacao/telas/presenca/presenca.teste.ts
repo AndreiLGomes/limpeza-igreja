@@ -52,6 +52,10 @@ describe('TelaPresenca', () => {
     tela.preencher('Código da função', '222');
     tela.elemento.querySelector<HTMLInputElement>('input[value="sim"]')!.click();
     tela.botao('Cheguei').click();
+    // L5: o "Cheguei" só abre a janela; a chegada (e a assinatura) é no "Confirmo".
+    await tela.esperar(() => tela.elemento.textContent!.includes('Confirmo que cheguei à limpeza de hoje e que recebi EPI.'), 'a janela');
+    expect(tela.api.marcarEntrada).not.toHaveBeenCalled();
+    tela.botao('Confirmo').click();
 
     await tela.esperar(() => tela.elemento.textContent!.includes('Olá, Célia'), 'o estado "chegou"');
     expect(tela.api.marcarEntrada).toHaveBeenCalledWith('dia-1', {
@@ -69,6 +73,8 @@ describe('TelaPresenca', () => {
     tela.preencher('Código da função', '222');
     tela.elemento.querySelector<HTMLInputElement>('input[value="nao"]')!.click();
     tela.botao('Cheguei').click();
+    await tela.esperar(() => tela.elemento.textContent!.includes('não recebi EPI'), 'a janela');
+    tela.botao('Confirmo').click();
 
     await tela.esperar(() => tela.campo('Seu nome') !== undefined, 'o campo Nome aparecer');
     // Armadilha 9 do docs/06: a mensagem embaixo do campo é desenhada um instante depois.

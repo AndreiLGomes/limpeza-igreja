@@ -70,7 +70,7 @@ export const confirmacoes = pgTable(
     recebeuEpi: boolean('recebeu_epi'),
     entrada: time('entrada'),
     saida: time('saida'),
-    /** Quando o PRÓPRIO voluntário tocou em "Confirmo" (L6). O organizador só pode apagar, nunca criar. */
+    /** Quando o PRÓPRIO voluntário confirmou a chegada (L5). O organizador só pode apagar, nunca criar. */
     assinadoEm: timestamp('assinado_em', { withTimezone: true }),
   },
   (t) => [
@@ -99,7 +99,8 @@ export const confirmacoes = pgTable(
       'confirmacoes_saida_depois_da_entrada',
       sql`${t.saida} IS NULL OR (${t.entrada} IS NOT NULL AND ${t.saida} >= ${t.entrada})`,
     ), // L6, L8
-    check('confirmacoes_assinatura_com_saida', sql`${t.assinadoEm} IS NULL OR ${t.saida} IS NOT NULL`), // L6
+    // A assinatura é feita na chegada (L5): só existe com entrada.
+    check('confirmacoes_assinatura_com_entrada', sql`${t.assinadoEm} IS NULL OR ${t.entrada} IS NOT NULL`), // L5
   ],
 );
 

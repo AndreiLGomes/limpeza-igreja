@@ -8,6 +8,12 @@ import { entrarComoOrganizador, expect, notificacao, semRolagemLateral, teste } 
 
 const CELIA = { nome: 'Célia Gomes', telefone: '47911112222' };
 
+/** "Cheguei" abre a janela; "Confirmo" marca a chegada e assina (L5). */
+async function chegarEConfirmar(pagina: Page): Promise<void> {
+  await pagina.getByRole('button', { name: 'Cheguei' }).click();
+  await pagina.getByRole('dialog', { name: 'Confirmar sua chegada?' }).getByRole('button', { name: 'Confirmo' }).click();
+}
+
 /** Preenche o formulário da presença, na tela ou dentro de uma janela (sem enviar). */
 async function preencherPresenca(
   onde: Page | Locator, telefone: string, adesao: string, epi: 'Sim' | 'Não',
@@ -18,7 +24,7 @@ async function preencherPresenca(
   await onde.getByLabel(epi, { exact: true }).check();
 }
 
-teste('presença: Cheguei, Saí e Confirmo; ao recarregar, continua assinada @escuro', async ({ page }) => {
+teste('presença: Cheguei e Confirmo assinam a chegada; Saí grava a saída; ao recarregar, continua @escuro', async ({ page }) => {
   const diaId = await criarLimpezaDeHoje([CELIA]);
   await page.goto('/');
   await page.getByRole('link', { name: 'Marcar presença' }).first().click();
@@ -27,18 +33,18 @@ teste('presença: Cheguei, Saí e Confirmo; ao recarregar, continua assinada @es
   await preencherPresenca(page, '47 91111-2222', '08', 'Sim');
   await semRolagemLateral(page);
   await page.getByRole('button', { name: 'Cheguei' }).click();
-
-  await expect(page.getByRole('heading', { name: 'Olá, Célia' })).toBeVisible();
-  await expect(page.getByText(/^Entrada: \d{2}:\d{2}$/)).toBeVisible();
-  await page.getByRole('button', { name: 'Saí' }).click();
-  const janela = page.getByRole('dialog', { name: 'Confirmar sua presença?' });
-  await expect(janela).toContainText(/a partir das \d{2}:\d{2}\./);
+  const janela = page.getByRole('dialog', { name: 'Confirmar sua chegada?' });
+  await expect(janela).toContainText('Confirmo que cheguei à limpeza de hoje e que recebi EPI.');
   await expect(janela.getByRole('button', { name: 'Voltar' })).toBeFocused();
   await janela.getByRole('button', { name: 'Confirmo' }).click();
 
-  await expect(page.getByText(/^Presença assinada às \d{2}:\d{2}\. Obrigado!$/)).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Olá, Célia' })).toBeVisible();
+  await expect(page.getByText(/^Chegada assinada às \d{2}:\d{2}\.$/)).toBeVisible();
+  await page.getByRole('button', { name: 'Saí' }).click();
+
+  await expect(page.getByText(/^Saída marcada às \d{2}:\d{2}\. Obrigado!$/)).toBeVisible();
   await page.reload();
-  await expect(page.getByText('Presença assinada', { exact: true })).toBeVisible();
+  await expect(page.getByText('Saída marcada', { exact: true })).toBeVisible();
   await semRolagemLateral(page);
 });
 
@@ -46,11 +52,11 @@ teste('presença: quem não confirmou antes escreve o nome e entra na lista', as
   const diaId = await criarLimpezaDeHoje();
   await page.goto(`/presenca?dia=${diaId}`);
   await preencherPresenca(page, '47 92222-3333', '03', 'Não');
-  await page.getByRole('button', { name: 'Cheguei' }).click();
+  await chegarEConfirmar(page);
 
   await expect(page.getByText('Você ainda não está na lista desta limpeza. Escreva seu nome.')).toBeVisible();
   await page.getByLabel('Seu nome').fill('Matheus Bett');
-  await page.getByRole('button', { name: 'Cheguei' }).click();
+  await chegarEConfirmar(page);
   await expect(page.getByRole('heading', { name: 'Olá, Matheus' })).toBeVisible();
 });
 
@@ -58,7 +64,7 @@ teste('presença: "Não sou eu" esquece os dados deste celular', async ({ page }
   const diaId = await criarLimpezaDeHoje([CELIA]);
   await page.goto(`/presenca?dia=${diaId}`);
   await preencherPresenca(page, '47 91111-2222', '08', 'Sim');
-  await page.getByRole('button', { name: 'Cheguei' }).click();
+  await chegarEConfirmar(page);
   await expect(page.getByRole('heading', { name: 'Olá, Célia' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Não sou eu' }).click();
@@ -79,14 +85,15 @@ teste('organizador: vê a lista, corrige o EPI e usa "Encerrar limpeza"', async 
   await page.goto(`/organizar/limpeza/${diaId}`);
 
   await expect(page.getByRole('heading', { name: 'Lista de presença' })).toBeVisible();
-  await expect(page.getByText(/Adesão 08 · Função 222 · EPI: sim · chegou às \d{2}:\d{2} · assina no papel/)).toBeVisible();
+  // A chegada pelo app já é assinada (L5); corrigir o EPI desfaz a assinatura (L8).
+  await expect(page.getByText(/Adesão 08 · Função 222 · EPI: sim · chegou às \d{2}:\d{2} · assinou no app/)).toBeVisible();
 
   await page.getByRole('button', { name: /Célia Gomes/ }).click();
   const corrigir = page.getByRole('dialog', { name: 'Corrigir presença de Célia Gomes' });
   await corrigir.getByLabel('Não', { exact: true }).check();
   await corrigir.getByRole('button', { name: 'Salvar', exact: true }).click();
   await expect(notificacao(page, 'Presença de Célia Gomes corrigida.')).toBeVisible();
-  await expect(page.getByText(/EPI: não/)).toBeVisible();
+  await expect(page.getByText(/EPI: não · chegou às \d{2}:\d{2} · assina no papel/)).toBeVisible();
 
   await page.getByRole('button', { name: 'Encerrar limpeza' }).click();
   const encerrar = page.getByRole('dialog', { name: 'Encerrar a limpeza?' });

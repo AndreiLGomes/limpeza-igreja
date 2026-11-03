@@ -154,19 +154,18 @@ describe('Presença: restrições no banco (L4, L6, L14)', () => {
     await esperarRecusaDaFabrica(criarConfirmacao(dia, { codigoFuncao: '22a' }), 'confirmacoes_codigo_funcao_so_digitos');
   });
 
-  it('saída exige entrada e não pode ser antes dela; assinatura exige saída', async () => {
+  it('saída exige entrada e não pode ser antes dela; assinatura exige entrada (é feita na chegada)', async () => {
     const dia = await criarDia();
     await esperarRecusaDaFabrica(criarConfirmacao(dia, { saida: '20:00' }), 'confirmacoes_saida_depois_da_entrada');
     await esperarRecusaDaFabrica(
       criarConfirmacao(dia, { entrada: '20:00', saida: '19:00' }),
       'confirmacoes_saida_depois_da_entrada',
     );
-    await esperarRecusaDaFabrica(
-      criarConfirmacao(dia, { entrada: '20:00', assinadoEm: new Date() }),
-      'confirmacoes_assinatura_com_saida',
-    );
-    const certa = await criarConfirmacao(dia, { entrada: '20:00', saida: '20:00', assinadoEm: new Date() });
-    expect(certa.saida).toBe('20:00:00');
+    await esperarRecusaDaFabrica(criarConfirmacao(dia, { assinadoEm: new Date() }), 'confirmacoes_assinatura_com_entrada');
+    const chegou = await criarConfirmacao(dia, { entrada: '20:00', assinadoEm: new Date() });
+    expect(chegou.saida).toBeNull();
+    const saiu = await criarConfirmacao(dia, { entrada: '20:00', saida: '20:00', assinadoEm: new Date() });
+    expect(saiu.saida).toBe('20:00:00');
   });
 
   it('L14: o telefone pode ficar vazio, e duas pessoas sem telefone cabem na mesma limpeza', async () => {

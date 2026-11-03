@@ -81,8 +81,11 @@ export interface Status {
   texto: string;
 }
 
-/** L12: em que pé está a presença de alguém na limpeza de hoje. */
-export const ESTADOS_DA_PRESENCA = ['fora', 'chegou', 'assinou'] as const;
+/**
+ * L12: em que pé está a presença de alguém na limpeza de hoje: ainda não chegou, chegou (e assinou na
+ * chegada, L5) ou já saiu.
+ */
+export const ESTADOS_DA_PRESENCA = ['fora', 'chegou', 'saiu'] as const;
 export type EstadoDaPresenca = (typeof ESTADOS_DA_PRESENCA)[number];
 
 /**

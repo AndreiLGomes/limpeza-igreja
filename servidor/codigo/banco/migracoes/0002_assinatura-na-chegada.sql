@@ -1,0 +1,2 @@
+ALTER TABLE "confirmacoes" DROP CONSTRAINT "confirmacoes_assinatura_com_saida";--> statement-breakpoint
+ALTER TABLE "confirmacoes" ADD CONSTRAINT "confirmacoes_assinatura_com_entrada" CHECK ("confirmacoes"."assinado_em" IS NULL OR "confirmacoes"."entrada" IS NOT NULL);

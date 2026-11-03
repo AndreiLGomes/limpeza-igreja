@@ -1,6 +1,7 @@
 /**
  * "/presenca?dia=ID": o voluntário marca a própria presença, sem senha (TelaPresenca; L1–L9).
- * Três estados: formulário ("Cheguei") → chegou ("Saí" abre a janela "Confirmo") → assinado.
+ * Três estados: formulário ("Cheguei" abre a janela "Confirmo", que marca a chegada e ASSINA, L5) →
+ * chegou ("Saí" grava só a hora de saída, L6) → saiu.
  * O celular lembra telefone, adesão e código (L9); "Não sou eu" esquece. Fora do dia: estado vazio.
  * O campo Nome começa DESABILITADO: só quem não confirmou antes precisa dele, e só aparece quando o
  * servidor pede (NOME_OBRIGATORIO). Desabilitado, ele não deixa o formulário inválido.
@@ -20,8 +21,8 @@ import { ehSemConexao, mensagemDaFalha, notificarFalha } from '@nucleo/falhas';
 import { MinhaPresenca } from '@nucleo/minha-presenca';
 import { Estado } from '../../comum/estado/estado';
 
-/** Já assinou em outro celular (JA_ASSINOU): a tela vai direto para "assinado", sem horários. */
-const JA_ASSINADA: Presenca = { estado: 'assinou', primeiroNome: null, entrada: null, saida: null, assinadoEm: null };
+/** Já saiu (pelo app em outro celular ou pelo "Encerrar limpeza"): a tela vai direto para "saiu", sem horários. */
+const JA_SAIU: Presenca = { estado: 'saiu', primeiroNome: null, entrada: null, saida: null, assinadoEm: null };
 
 @Component({
   selector: 'app-tela-presenca',
@@ -39,9 +40,9 @@ const JA_ASSINADA: Presenca = { estado: 'assinou', primeiroNome: null, entrada: 
       >
         @if (limpeza(); as limpeza) {
           @switch (presenca()?.estado) {
-            @case ('assinou') {
+            @case ('saiu') {
               <div class="card">
-                <app-vazio icone="calendar-check" titulo="Presença assinada" [texto]="textoDeAssinado()">
+                <app-vazio icone="calendar-check" titulo="Saída marcada" [texto]="textoDeSaida()">
                   <a appBotao variante="secundario" routerLink="/">Voltar ao início</a>
                 </app-vazio>
               </div>
@@ -50,16 +51,18 @@ const JA_ASSINADA: Presenca = { estado: 'assinou', primeiroNome: null, entrada: 
               <div class="card cartao-de-formulario">
                 <app-cabecalho-do-formulario [titulo]="'Olá, ' + (presenca()?.primeiroNome ?? '')" [descricao]="titulo()" />
                 @if (entrada(); as entrada) {
-                  <p class="form__desc">Entrada: {{ entrada }}</p>
+                  <p class="form__desc">Chegada assinada às {{ entrada }}.</p>
                 }
                 <div appAcoesDoFormulario>
                   <button appBotao variante="discreto" type="button" (click)="naoSouEu()">Não sou eu</button>
-                  <button appBotao type="button" (click)="janelaDeSaida.set(true)">Saí</button>
+                  <button appBotao type="button" [esperando]="enviando()" [disabled]="enviando()" (click)="sair()">
+                    <app-conteudo-do-botao [esperando]="enviando()" textoDeEspera="Marcando…">Saí</app-conteudo-do-botao>
+                  </button>
                 </div>
               </div>
             }
             @default {
-              <form appFormulario class="card cartao-de-formulario" [formGroup]="formulario" (ngSubmit)="chegar()">
+              <form appFormulario class="card cartao-de-formulario" [formGroup]="formulario" (ngSubmit)="pedirConfirmacao()">
                 <app-cabecalho-do-formulario titulo="Marcar presença" [descricao]="titulo()" />
                 <app-campo
                   rotulo="Telefone"
@@ -85,9 +88,7 @@ const JA_ASSINADA: Presenca = { estado: 'assinou', primeiroNome: null, entrada: 
                   @if (minhaPresenca.dados()) {
                     <button appBotao variante="discreto" type="button" (click)="naoSouEu()">Não sou eu</button>
                   }
-                  <button appBotao type="submit" [esperando]="enviando()" [disabled]="enviando()">
-                    <app-conteudo-do-botao [esperando]="enviando()" textoDeEspera="Marcando…">Cheguei</app-conteudo-do-botao>
-                  </button>
+                  <button appBotao type="submit" [disabled]="enviando()">Cheguei</button>
                 </div>
               </form>
             }
@@ -102,11 +103,11 @@ const JA_ASSINADA: Presenca = { estado: 'assinou', primeiroNome: null, entrada: 
       </app-estado>
     </div>
 
-    <app-janela titulo="Confirmar sua presença?" [(aberta)]="janelaDeSaida">
+    <app-janela titulo="Confirmar sua chegada?" [(aberta)]="janelaDeChegada">
       <p class="dialog__text">{{ textoDaJanela() }}</p>
       <div acoesDaJanela>
-        <button appBotao variante="secundario" type="button" autofocus (click)="janelaDeSaida.set(false)">Voltar</button>
-        <button appBotao type="button" [esperando]="enviando()" [disabled]="enviando()" (click)="sair()">
+        <button appBotao variante="secundario" type="button" autofocus (click)="janelaDeChegada.set(false)">Voltar</button>
+        <button appBotao type="button" [esperando]="enviando()" [disabled]="enviando()" (click)="chegar()">
           <app-conteudo-do-botao [esperando]="enviando()" textoDeEspera="Assinando…">Confirmo</app-conteudo-do-botao>
         </button>
       </div>
@@ -143,23 +144,18 @@ export class TelaPresenca implements OnInit {
   protected readonly presenca = signal<Presenca | null>(null);
   protected readonly pedirNome = signal(false);
   protected readonly enviando = signal(false);
-  protected readonly janelaDeSaida = signal(false);
+  protected readonly janelaDeChegada = signal(false);
+  /** L5: o que a pessoa está assinando (a chegada e o EPI). Montado ao abrir a janela. */
+  protected readonly textoDaJanela = signal('');
 
   /** A hora de entrada: a que o servidor devolveu ou a que este celular guardou (L9). */
   protected readonly entrada = computed(() => {
     const dia = this.limpeza();
     return this.presenca()?.entrada ?? (dia ? this.minhaPresenca.entradaEm(dia.id) : null);
   });
-  /** L6: a janela não mostra a saída, que é a hora do servidor e só se sabe depois de confirmar. */
-  protected readonly textoDaJanela = computed(() => {
-    const entrada = this.entrada();
-    return entrada
-      ? `Confirmo que participei da limpeza de hoje, a partir das ${entrada}.`
-      : 'Confirmo que participei da limpeza de hoje.';
-  });
-  protected readonly textoDeAssinado = computed(() => {
+  protected readonly textoDeSaida = computed(() => {
     const saida = this.presenca()?.saida;
-    return saida ? `Presença assinada às ${saida}. Obrigado!` : 'Sua presença já está assinada. Obrigado!';
+    return saida ? `Saída marcada às ${saida}. Obrigado!` : 'Sua saída já está marcada. Obrigado!';
   });
 
   protected readonly formulario = new FormGroup({
@@ -201,10 +197,19 @@ export class TelaPresenca implements OnInit {
     }
   }
 
+  /** "Cheguei": confere o formulário e abre a janela com o que a pessoa vai assinar (L5). */
+  protected pedirConfirmacao(): void {
+    this.formulario.markAllAsTouched();
+    if (!this.limpeza() || this.formulario.invalid) return;
+    const recebeu = deSimNao(this.formulario.controls.recebeuEpi.value);
+    this.textoDaJanela.set(`Confirmo que cheguei à limpeza de hoje e que ${recebeu ? 'recebi' : 'não recebi'} EPI.`);
+    this.janelaDeChegada.set(true);
+  }
+
+  /** "Confirmo": marca a chegada e assina (L5). */
   protected async chegar(): Promise<void> {
     const dia = this.limpeza();
-    this.formulario.markAllAsTouched();
-    if (!dia || this.formulario.invalid) return;
+    if (!dia) return;
     const { telefone, numeroAdesao, codigoFuncao, recebeuEpi } = this.formulario.getRawValue();
     const nome = this.formulario.controls.nome;
     this.enviando.set(true);
@@ -222,6 +227,7 @@ export class TelaPresenca implements OnInit {
     } catch (erro) {
       this.mostrarFalha(erro, () => void this.chegar());
     } finally {
+      this.janelaDeChegada.set(false);
       this.enviando.set(false);
     }
   }
@@ -235,7 +241,6 @@ export class TelaPresenca implements OnInit {
     } catch (erro) {
       this.mostrarFalha(erro, () => void this.sair());
     } finally {
-      this.janelaDeSaida.set(false);
       this.enviando.set(false);
     }
   }
@@ -262,12 +267,12 @@ export class TelaPresenca implements OnInit {
   }
 
   /**
-   * Já assinou: vai direto para "assinado" (L7). Falta o nome: o campo aparece (L3). Erro de campo:
+   * Já saiu: vai direto para "saiu" (L7). Falta o nome: o campo aparece (L3). Erro de campo:
    * embaixo do campo. Sem conexão: notificação com "Tentar de novo". O resto: notificação.
    */
   private mostrarFalha(erro: unknown, tentarDeNovo: () => void): void {
-    if (erro instanceof FalhaNaApi && erro.codigo === 'JA_ASSINOU') {
-      this.presenca.set(JA_ASSINADA);
+    if (erro instanceof FalhaNaApi && erro.codigo === 'JA_SAIU') {
+      this.presenca.set(JA_SAIU);
       return;
     }
     if (erro instanceof FalhaNaApi && erro.codigo === 'NOME_OBRIGATORIO') {

@@ -77,9 +77,9 @@ export const CATALOGO_DE_ERROS = {
     status: 409,
     mensagem: 'A presença só pode ser marcada no dia da limpeza.',
   },
-  JA_ASSINOU: {
+  JA_SAIU: {
     status: 409,
-    mensagem: 'Sua presença já foi assinada. Para mudar algo, fale com quem organiza.',
+    mensagem: 'Sua saída já foi marcada. Para mudar algo, fale com quem organiza.',
   },
   SEM_ENTRADA: {
     status: 409,
