@@ -51,6 +51,10 @@ rotasDoOrganizador.get(organizador.sugestaoTarefas, exigirOrganizador, async (_r
   resposta.json(await servicoDeDias.sugestaoDeTarefas());
 });
 
+rotasDoOrganizador.get(organizador.cabecalhoPadrao, exigirOrganizador, async (_requisicao, resposta) => {
+  resposta.json(await servicoDeDias.cabecalhoPadrao());
+});
+
 rotasDoOrganizador.get(organizador.dia(':id'), exigirOrganizador, validar(DIA_VALIDO), async (requisicao: ComDia, resposta) => {
   resposta.json(await servicoDeDias.diaCompleto(requisicao.params.id));
 });

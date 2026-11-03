@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
-  dataNaFrase, dataPorExtenso, ehDataValida, ehPassada, hora, horario, proximoDiaDaSemana, somarDias,
+  dataNaFrase, dataPorExtenso, ehDataValida, ehPassada, hora, horario, mesPorExtenso, proximoDiaDaSemana, somarDias,
 } from '../codigo/datas.js';
 
 describe('datas (D2, D4)', () => {
+  it('escreve o mês por extenso (folha)', () => {
+    expect(mesPorExtenso('2026-03-27')).toBe('março');
+    expect(mesPorExtenso('2026-12-01')).toBe('dezembro');
+  });
+
   it('escreve a data por extenso', () => {
     expect(dataPorExtenso('2026-10-16')).toBe('Sexta, 16 de outubro');
     expect(dataPorExtenso('2026-10-17')).toBe('Sábado, 17 de outubro');

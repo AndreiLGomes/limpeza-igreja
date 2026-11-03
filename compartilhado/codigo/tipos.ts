@@ -10,6 +10,28 @@ export const TEXTO_DO_TEMPO: Record<Tempo, string> = {
   'primeira-hora': 'Só a primeira hora',
 };
 
+/** L10: o quadrinho da folha de papel. */
+export const TIPOS_DE_SERVICO = ['apoio', 'construcao', 'reforma'] as const;
+export type TipoDeServico = (typeof TIPOS_DE_SERVICO)[number];
+
+/** Texto de cada tipo, como na folha de papel. */
+export const TEXTO_DO_TIPO_DE_SERVICO: Record<TipoDeServico, string> = {
+  apoio: 'Serviços Suplementares / Apoio',
+  construcao: 'Construção',
+  reforma: 'Reforma',
+};
+
+/** L10: o cabeçalho da folha de presença. Tudo opcional. */
+export interface Cabecalho {
+  /** "Casa de Oração Nº (Relatório)". */
+  casaDeOracao: string | null;
+  local: string | null;
+  /** "Administração/Setor". */
+  setor: string | null;
+  atividades: string | null;
+  tipoDeServico: TipoDeServico | null;
+}
+
 /** Pessoa como a parte pública vê (P1, P2): sem telefone, sem observação. */
 export interface PessoaPublica {
   id: string;
@@ -58,6 +80,8 @@ export interface DiaPublico {
 
 export interface DiaCompleto extends Omit<DiaPublico, 'pessoas'> {
   pessoas: PessoaCompleta[];
+  /** L10: o cabeçalho da folha (só o organizador vê). */
+  cabecalho: Cabecalho;
 }
 
 /** Resposta de POST /dias/:id/confirmacoes. */

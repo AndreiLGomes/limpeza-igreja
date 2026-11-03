@@ -4,8 +4,8 @@
  * pelo formato, e não por cuidado em cada rota.
  */
 import {
-  formatarTelefone, type DiaCompleto, type DiaPublico, type PessoaCompleta, type PessoaPublica, type Presenca,
-  type Tarefa, type Tempo,
+  formatarTelefone, type Cabecalho, type DiaCompleto, type DiaPublico, type PessoaCompleta, type PessoaPublica, type Presenca,
+  type Tarefa, type Tempo, type TipoDeServico,
 } from '@limpeza/compartilhado';
 import type { Confirmacao, DiaComTudo, TarefaDoBanco } from '../banco/esquema.js';
 
@@ -53,8 +53,19 @@ export function paraDiaPublico(dia: DiaComTudo): DiaPublico {
   return { ...camposDoDia(dia), pessoas: dia.pessoas.map(paraPessoaPublica) };
 }
 
+/** L10: o cabeçalho, de uma limpeza ou do padrão (as colunas são as mesmas). */
+export function paraCabecalho(linha: Record<keyof Cabecalho, string | null>): Cabecalho {
+  return {
+    casaDeOracao: linha.casaDeOracao,
+    local: linha.local,
+    setor: linha.setor,
+    atividades: linha.atividades,
+    tipoDeServico: linha.tipoDeServico as TipoDeServico | null,
+  };
+}
+
 export function paraDiaCompleto(dia: DiaComTudo): DiaCompleto {
-  return { ...camposDoDia(dia), pessoas: dia.pessoas.map(paraPessoaCompleta) };
+  return { ...camposDoDia(dia), pessoas: dia.pessoas.map(paraPessoaCompleta), cabecalho: paraCabecalho(dia) };
 }
 
 /**

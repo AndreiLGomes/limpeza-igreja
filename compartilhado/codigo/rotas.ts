@@ -25,6 +25,7 @@ export const ROTAS = {
     dias: '/organizador/dias',
     dia: (id: string) => `/organizador/dias/${id}`,
     sugestaoTarefas: '/organizador/sugestao-tarefas',
+    cabecalhoPadrao: '/organizador/cabecalho-padrao',
     pessoas: (diaId: string) => `/organizador/dias/${diaId}/pessoas`,
     pessoa: (diaId: string, pessoaId: string) => `/organizador/dias/${diaId}/pessoas/${pessoaId}`,
     presenca: (diaId: string, pessoaId: string) => `/organizador/dias/${diaId}/pessoas/${pessoaId}/presenca`,

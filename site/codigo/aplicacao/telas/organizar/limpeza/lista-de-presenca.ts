@@ -7,6 +7,7 @@
  */
 import { Component, computed, inject, input, output, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import {
   errosPorCampo, esquemaCorrecaoPresenca, esquemaPessoaNaPresenca, hoje, horaAgora, MENSAGENS,
   type DiaCompleto, type PessoaCompleta,
@@ -22,7 +23,7 @@ import { Limpezas } from '@nucleo/limpezas';
 
 @Component({
   selector: 'app-lista-de-presenca',
-  imports: [AcoesDoFormulario, Botao, Campo, ConteudoDoBotao, Entrada, Escolhas, Janela, ReactiveFormsModule],
+  imports: [AcoesDoFormulario, Botao, Campo, ConteudoDoBotao, Entrada, Escolhas, Janela, ReactiveFormsModule, RouterLink],
   template: `
     <section class="card">
       <h2 class="card__title">Lista de presença</h2>
@@ -41,6 +42,7 @@ import { Limpezas } from '@nucleo/limpezas';
         <p class="form__desc">Ninguém confirmou presença nesta limpeza.</p>
       }
       <div appAcoesDoFormulario>
+        <a appBotao variante="secundario" [routerLink]="['/organizar/limpeza', dia().id, 'folha']">Imprimir folha</a>
         <button appBotao variante="secundario" type="button" (click)="abrirNova()">Adicionar pessoa</button>
         @if (faltaSair() > 0) {
           <button appBotao variante="secundario" type="button" (click)="abrirEncerrar()">Encerrar limpeza</button>

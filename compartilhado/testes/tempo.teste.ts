@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { hoje, horaAgora } from '../codigo/tempo.js';
+import { dataEHoraCurtas, hoje, horaAgora } from '../codigo/tempo.js';
+
+describe('dataEHoraCurtas() (folha)', () => {
+  it('dia/mês e hora em São Paulo', () => {
+    expect(dataEHoraCurtas('2026-11-03T22:32:00Z')).toBe('03/11 às 19:32');
+    expect(dataEHoraCurtas('2026-11-04T02:05:00Z')).toBe('03/11 às 23:05');
+  });
+});
 
 describe('hoje() (D1)', () => {
   it('usa o fuso de São Paulo, não o UTC', () => {

@@ -175,3 +175,22 @@ describe('Presença: restrições no banco (L4, L6, L14)', () => {
     expect(segunda.telefone).toBeNull();
   });
 });
+
+describe('Cabeçalho da folha (L10, L11)', () => {
+  it('tipo de serviço só apoio, construção ou reforma, na limpeza e no padrão', async () => {
+    await esperarRecusa(
+      conexoes.query(`INSERT INTO dias (data, inicio, fim, vagas, tipo_de_servico) VALUES ('2030-01-04', '19:00', '21:00', 5, 'outro')`),
+      VIOLA_CHECK,
+      'dias_tipo_de_servico_valido',
+    );
+    await esperarRecusa(
+      conexoes.query(`INSERT INTO cabecalho_padrao (id, tipo_de_servico) VALUES (1, 'outro')`),
+      VIOLA_CHECK,
+      'cabecalho_padrao_tipo_de_servico_valido',
+    );
+  });
+
+  it('o padrão tem uma linha só (id 1)', async () => {
+    await esperarRecusa(conexoes.query('INSERT INTO cabecalho_padrao (id) VALUES (2)'), VIOLA_CHECK, 'cabecalho_padrao_linha_unica');
+  });
+});

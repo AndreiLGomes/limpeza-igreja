@@ -4,9 +4,9 @@
  */
 import { getTableName, sql } from 'drizzle-orm';
 import type { Banco } from './cliente.js';
-import { confirmacoes, dias, sessoesOrganizador, tarefas, tentativasDeAcesso } from './esquema.js';
+import { cabecalhoPadrao, confirmacoes, dias, sessoesOrganizador, tarefas, tentativasDeAcesso } from './esquema.js';
 
-const TABELAS = [confirmacoes, tarefas, dias, sessoesOrganizador, tentativasDeAcesso]
+const TABELAS = [confirmacoes, tarefas, dias, sessoesOrganizador, tentativasDeAcesso, cabecalhoPadrao]
   .map((tabela) => `"${getTableName(tabela)}"`)
   .join(', ');
 

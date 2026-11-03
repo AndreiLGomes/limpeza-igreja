@@ -50,7 +50,11 @@ export async function buscarMaisRecente(): Promise<DiaComTudo | undefined> {
   return dia ? (await completar([dia]))[0] : undefined;
 }
 
-type CamposDaLimpeza = Pick<typeof dias.$inferInsert, 'data' | 'inicio' | 'fim' | 'vagas'>;
+/** Os campos da limpeza mais os do cabeçalho da folha (L10). */
+type CamposDaLimpeza = Pick<
+  typeof dias.$inferInsert,
+  'data' | 'inicio' | 'fim' | 'vagas' | 'casaDeOracao' | 'local' | 'setor' | 'atividades' | 'tipoDeServico'
+>;
 
 export async function inserir(tx: Executor, valores: CamposDaLimpeza): Promise<Dia> {
   const [dia] = await tx.insert(dias).values(valores).returning();

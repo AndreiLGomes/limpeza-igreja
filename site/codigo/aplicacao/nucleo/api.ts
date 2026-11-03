@@ -8,7 +8,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom, type Observable } from 'rxjs';
 import {
-  ehCodigoDeErro, mensagemDoErro, ROTAS, type ConfirmacaoCriada, type DiaCompleto, type DiaPublico,
+  ehCodigoDeErro, mensagemDoErro, ROTAS, type Cabecalho, type ConfirmacaoCriada, type DiaCompleto, type DiaPublico,
   type EntradaConfirmacao, type EntradaCorrecaoPresenca, type EntradaDia, type EntradaPessoaNaPresenca,
   type EntradaPresenca, type ErroApi, type PessoaCompleta, type Presenca, type SessaoCriada, type Tarefa,
 } from '@limpeza/compartilhado';
@@ -116,6 +116,11 @@ export class Api {
 
   sugestaoDeTarefas(): Promise<string[]> {
     return this.pedir(this.http.get<string[]>(this.url(ROTAS.organizador.sugestaoTarefas)));
+  }
+
+  /** L11: o cabeçalho padrão da folha. */
+  cabecalhoPadrao(): Promise<Cabecalho> {
+    return this.pedir(this.http.get<Cabecalho>(this.url(ROTAS.organizador.cabecalhoPadrao)));
   }
 
   criarLimpeza(dados: EntradaDia): Promise<DiaCompleto> {

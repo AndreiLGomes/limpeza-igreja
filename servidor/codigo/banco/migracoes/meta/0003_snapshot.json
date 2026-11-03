@@ -1,0 +1,617 @@
+{
+  "id": "1d00ec2c-d0a2-4898-8a69-4491aa178b92",
+  "prevId": "d15186ee-4732-4840-b580-64acd5d33e20",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.cabecalho_padrao": {
+      "name": "cabecalho_padrao",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "smallint",
+          "primaryKey": true,
+          "notNull": true,
+          "default": 1
+        },
+        "casa_de_oracao": {
+          "name": "casa_de_oracao",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "local": {
+          "name": "local",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "setor": {
+          "name": "setor",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atividades": {
+          "name": "atividades",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tipo_de_servico": {
+          "name": "tipo_de_servico",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "cabecalho_padrao_linha_unica": {
+          "name": "cabecalho_padrao_linha_unica",
+          "value": "\"cabecalho_padrao\".\"id\" = 1"
+        },
+        "cabecalho_padrao_tipo_de_servico_valido": {
+          "name": "cabecalho_padrao_tipo_de_servico_valido",
+          "value": "\"cabecalho_padrao\".\"tipo_de_servico\" IN ('apoio', 'construcao', 'reforma')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.confirmacoes": {
+      "name": "confirmacoes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "dia_id": {
+          "name": "dia_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nome": {
+          "name": "nome",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "telefone": {
+          "name": "telefone",
+          "type": "varchar(11)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tempo": {
+          "name": "tempo",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "observacao": {
+          "name": "observacao",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "codigo_cancelamento_hash": {
+          "name": "codigo_cancelamento_hash",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "numero_adesao": {
+          "name": "numero_adesao",
+          "type": "varchar(6)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "codigo_funcao": {
+          "name": "codigo_funcao",
+          "type": "varchar(6)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "recebeu_epi": {
+          "name": "recebeu_epi",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "entrada": {
+          "name": "entrada",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "saida": {
+          "name": "saida",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "assinado_em": {
+          "name": "assinado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "confirmacoes_dia_id_idx": {
+          "name": "confirmacoes_dia_id_idx",
+          "columns": [
+            {
+              "expression": "dia_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "confirmacoes_dia_id_dias_id_fk": {
+          "name": "confirmacoes_dia_id_dias_id_fk",
+          "tableFrom": "confirmacoes",
+          "tableTo": "dias",
+          "columnsFrom": [
+            "dia_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "confirmacoes_telefone_unico_no_dia": {
+          "name": "confirmacoes_telefone_unico_no_dia",
+          "nullsNotDistinct": false,
+          "columns": [
+            "dia_id",
+            "telefone"
+          ]
+        },
+        "confirmacoes_codigo_unico": {
+          "name": "confirmacoes_codigo_unico",
+          "nullsNotDistinct": false,
+          "columns": [
+            "codigo_cancelamento_hash"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "confirmacoes_nome_tamanho": {
+          "name": "confirmacoes_nome_tamanho",
+          "value": "char_length(\"confirmacoes\".\"nome\") BETWEEN 3 AND 80"
+        },
+        "confirmacoes_telefone_so_digitos": {
+          "name": "confirmacoes_telefone_so_digitos",
+          "value": "\"confirmacoes\".\"telefone\" ~ '^[0-9]{10,11}$'"
+        },
+        "confirmacoes_tempo_valido": {
+          "name": "confirmacoes_tempo_valido",
+          "value": "\"confirmacoes\".\"tempo\" IN ('todo', 'primeira-hora')"
+        },
+        "confirmacoes_adesao_so_digitos": {
+          "name": "confirmacoes_adesao_so_digitos",
+          "value": "\"confirmacoes\".\"numero_adesao\" ~ '^[0-9]{1,6}$'"
+        },
+        "confirmacoes_codigo_funcao_so_digitos": {
+          "name": "confirmacoes_codigo_funcao_so_digitos",
+          "value": "\"confirmacoes\".\"codigo_funcao\" ~ '^[0-9]{1,6}$'"
+        },
+        "confirmacoes_saida_depois_da_entrada": {
+          "name": "confirmacoes_saida_depois_da_entrada",
+          "value": "\"confirmacoes\".\"saida\" IS NULL OR (\"confirmacoes\".\"entrada\" IS NOT NULL AND \"confirmacoes\".\"saida\" >= \"confirmacoes\".\"entrada\")"
+        },
+        "confirmacoes_assinatura_com_entrada": {
+          "name": "confirmacoes_assinatura_com_entrada",
+          "value": "\"confirmacoes\".\"assinado_em\" IS NULL OR \"confirmacoes\".\"entrada\" IS NOT NULL"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.dias": {
+      "name": "dias",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "data": {
+          "name": "data",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "inicio": {
+          "name": "inicio",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fim": {
+          "name": "fim",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "vagas": {
+          "name": "vagas",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "casa_de_oracao": {
+          "name": "casa_de_oracao",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "local": {
+          "name": "local",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "setor": {
+          "name": "setor",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atividades": {
+          "name": "atividades",
+          "type": "varchar(60)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tipo_de_servico": {
+          "name": "tipo_de_servico",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "dias_data_unica": {
+          "name": "dias_data_unica",
+          "nullsNotDistinct": false,
+          "columns": [
+            "data"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "dias_fim_depois_do_inicio": {
+          "name": "dias_fim_depois_do_inicio",
+          "value": "\"dias\".\"fim\" > \"dias\".\"inicio\""
+        },
+        "dias_vagas_validas": {
+          "name": "dias_vagas_validas",
+          "value": "\"dias\".\"vagas\" BETWEEN 1 AND 30"
+        },
+        "dias_tipo_de_servico_valido": {
+          "name": "dias_tipo_de_servico_valido",
+          "value": "\"dias\".\"tipo_de_servico\" IN ('apoio', 'construcao', 'reforma')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.sessoes_organizador": {
+      "name": "sessoes_organizador",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "token_hash": {
+          "name": "token_hash",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expira_em": {
+          "name": "expira_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "sessoes_token_unico": {
+          "name": "sessoes_token_unico",
+          "nullsNotDistinct": false,
+          "columns": [
+            "token_hash"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tarefas": {
+      "name": "tarefas",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "dia_id": {
+          "name": "dia_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nome": {
+          "name": "nome",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ordem": {
+          "name": "ordem",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "feita": {
+          "name": "feita",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "feita_em": {
+          "name": "feita_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "tarefas_dia_id_idx": {
+          "name": "tarefas_dia_id_idx",
+          "columns": [
+            {
+              "expression": "dia_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "tarefas_dia_id_dias_id_fk": {
+          "name": "tarefas_dia_id_dias_id_fk",
+          "tableFrom": "tarefas",
+          "tableTo": "dias",
+          "columnsFrom": [
+            "dia_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "tarefas_nome_unico_no_dia": {
+          "name": "tarefas_nome_unico_no_dia",
+          "nullsNotDistinct": false,
+          "columns": [
+            "dia_id",
+            "nome"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "tarefas_nome_tamanho": {
+          "name": "tarefas_nome_tamanho",
+          "value": "char_length(\"tarefas\".\"nome\") BETWEEN 1 AND 80"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.tentativas_acesso": {
+      "name": "tentativas_acesso",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "tipo": {
+          "name": "tipo",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "chave": {
+          "name": "chave",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "tentativas_busca_idx": {
+          "name": "tentativas_busca_idx",
+          "columns": [
+            {
+              "expression": "tipo",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "chave",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "criado_em",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "tentativas_tipo_valido": {
+          "name": "tentativas_tipo_valido",
+          "value": "\"tentativas_acesso\".\"tipo\" IN ('senha', 'cancelamento')"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

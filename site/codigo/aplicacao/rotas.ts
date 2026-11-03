@@ -58,6 +58,13 @@ export const rotas: Routes = [
         title: 'Editar limpeza',
         loadComponent: () => import('./telas/organizar/limpeza/limpeza').then((modulo) => modulo.TelaLimpeza),
       },
+      {
+        path: 'limpeza/:id/folha',
+        title: 'Folha de presença',
+        // A folha é para o papel: sem barra e sem rodapé.
+        data: { moldura: false },
+        loadComponent: () => import('./telas/organizar/folha/folha').then((modulo) => modulo.TelaFolha),
+      },
     ],
   },
 

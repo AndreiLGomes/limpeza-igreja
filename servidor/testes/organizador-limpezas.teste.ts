@@ -1,7 +1,8 @@
 /** Organizador: limpezas e pessoas (S1–S13, O5). */
 import { eq } from 'drizzle-orm';
+import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { hoje, MENSAGENS, mensagemDoErro, proximoDiaDaSemana, somarDias } from '@limpeza/compartilhado';
+import { CABECALHO_VAZIO, hoje, MENSAGENS, mensagemDoErro, proximoDiaDaSemana, somarDias } from '@limpeza/compartilhado';
 import { bd } from '../codigo/banco/cliente.js';
 import { confirmacoes, dias, tarefas } from '../codigo/banco/esquema.js';
 import { criarAplicacaoDeTeste } from './ajuda/aplicacao.js';
@@ -255,5 +256,40 @@ describe('Remover pessoa e desfazer (O5)', () => {
     const resposta = await org.delete(`/api/organizador/dias/${dia.id}/pessoas/${deOutra.id}`);
     expect(resposta.status).toBe(404);
     expect(resposta.body.codigo).toBe('PESSOA_NAO_ENCONTRADA');
+  });
+});
+
+describe('Cabeçalho da folha (L10, L11)', () => {
+  const CABECALHO = { casaDeOracao: '123', local: 'Taiti', setor: 'Sede / Escolinha', atividades: 'Limpeza', tipoDeServico: 'apoio' };
+
+  it('criar e editar gravam o cabeçalho; o organizador vê; o PUT substitui o cabeçalho inteiro', async () => {
+    const criada = await org.post('/api/organizador/dias', { ...NOVA, cabecalho: CABECALHO });
+    expect(criada.body.cabecalho).toEqual(CABECALHO);
+    const editada = await org.put(`/api/organizador/dias/${criada.body.id}`, { ...NOVA, cabecalho: { local: 'Centro' } });
+    expect(editada.body.cabecalho).toEqual({ ...CABECALHO_VAZIO, local: 'Centro' });
+  });
+
+  it('o padrão começa vazio; "usarComoPadrao" grava o cabeçalho daquela limpeza como padrão', async () => {
+    expect((await org.get('/api/organizador/cabecalho-padrao')).body).toEqual(CABECALHO_VAZIO);
+    await org.post('/api/organizador/dias', { ...NOVA, cabecalho: CABECALHO, usarComoPadrao: true });
+    expect((await org.get('/api/organizador/cabecalho-padrao')).body).toEqual(CABECALHO);
+    await org.post('/api/organizador/dias', { ...NOVA, data: daquiA(31), cabecalho: { local: 'Outro' } });
+    expect((await org.get('/api/organizador/cabecalho-padrao')).body).toEqual(CABECALHO);
+  });
+
+  it('editar com "usarComoPadrao" também troca o padrão', async () => {
+    const criada = await org.post('/api/organizador/dias', NOVA);
+    await org.put(`/api/organizador/dias/${criada.body.id}`, { ...NOVA, cabecalho: { local: 'Centro' }, usarComoPadrao: true });
+    expect((await org.get('/api/organizador/cabecalho-padrao')).body).toEqual({ ...CABECALHO_VAZIO, local: 'Centro' });
+  });
+
+  it('tipo de serviço inválido → 400 com campos', async () => {
+    const resposta = await org.post('/api/organizador/dias', { ...NOVA, cabecalho: { tipoDeServico: 'x' } });
+    expect(resposta.status).toBe(400);
+    expect(resposta.body.campos).toEqual({ 'cabecalho.tipoDeServico': MENSAGENS.tipoDeServicoInvalido });
+  });
+
+  it('o padrão é só do organizador', async () => {
+    expect((await request(aplicacao).get('/api/organizador/cabecalho-padrao')).status).toBe(401);
   });
 });

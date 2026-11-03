@@ -6,11 +6,11 @@
 import { z } from 'zod';
 import { ehDataValida, FORMATO_HORA } from './datas.js';
 import {
-  ADESAO_MAX_DIGITOS, CODIGO_FUNCAO_MAX_DIGITOS, NOME_MAX, NOME_MIN, OBSERVACAO_MAX, TAREFA_NOME_MAX, TAREFAS_MAX,
+  ADESAO_MAX_DIGITOS, CABECALHO_TEXTO_MAX, CASA_DE_ORACAO_MAX, CODIGO_FUNCAO_MAX_DIGITOS, NOME_MAX, NOME_MIN, OBSERVACAO_MAX, TAREFA_NOME_MAX, TAREFAS_MAX,
   VAGAS_MAX, VAGAS_MIN,
 } from './limites.js';
 import { ehTelefoneValido, soDigitos } from './telefone.js';
-import { TEMPOS } from './tipos.js';
+import { TEMPOS, TIPOS_DE_SERVICO, type Cabecalho } from './tipos.js';
 
 /** Mensagens de campo. Também aparecem no site, embaixo de cada campo. */
 export const MENSAGENS = {
@@ -40,6 +40,8 @@ export const MENSAGENS = {
   epiObrigatorio: 'Responda se recebeu EPI.',
   saidaSemEntrada: 'Preencha a entrada antes da saída.',
   saidaAntesDaEntrada: 'A saída não pode ser antes da entrada.',
+  textoLongo: (maximo: number) => `Use no máximo ${maximo} letras.`,
+  tipoDeServicoInvalido: 'Escolha apoio, construção ou reforma.',
   idInvalido: 'Endereço inválido.',
 } as const;
 
@@ -110,6 +112,24 @@ const horaOpcional = vazioViraNulo(horaDoDia);
 /** L14: só quem o organizador cadastra pode ficar sem telefone. */
 const telefoneOpcional = vazioViraNulo(telefone);
 
+/** L10: texto opcional do cabeçalho, aparado; vazio vira null. */
+const textoDoCabecalho = (maximo: number) =>
+  vazioViraNulo(z.string({ error: MENSAGENS.textoLongo(maximo) }).trim().max(maximo, { error: MENSAGENS.textoLongo(maximo) }))
+    .transform((valor) => valor || null);
+
+/** L10: o cabeçalho da folha, igual em cada limpeza e no padrão (L11). */
+export const esquemaCabecalho = z.object({
+  casaDeOracao: textoDoCabecalho(CASA_DE_ORACAO_MAX),
+  local: textoDoCabecalho(CABECALHO_TEXTO_MAX),
+  setor: textoDoCabecalho(CABECALHO_TEXTO_MAX),
+  atividades: textoDoCabecalho(CABECALHO_TEXTO_MAX),
+  tipoDeServico: vazioViraNulo(z.enum(TIPOS_DE_SERVICO, { error: MENSAGENS.tipoDeServicoInvalido })),
+});
+
+export const CABECALHO_VAZIO: Cabecalho = {
+  casaDeOracao: null, local: null, setor: null, atividades: null, tipoDeServico: null,
+};
+
 /** Tarefa vinda do formulário: com `id` se já existia (S9), sem `id` se é nova. */
 const tarefaEditada = z.object({
   id: id.optional(),
@@ -164,7 +184,11 @@ export const esquemaEntrar = z.object({
 
 /** POST e PUT /organizador/dias (S3, S4, S5). */
 export const esquemaDia = z
-  .object({ data, inicio: horaDoDia, fim: horaDoDia, vagas, tarefas })
+  .object({
+    data, inicio: horaDoDia, fim: horaDoDia, vagas, tarefas,
+    cabecalho: esquemaCabecalho.default(CABECALHO_VAZIO),
+    usarComoPadrao: z.boolean().default(false),
+  })
   .refine(
     (dia) => !FORMATO_HORA.test(dia.inicio) || !FORMATO_HORA.test(dia.fim) || dia.fim > dia.inicio,
     { error: MENSAGENS.fimAntesDoInicio, path: ['fim'] },

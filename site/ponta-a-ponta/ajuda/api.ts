@@ -15,12 +15,15 @@ async function chamar<T>(caminho: string, corpo: object, token?: string): Promis
   return (await resposta.json()) as T;
 }
 
-/** Cria a limpeza de hoje (00:00 às 23:59) e confirma as pessoas pedidas. Devolve o id. */
-export async function criarLimpezaDeHoje(pessoas: { nome: string; telefone: string }[] = []): Promise<string> {
+/** Cria a limpeza de hoje (00:00 às 23:59), com o cabeçalho da folha se vier, e confirma as pessoas. Devolve o id. */
+export async function criarLimpezaDeHoje(
+  pessoas: { nome: string; telefone: string }[] = [],
+  cabecalho?: object,
+): Promise<string> {
   const { token } = await chamar<{ token: string }>(ROTAS.organizador.entrar, { senha: SENHA_DOS_TESTES });
   const { id } = await chamar<{ id: string }>(
     ROTAS.organizador.dias,
-    { data: hoje(), inicio: '00:00', fim: '23:59', vagas: 5, tarefas: [] },
+    { data: hoje(), inicio: '00:00', fim: '23:59', vagas: 5, tarefas: [], cabecalho },
     token,
   );
   for (const pessoa of pessoas) await chamar(ROTAS.confirmar(id), { ...pessoa, tempo: 'todo' });

@@ -4,7 +4,7 @@
  */
 import { inject, Injectable } from '@angular/core';
 import {
-  dataNaFrase, type DiaCompleto, type EntradaCorrecaoPresenca, type EntradaDia, type EntradaPessoaNaPresenca,
+  dataNaFrase, type Cabecalho, type DiaCompleto, type EntradaCorrecaoPresenca, type EntradaDia, type EntradaPessoaNaPresenca,
   type PessoaCompleta,
 } from '@limpeza/compartilhado';
 import { Notificacoes } from '@componentes';
@@ -33,6 +33,11 @@ export class Limpezas {
   /** S7: as tarefas da limpeza mais recente, para o formulário de nova limpeza já vir preenchido. */
   sugestaoDeTarefas(): Promise<string[]> {
     return this.api.sugestaoDeTarefas();
+  }
+
+  /** L11: o cabeçalho padrão, para a limpeza nova já vir preenchida. */
+  cabecalhoPadrao(): Promise<Cabecalho> {
+    return this.api.cabecalhoPadrao();
   }
 
   async criar(dados: EntradaDia): Promise<void> {

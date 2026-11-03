@@ -69,6 +69,9 @@ gravar(
     `// ${AVISO}`,
     `:root, [data-theme="${primeiroTema}"] {\n${blocoDoTema(primeiroTema, primeiroTema)}\n}`,
     ...outrosTemas.map((tema) => `[data-theme="${tema}"] {\n${blocoDoTema(tema, primeiroTema)}\n}`),
+    // Na impressão, a folha sai sempre no tema claro. Os seletores são os mesmos dos temas (inclusive o escuro):
+    // por vir depois no arquivo, este bloco ganha no empate de especificidade.
+    `@media print {\n  ${[':root', ...temas.map((tema) => `[data-theme="${tema}"]`)].join(', ')} {\n${blocoDoTema(primeiroTema, primeiroTema).replaceAll('\n', '\n  ').replace(/^/, '  ')}\n  }\n}`,
     `:root {\n${variaveisFixas.join('\n')}\n}`,
     // CSS não aceita var() dentro de @media: os pontos de quebra viram variáveis do SCSS ($bp-mobile…),
     // que funcionam em @media, e não variáveis CSS. Os nomes vêm do Design System.

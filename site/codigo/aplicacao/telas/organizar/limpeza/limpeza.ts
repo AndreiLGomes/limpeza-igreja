@@ -4,6 +4,7 @@
  * - Nova: horários e vagas padrão (S3, S4) e as tarefas da limpeza mais recente (S7).
  * - A data pode ser qualquer dia da semana (S6).
  * - Editando: vagas abaixo dos confirmados mostram o erro e bloqueiam "Salvar" (S8).
+ * - Cabeçalho da folha (L10): a nova vem com o padrão (L11); "Usar como padrão" guarda o desta limpeza.
  * - Editando: "Apagar limpeza" no fim, com janela dizendo quantas confirmações se perdem (S11).
  * A validação é o esquemaDia do compartilhado, o mesmo que o servidor usa.
  */
@@ -11,12 +12,14 @@ import { Component, computed, inject, input, signal, type OnInit } from '@angula
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import {
-  dataNaFrase, dataPorExtenso, errosPorCampo, esquemaDia, FIM_PADRAO, INICIO_PADRAO,
-  mensagemDoErro, VAGAS_MAX, VAGAS_MIN, VAGAS_PADRAO, type DiaCompleto, type EntradaDia,
+  CABECALHO_VAZIO, dataNaFrase, dataPorExtenso, errosPorCampo, esquemaCabecalho, esquemaDia, FIM_PADRAO, INICIO_PADRAO,
+  mensagemDoErro, TEXTO_DO_TIPO_DE_SERVICO, TIPOS_DE_SERVICO, VAGAS_MAX, VAGAS_MIN, VAGAS_PADRAO, type Cabecalho,
+  type DiaCompleto, type EntradaDia,
 } from '@limpeza/compartilhado';
 import {
   AcoesDoFormulario, Aviso, Botao, CabecalhoDoFormulario, Campo, ConteudoDoBotao, Contador, EditorDeTarefas, Entrada,
-  estadoDoControle, Formulario, Icone, Janela, linhaDeTarefa, LinhaDoFormulario, Notificacoes, type LinhaDeTarefa,
+  Escolhas, estadoDoControle, Formulario, Icone, Janela, linhaDeTarefa, LinhaDoFormulario, Notificacoes,
+  type LinhaDeTarefa, type Opcao,
 } from '@componentes';
 import { mostrarErrosNosCampos, resumoDeErros, validadorZod, type AvisoDoFormulario } from '@formularios';
 import { FalhaNaApi } from '@nucleo/api';
@@ -29,7 +32,7 @@ import { ListaDePresenca } from './lista-de-presenca';
   selector: 'app-tela-limpeza',
   imports: [
     AcoesDoFormulario, Aviso, Botao, CabecalhoDoFormulario, Campo, ConteudoDoBotao, Contador, EditorDeTarefas, Entrada,
-    Estado, Formulario, Icone, Janela, LinhaDoFormulario, ListaDePresenca, ReactiveFormsModule, RouterLink,
+    Escolhas, Estado, Formulario, Icone, Janela, LinhaDoFormulario, ListaDePresenca, ReactiveFormsModule, RouterLink,
   ],
   template: `
     <div class="pagina">
@@ -65,6 +68,27 @@ import { ListaDePresenca } from './lista-de-presenca';
           }
 
           <app-editor-de-tarefas legenda="Tarefas" [lista]="formulario.controls.tarefas" />
+
+          <div class="form__head">
+            <h2 class="subtitle">Cabeçalho da folha</h2>
+            <p class="form__desc">Aparece no topo da folha de presença impressa. Tudo é opcional.</p>
+          </div>
+          <ng-container formGroupName="cabecalho">
+            <app-campo rotulo="Casa de Oração nº" [controle]="formulario.controls.cabecalho.controls.casaDeOracao">
+              <input appEntrada formControlName="casaDeOracao" />
+            </app-campo>
+            <app-campo rotulo="Local" [controle]="formulario.controls.cabecalho.controls.local">
+              <input appEntrada formControlName="local" placeholder="Ex.: Taiti" />
+            </app-campo>
+            <app-campo rotulo="Administração/Setor" [controle]="formulario.controls.cabecalho.controls.setor">
+              <input appEntrada formControlName="setor" />
+            </app-campo>
+            <app-campo rotulo="Atividades" [controle]="formulario.controls.cabecalho.controls.atividades">
+              <input appEntrada formControlName="atividades" placeholder="Ex.: Limpeza" />
+            </app-campo>
+            <app-escolhas legenda="Tipo de serviço" formControlName="tipoDeServico" [opcoes]="tiposDeServico" />
+          </ng-container>
+          <app-escolhas legenda="Padrão" multipla formControlName="usarComoPadrao" [opcoes]="opcaoDePadrao" />
 
           <div appAcoesDoFormulario>
             <a appBotao variante="discreto" routerLink="/organizar">Cancelar</a>
@@ -128,7 +152,22 @@ export class TelaLimpeza implements OnInit {
     fim: new FormControl(FIM_PADRAO, { nonNullable: true, validators: validadorZod(esquemaDia.shape.fim) }),
     vagas: new FormControl<number | null>(VAGAS_PADRAO, { validators: validadorZod(esquemaDia.shape.vagas) }),
     tarefas: new FormArray<LinhaDeTarefa>([]),
+    // L10: "" é "Nenhum" no tipo de serviço; o esquema transforma vazio em null.
+    cabecalho: new FormGroup({
+      casaDeOracao: new FormControl('', { nonNullable: true, validators: validadorZod(esquemaCabecalho.shape.casaDeOracao) }),
+      local: new FormControl('', { nonNullable: true, validators: validadorZod(esquemaCabecalho.shape.local) }),
+      setor: new FormControl('', { nonNullable: true, validators: validadorZod(esquemaCabecalho.shape.setor) }),
+      atividades: new FormControl('', { nonNullable: true, validators: validadorZod(esquemaCabecalho.shape.atividades) }),
+      tipoDeServico: new FormControl('', { nonNullable: true }),
+    }),
+    usarComoPadrao: new FormControl<string[]>([], { nonNullable: true }),
   });
+
+  protected readonly tiposDeServico: Opcao[] = [
+    { valor: '', rotulo: 'Nenhum' },
+    ...TIPOS_DE_SERVICO.map((tipo) => ({ valor: tipo, rotulo: TEXTO_DO_TIPO_DE_SERVICO[tipo] })),
+  ];
+  protected readonly opcaoDePadrao: Opcao[] = [{ valor: 'sim', rotulo: 'Usar como padrão nas próximas limpezas' }];
 
   protected readonly estado = signal<EstadoDaCarga>('carregando');
   protected readonly erro = signal<string | null>(null);
@@ -187,11 +226,14 @@ export class TelaLimpeza implements OnInit {
         this.dia.set(dia);
         this.formulario.patchValue({ data: dia.data, inicio: dia.inicio, fim: dia.fim, vagas: dia.vagas });
         this.trocarTarefas(dia.tarefas.map((tarefa) => linhaDeTarefa(tarefa.nome, tarefa.id)));
+        this.trocarCabecalho(dia.cabecalho);
         this.original.set({ data: dia.data, confirmados: dia.pessoas.length });
       } else {
         // S7: é só uma sugestão; se não vier, o formulário começa sem tarefas.
         const nomes = await this.limpezas.sugestaoDeTarefas().catch(() => [] as string[]);
         this.trocarTarefas(nomes.map((nome) => linhaDeTarefa(nome)));
+        // L11: a limpeza nova já vem com o cabeçalho padrão; se não vier, começa vazio.
+        this.trocarCabecalho(await this.limpezas.cabecalhoPadrao().catch(() => CABECALHO_VAZIO));
       }
       this.estado.set('pronto');
     } catch (erro) {
@@ -202,6 +244,17 @@ export class TelaLimpeza implements OnInit {
 
   protected trocarDia(novo: DiaCompleto): void {
     this.dia.set(novo);
+  }
+
+  /** No formulário, vazio é "" (campo de texto em branco, "Nenhum" no tipo de serviço). */
+  private trocarCabecalho(cabecalho: Cabecalho): void {
+    this.formulario.controls.cabecalho.setValue({
+      casaDeOracao: cabecalho.casaDeOracao ?? '',
+      local: cabecalho.local ?? '',
+      setor: cabecalho.setor ?? '',
+      atividades: cabecalho.atividades ?? '',
+      tipoDeServico: cabecalho.tipoDeServico ?? '',
+    });
   }
 
   private trocarTarefas(linhas: LinhaDeTarefa[]): void {
@@ -219,6 +272,8 @@ export class TelaLimpeza implements OnInit {
       fim: valor.fim,
       vagas: valor.vagas ?? Number.NaN,
       tarefas: valor.tarefas.map((tarefa) => (tarefa.id ? { id: tarefa.id, nome: tarefa.nome } : { nome: tarefa.nome })),
+      cabecalho: valor.cabecalho,
+      usarComoPadrao: valor.usarComoPadrao.includes('sim'),
     };
   }
 

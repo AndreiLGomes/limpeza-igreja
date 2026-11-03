@@ -28,3 +28,10 @@ const formatoDeHora = new Intl.DateTimeFormat('en-GB', {
 export function horaAgora(agora: Date = new Date()): string {
   return formatoDeHora.format(agora);
 }
+
+/** "2026-11-03T22:32:00Z" → "03/11 às 19:32" (São Paulo): a assinatura na folha. */
+export function dataEHoraCurtas(iso: string): string {
+  const momento = new Date(iso);
+  const [, mes, dia] = hoje(momento).split('-');
+  return `${dia}/${mes} às ${horaAgora(momento)}`;
+}

@@ -45,6 +45,11 @@ export function dataPorExtenso(data: string): string {
   return `${DIAS_DA_SEMANA[diaDaSemana(data)]}, ${dia} de ${MESES[mes - 1]}`;
 }
 
+/** "2026-03-27" → "março" (o "Mês" da folha). */
+export function mesPorExtenso(data: string): string {
+  return MESES[partesDaData(data).mes - 1] ?? '';
+}
+
 /** A data por extenso no meio de uma frase: "2026-10-16" → "sexta, 16 de outubro". */
 export function dataNaFrase(data: string): string {
   return inicialMinuscula(dataPorExtenso(data));

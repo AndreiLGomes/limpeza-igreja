@@ -1,10 +1,13 @@
 /** Regras das limpezas (S1–S13). */
-import { ehPassada, ESCALA_MAX_DIAS, hoje, type DadosDia, type DiaCompleto, type DiaPublico } from '@limpeza/compartilhado';
+import {
+  ehPassada, ESCALA_MAX_DIAS, hoje, type Cabecalho, type DadosDia, type DiaCompleto, type DiaPublico,
+} from '@limpeza/compartilhado';
 import type { DiaComTudo } from '../../banco/esquema.js';
 import { emTransacao } from '../../banco/transacao.js';
 import { ErroDeRegra } from '../../comum/erros.js';
 import { comRestricaoUnica } from '../../comum/erros-do-banco.js';
 import { paraDiaCompleto, paraDiaPublico } from '../../comum/mapeadores.js';
+import * as repositorioDeCabecalho from '../cabecalho/repositorio.js';
 import * as repositorioDeConfirmacoes from '../confirmacoes/repositorio.js';
 import * as servicoDeTarefas from '../tarefas/servico.js';
 import { exigirNaoPassada } from './exigir-nao-passada.js';
@@ -52,12 +55,18 @@ export async function sugestaoDeTarefas(): Promise<string[]> {
   return maisRecente?.tarefas.map((tarefa) => tarefa.nome) ?? [];
 }
 
-/** S1–S5: cria a limpeza com as tarefas. */
-export async function criar({ tarefas, ...campos }: DadosDia): Promise<DiaCompleto> {
+/** L11: o cabeçalho padrão, para o formulário de limpeza nova vir preenchido. */
+export function cabecalhoPadrao(): Promise<Cabecalho> {
+  return repositorioDeCabecalho.lerPadrao();
+}
+
+/** S1–S5, L10, L11: cria a limpeza com as tarefas e o cabeçalho da folha. */
+export async function criar({ tarefas, cabecalho, usarComoPadrao, ...campos }: DadosDia): Promise<DiaCompleto> {
   if (ehPassada(campos.data, hoje())) throw new ErroDeRegra('LIMPEZA_PASSADA');
   const id = await comDataUnica(() =>
     emTransacao(async (tx) => {
-      const dia = await repositorio.inserir(tx, campos);
+      const dia = await repositorio.inserir(tx, { ...campos, ...cabecalho });
+      if (usarComoPadrao) await repositorioDeCabecalho.salvarPadrao(tx, cabecalho);
       await servicoDeTarefas.salvarDoDia(tx, dia.id, tarefas);
       return dia.id;
     }),
@@ -70,7 +79,7 @@ export async function criar({ tarefas, ...campos }: DadosDia): Promise<DiaComple
  * S8: vagas não podem ficar abaixo dos confirmados. S9: tarefas mantidas guardam "feita".
  * A linha fica travada durante a edição, para não correr junto com uma confirmação (C5).
  */
-export async function editar(id: string, { tarefas, ...campos }: DadosDia): Promise<DiaCompleto> {
+export async function editar(id: string, { tarefas, cabecalho, usarComoPadrao, ...campos }: DadosDia): Promise<DiaCompleto> {
   await comDataUnica(() =>
     emTransacao(async (tx) => {
       exigirNaoPassada(await repositorio.buscarTravando(tx, id));
@@ -79,7 +88,9 @@ export async function editar(id: string, { tarefas, ...campos }: DadosDia): Prom
       const confirmados = await repositorioDeConfirmacoes.contarDoDia(tx, id);
       if (campos.vagas < confirmados) throw new ErroDeRegra('VAGAS_MENOR_QUE_CONFIRMADOS', { confirmados });
 
-      await repositorio.atualizar(tx, id, campos);
+      // L10: o PUT substitui o cabeçalho inteiro (sem cabeçalho no corpo, ele fica vazio).
+      await repositorio.atualizar(tx, id, { ...campos, ...cabecalho });
+      if (usarComoPadrao) await repositorioDeCabecalho.salvarPadrao(tx, cabecalho);
       await servicoDeTarefas.salvarDoDia(tx, id, tarefas);
     }),
   );

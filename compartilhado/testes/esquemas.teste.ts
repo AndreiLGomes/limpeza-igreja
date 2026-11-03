@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { z } from 'zod';
 import {
-  errosPorCampo, esquemaCancelarPorCodigo, esquemaConfirmacao, esquemaCorrecaoPresenca, esquemaDia, esquemaEncerrar,
+  CABECALHO_VAZIO, errosPorCampo, esquemaCabecalho, esquemaCancelarPorCodigo, esquemaConfirmacao, esquemaCorrecaoPresenca, esquemaDia, esquemaEncerrar,
   esquemaEntrada, esquemaPessoaNaPresenca, esquemaTelefone,
   esquemaEntrar, esquemaMarcarTarefa, esquemaParametrosDia, MENSAGENS,
 } from '../codigo/esquemas.js';
@@ -67,7 +67,7 @@ describe('esquemaConfirmacao (C1, C2)', () => {
 
 describe('esquemaDia (S3, S4, S5)', () => {
   it('aceita um exemplo válido', () => {
-    expect(esquemaDia.parse(DIA)).toEqual(DIA);
+    expect(esquemaDia.parse(DIA)).toEqual({ ...DIA, cabecalho: CABECALHO_VAZIO, usarComoPadrao: false });
   });
 
   it('data vazia ou que não existe', () => {
@@ -233,5 +233,35 @@ describe('esquemaEncerrar (L13)', () => {
     expect(esquemaEncerrar.parse({})).toEqual({});
     expect(esquemaEncerrar.parse({ saida: '20:45' })).toEqual({ saida: '20:45' });
     expect(campos(esquemaEncerrar, { saida: '25:00' })).toEqual({ saida: MENSAGENS.horaInvalida });
+  });
+});
+
+describe('esquemaCabecalho (L10)', () => {
+  it('tudo opcional: vazio vira null; textos aparados', () => {
+    expect(esquemaCabecalho.parse({})).toEqual(CABECALHO_VAZIO);
+    expect(esquemaCabecalho.parse({ local: '  Taiti ', tipoDeServico: '' })).toEqual({ ...CABECALHO_VAZIO, local: 'Taiti' });
+  });
+
+  it('tipo de serviço só apoio, construção ou reforma; textos com limite', () => {
+    expect(esquemaCabecalho.parse({ tipoDeServico: 'apoio' }).tipoDeServico).toBe('apoio');
+    expect(campos(esquemaCabecalho, { tipoDeServico: 'outro' })).toEqual({ tipoDeServico: MENSAGENS.tipoDeServicoInvalido });
+    expect(campos(esquemaCabecalho, { casaDeOracao: '12345678901' })).toEqual({ casaDeOracao: MENSAGENS.textoLongo(10) });
+  });
+});
+
+describe('esquemaDia com cabeçalho (L10, L11)', () => {
+  it('sem cabeçalho: vazio e usarComoPadrao falso', () => {
+    expect(esquemaDia.parse(DIA)).toMatchObject({ cabecalho: CABECALHO_VAZIO, usarComoPadrao: false });
+  });
+
+  it('com cabeçalho e usarComoPadrao', () => {
+    const dia = esquemaDia.parse({ ...DIA, cabecalho: { local: 'Taiti' }, usarComoPadrao: true });
+    expect(dia).toMatchObject({ cabecalho: { ...CABECALHO_VAZIO, local: 'Taiti' }, usarComoPadrao: true });
+  });
+
+  it('erro no cabeçalho aparece com o caminho do campo', () => {
+    expect(campos(esquemaDia, { ...DIA, cabecalho: { tipoDeServico: 'x' } })).toEqual({
+      'cabecalho.tipoDeServico': MENSAGENS.tipoDeServicoInvalido,
+    });
   });
 });

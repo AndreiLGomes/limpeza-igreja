@@ -49,3 +49,7 @@ export const CANCELAMENTO_BLOQUEIO_SEGUNDOS = 10 * 60;
 
 /** Limite geral de escritas (POST, PUT, PATCH, DELETE) por IP (docs/04-api.md). */
 export const ESCRITAS_POR_MINUTO = 60;
+
+/** L10: textos do cabeçalho da folha. */
+export const CASA_DE_ORACAO_MAX = 10;
+export const CABECALHO_TEXTO_MAX = 60;

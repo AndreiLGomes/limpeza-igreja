@@ -16,7 +16,9 @@ const TELEFONE_FORMATADO = '47 99999-1234';
 const OBSERVACAO = 'moro na rua das flores 123';
 
 /** Nunca saem pela parte pública (P1, P2, L12). */
-const CHAVES_PROIBIDAS = ['telefone', 'observacao', 'numeroAdesao', 'codigoFuncao', 'recebeuEpi'];
+const CHAVES_PROIBIDAS = [
+  'telefone', 'observacao', 'numeroAdesao', 'codigoFuncao', 'recebeuEpi', 'cabecalho', 'casaDeOracao', 'tipoDeServico',
+];
 
 /** Procura chaves proibidas em qualquer nível, menos dentro de `campos` (nomes de campo com erro). */
 function chavesProibidas(valor: unknown, caminho = 'resposta'): string[] {

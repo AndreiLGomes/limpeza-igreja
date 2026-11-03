@@ -5,11 +5,11 @@
  */
 import { sql } from 'drizzle-orm';
 import {
-  boolean, check, date, index, pgTable, smallint, time, timestamp, unique, uuid, varchar,
+  boolean, check, date, index, type AnyPgColumn, pgTable, smallint, time, timestamp, unique, uuid, varchar,
 } from 'drizzle-orm/pg-core';
 import {
-  ADESAO_MAX_DIGITOS, CODIGO_FUNCAO_MAX_DIGITOS, NOME_MAX, NOME_MIN, OBSERVACAO_MAX, TAREFA_NOME_MAX, TAREFA_NOME_MIN, TELEFONE_MAX_DIGITOS,
-  TELEFONE_MIN_DIGITOS, TEMPOS, VAGAS_MAX, VAGAS_MIN,
+  ADESAO_MAX_DIGITOS, CABECALHO_TEXTO_MAX, CASA_DE_ORACAO_MAX, CODIGO_FUNCAO_MAX_DIGITOS, NOME_MAX, NOME_MIN, OBSERVACAO_MAX, TAREFA_NOME_MAX, TAREFA_NOME_MIN, TELEFONE_MAX_DIGITOS,
+  TELEFONE_MIN_DIGITOS, TEMPOS, TIPOS_DE_SERVICO, VAGAS_MAX, VAGAS_MIN,
 } from '@limpeza/compartilhado';
 
 /** Escreve um número ou texto fixo dentro do SQL das restrições. */
@@ -32,6 +32,19 @@ const colunasPadrao = {
     .$onUpdate(() => new Date()),
 };
 
+/** L10: as colunas do cabeçalho da folha. As MESMAS na limpeza e no padrão (L11). */
+const colunasDoCabecalho = {
+  casaDeOracao: varchar('casa_de_oracao', { length: CASA_DE_ORACAO_MAX }),
+  local: varchar('local', { length: CABECALHO_TEXTO_MAX }),
+  setor: varchar('setor', { length: CABECALHO_TEXTO_MAX }),
+  atividades: varchar('atividades', { length: CABECALHO_TEXTO_MAX }),
+  tipoDeServico: varchar('tipo_de_servico', { length: 20 }),
+};
+
+/** L10: o tipo de serviço só pode ser um dos três (ou vazio). */
+const tipoDeServicoValido = (nome: string, coluna: AnyPgColumn) =>
+  check(nome, sql`${coluna} IN (${listaLiteral(TIPOS_DE_SERVICO)})`);
+
 /** Cada dia de limpeza. */
 export const dias = pgTable(
   'dias',
@@ -41,11 +54,13 @@ export const dias = pgTable(
     inicio: time('inicio').notNull(),
     fim: time('fim').notNull(),
     vagas: smallint('vagas').notNull(),
+    ...colunasDoCabecalho,
   },
   (t) => [
     unique('dias_data_unica').on(t.data), // S2
     check('dias_fim_depois_do_inicio', sql`${t.fim} > ${t.inicio}`), // S3
     check('dias_vagas_validas', sql`${t.vagas} BETWEEN ${literal(VAGAS_MIN)} AND ${literal(VAGAS_MAX)}`), // S4
+    tipoDeServicoValido('dias_tipo_de_servico_valido', t.tipoDeServico), // L10
   ],
 );
 
@@ -159,5 +174,19 @@ export const tentativasDeAcesso = pgTable(
   (t) => [
     index('tentativas_busca_idx').on(t.tipo, t.chave, t.criadoEm),
     check('tentativas_tipo_valido', sql`${t.tipo} IN (${listaLiteral(TIPOS_DE_TENTATIVA)})`),
+  ],
+);
+
+/** L11: o cabeçalho padrão. Uma linha só (id 1); toda limpeza nova nasce com ele. */
+export const cabecalhoPadrao = pgTable(
+  'cabecalho_padrao',
+  {
+    id: smallint('id').primaryKey().default(1),
+    ...colunasDoCabecalho,
+    atualizadoEm: colunasPadrao.atualizadoEm,
+  },
+  (t) => [
+    check('cabecalho_padrao_linha_unica', sql`${t.id} = 1`),
+    tipoDeServicoValido('cabecalho_padrao_tipo_de_servico_valido', t.tipoDeServico),
   ],
 );
