@@ -69,13 +69,22 @@
               "buildTarget": "site:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+            "prebundle": {
+              "exclude": [
+                "@limpeza/compartilhado"
+              ]
+            }
+          }
         },
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "tsconfig.testes.json",
-            "include": ["codigo/**/*.teste.ts"]
+            "include": [
+              "codigo/**/*.teste.ts"
+            ]
           }
         }
       }
