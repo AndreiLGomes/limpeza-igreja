@@ -36,7 +36,7 @@ import { Marca } from '../marca/marca';
           </li>
         </ul>
         <p class="footer__note">
-          Projeto pessoal para organizar a limpeza de sexta. Não é um aplicativo oficial da Congregação Cristã no Brasil.
+          Projeto pessoal para organizar a limpeza da igreja. Não é um aplicativo oficial da Congregação Cristã no Brasil.
         </p>
       </div>
     </footer>

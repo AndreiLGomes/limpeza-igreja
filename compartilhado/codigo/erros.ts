@@ -27,7 +27,7 @@ export const CATALOGO_DE_ERROS = {
   },
   DIA_NAO_ENCONTRADO: {
     status: 404,
-    mensagem: 'Essa sexta não foi encontrada. Ela pode ter sido apagada.',
+    mensagem: 'Essa limpeza não foi encontrada. Ela pode ter sido apagada.',
   },
   TAREFA_NAO_ENCONTRADA: {
     status: 404,
@@ -35,7 +35,7 @@ export const CATALOGO_DE_ERROS = {
   },
   PESSOA_NAO_ENCONTRADA: {
     status: 404,
-    mensagem: 'Essa pessoa não está mais na escala desta sexta.',
+    mensagem: 'Essa pessoa não está mais na escala desta limpeza.',
   },
   CODIGO_INVALIDO: {
     status: 404,
@@ -43,23 +43,23 @@ export const CATALOGO_DE_ERROS = {
   },
   TELEFONE_NAO_CONFERE: {
     status: 404,
-    mensagem: 'Esse telefone não confere com nenhuma confirmação desta sexta.',
+    mensagem: 'Esse telefone não confere com nenhuma confirmação desta limpeza.',
   },
-  SEXTA_PASSADA: {
+  LIMPEZA_PASSADA: {
     status: 409,
-    mensagem: 'Essa sexta já passou e não pode mais ser mudada.',
+    mensagem: 'Essa limpeza já passou e não pode mais ser mudada.',
   },
   SEM_VAGA: {
     status: 409,
-    mensagem: 'As vagas desta sexta acabaram.',
+    mensagem: 'As vagas desta limpeza acabaram.',
   },
   TELEFONE_REPETIDO: {
     status: 409,
-    mensagem: 'Esse telefone já está confirmado nesta sexta.',
+    mensagem: 'Esse telefone já está confirmado nesta limpeza.',
   },
   DATA_REPETIDA: {
     status: 409,
-    mensagem: 'Já existe uma sexta cadastrada nessa data.',
+    mensagem: 'Já existe uma limpeza cadastrada nessa data.',
   },
   VAGAS_MENOR_QUE_CONFIRMADOS: {
     status: 409,

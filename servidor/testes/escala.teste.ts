@@ -1,7 +1,6 @@
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { somarDias } from '@limpeza/compartilhado';
-import { hoje } from '../codigo/comum/tempo.js';
+import { hoje, somarDias } from '@limpeza/compartilhado';
 import { criarAplicacaoDeTeste } from './ajuda/aplicacao.js';
 import { limparBanco } from './ajuda/banco.js';
 import { criarConfirmacao, criarDia, criarDiaPassado, criarTarefa, ID_QUE_NAO_EXISTE } from './ajuda/fabricas.js';
@@ -11,7 +10,7 @@ const aplicacao = criarAplicacaoDeTeste();
 beforeEach(limparBanco);
 
 describe('GET /api/dias (S12, D2)', () => {
-  it('só sextas de hoje em diante, em ordem, no máximo 8; a de hoje aparece e a de ontem não', async () => {
+  it('só limpezas de hoje em diante, em ordem, no máximo 8; a de hoje aparece e a de ontem não', async () => {
     await criarDiaPassado();
     // Cria fora de ordem para conferir que a resposta vem ordenada.
     for (const dias of [9, 3, 0, 1, 7, 2, 8, 4, 6, 5]) await criarDia({ data: somarDias(hoje(), dias) });
@@ -23,12 +22,12 @@ describe('GET /api/dias (S12, D2)', () => {
     );
   });
 
-  it('lista vazia quando não há sextas', async () => {
+  it('lista vazia quando não há limpezas', async () => {
     const resposta = await request(aplicacao).get('/api/dias');
     expect(resposta.body).toEqual([]);
   });
 
-  it('cada sexta vem no formato do docs/04: horas curtas, pessoas em ordem e tarefas em ordem', async () => {
+  it('cada limpeza vem no formato do docs/04: horas curtas, pessoas em ordem e tarefas em ordem', async () => {
     const dia = await criarDia({ inicio: '19:30', fim: '21:00', vagas: 3 });
     const primeira = await criarConfirmacao(dia, { nome: 'Ana Souza', tempo: 'primeira-hora' });
     const segunda = await criarConfirmacao(dia, { nome: 'Bruno Lima' });
@@ -55,7 +54,7 @@ describe('GET /api/dias (S12, D2)', () => {
 });
 
 describe('GET /api/dias/:id', () => {
-  it('devolve a sexta', async () => {
+  it('devolve a limpeza', async () => {
     const dia = await criarDia();
     const resposta = await request(aplicacao).get(`/api/dias/${dia.id}`);
     expect(resposta.status).toBe(200);

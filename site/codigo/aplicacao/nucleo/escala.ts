@@ -24,7 +24,7 @@ export class Escala {
   readonly estado = this.carga.estado.asReadonly();
   readonly erro = this.carga.erro.asReadonly();
 
-  /** A próxima sexta (a escala já vem em ordem de data, de hoje em diante). */
+  /** A próxima limpeza (a escala já vem em ordem de data, de hoje em diante). */
   readonly proximo = computed<DiaPublico | undefined>(() => this.dias()[0]);
 
   carregar(): Promise<void> {
@@ -53,7 +53,7 @@ export class Escala {
 
   /** X1, X5, X6: cancela pelo código guardado neste celular. */
   async cancelarMinhaPresenca(dia: DiaPublico): Promise<void> {
-    const guardada = this.minhasConfirmacoes.daSexta(dia.id);
+    const guardada = this.minhasConfirmacoes.daLimpeza(dia.id);
     if (!guardada) return;
     try {
       await this.api.cancelarPorCodigo(guardada.codigo);
@@ -61,7 +61,7 @@ export class Escala {
       this.notificacoes.mostrar('Presença cancelada.');
     } catch (erro) {
       if (erro instanceof FalhaNaApi && erro.codigo === 'CODIGO_INVALIDO') {
-        // X6: o código não existe mais (pessoa removida ou sexta apagada): esquece em silêncio.
+        // X6: o código não existe mais (pessoa removida ou limpeza apagada): esquece em silêncio.
         this.minhasConfirmacoes.esquecer(dia.id);
       } else {
         notificarFalha(this.notificacoes, erro, () => this.cancelarMinhaPresenca(dia));

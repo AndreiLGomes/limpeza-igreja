@@ -32,7 +32,7 @@ const colunasPadrao = {
     .$onUpdate(() => new Date()),
 };
 
-/** Cada sexta de limpeza. */
+/** Cada dia de limpeza. */
 export const dias = pgTable(
   'dias',
   {
@@ -49,7 +49,7 @@ export const dias = pgTable(
   ],
 );
 
-/** Quem vem em cada sexta. */
+/** Quem vem em cada limpeza. */
 export const confirmacoes = pgTable(
   'confirmacoes',
   {
@@ -80,7 +80,7 @@ export const confirmacoes = pgTable(
   ],
 );
 
-/** O que limpar em cada sexta. */
+/** O que limpar em cada limpeza. */
 export const tarefas = pgTable(
   'tarefas',
   {
@@ -108,7 +108,7 @@ export type Dia = typeof dias.$inferSelect;
 export type Confirmacao = typeof confirmacoes.$inferSelect;
 export type TarefaDoBanco = typeof tarefas.$inferSelect;
 
-/** Uma sexta com as pessoas (em ordem de confirmação) e as tarefas (em ordem). */
+/** Uma limpeza com as pessoas (em ordem de confirmação) e as tarefas (em ordem). */
 export type DiaComTudo = Dia & { pessoas: Confirmacao[]; tarefas: TarefaDoBanco[] };
 
 /** Quem entrou com a senha de organizador (O2). */

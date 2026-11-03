@@ -4,7 +4,7 @@ import { bd } from '../../banco/cliente.js';
 import { dias, tarefas, type TarefaDoBanco } from '../../banco/esquema.js';
 import type { Executor } from '../../banco/transacao.js';
 
-/** A tarefa daquela sexta, com a data da sexta. */
+/** A tarefa daquela limpeza, com a data da limpeza. */
 export async function buscarComData(
   diaId: string,
   tarefaId: string,
@@ -42,7 +42,7 @@ export async function apagarVarias(tx: Executor, ids: string[]) {
 /**
  * Renomeia e reordena tarefas que já existem, sem mexer em "feita" (S9).
  * Primeiro troca cada nome por um provisório único (o próprio id), para trocas como
- * "A"↔"B" não esbarrarem na restrição de nome único da sexta no meio do caminho.
+ * "A"↔"B" não esbarrarem na restrição de nome único da limpeza no meio do caminho.
  */
 export async function renomearVarias(tx: Executor, mantidas: { id: string; nome: string; ordem: number }[]) {
   if (mantidas.length === 0) return;

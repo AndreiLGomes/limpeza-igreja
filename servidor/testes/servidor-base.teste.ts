@@ -53,7 +53,7 @@ describe('formato de erro (docs/04-api.md)', () => {
   it('ErroDeRegra("SEM_VAGA") vira 409 com código e mensagem do catálogo', async () => {
     const resposta = await request(appQueFalha()).get('/sem-vaga');
     expect(resposta.status).toBe(409);
-    expect(resposta.body).toEqual({ codigo: 'SEM_VAGA', mensagem: 'As vagas desta sexta acabaram.' });
+    expect(resposta.body).toEqual({ codigo: 'SEM_VAGA', mensagem: 'As vagas desta limpeza acabaram.' });
   });
 
   it('erro de rota async com extras (S8)', async () => {

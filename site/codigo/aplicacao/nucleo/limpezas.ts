@@ -1,5 +1,5 @@
 /**
- * sextas.ts: as sextas na área de quem organiza (S13, O4, O5) — com telefones, só para quem entrou.
+ * limpezas.ts: as limpezas na área de quem organiza (S13, O4, O5) — com telefones, só para quem entrou.
  * Mesmo padrão da escala pública: a Carga cuida de carregando / pronto / erro.
  */
 import { inject, Injectable } from '@angular/core';
@@ -10,11 +10,11 @@ import { Carga } from './carga';
 import { notificarFalha } from './falhas';
 
 @Injectable({ providedIn: 'root' })
-export class Sextas {
+export class Limpezas {
   private readonly api = inject(Api);
   private readonly notificacoes = inject(Notificacoes);
 
-  private readonly carga = new Carga<DiaCompleto[]>(() => this.api.sextasDoOrganizador(), []);
+  private readonly carga = new Carga<DiaCompleto[]>(() => this.api.limpezasDoOrganizador(), []);
   readonly dias = this.carga.dados.asReadonly();
   readonly estado = this.carga.estado.asReadonly();
   readonly erro = this.carga.erro.asReadonly();
@@ -24,28 +24,28 @@ export class Sextas {
   }
 
   buscar(id: string): Promise<DiaCompleto> {
-    return this.api.sextaDoOrganizador(id);
+    return this.api.limpezaDoOrganizador(id);
   }
 
-  /** S7: as tarefas da sexta mais recente, para o formulário de nova sexta já vir preenchido. */
+  /** S7: as tarefas da limpeza mais recente, para o formulário de nova limpeza já vir preenchido. */
   sugestaoDeTarefas(): Promise<string[]> {
     return this.api.sugestaoDeTarefas();
   }
 
   async criar(dados: EntradaDia): Promise<void> {
-    const criada = await this.api.criarSexta(dados);
-    this.notificacoes.mostrar(`Sexta criada para ${dataNaFrase(criada.data)}.`);
+    const criada = await this.api.criarLimpeza(dados);
+    this.notificacoes.mostrar(`Limpeza criada para ${dataNaFrase(criada.data)}.`);
   }
 
   async editar(id: string, dados: EntradaDia): Promise<void> {
-    await this.api.editarSexta(id, dados);
+    await this.api.editarLimpeza(id, dados);
     this.notificacoes.mostrar('Alterações salvas.');
   }
 
-  /** S11: apaga a sexta com as confirmações e tarefas. Não tem "Desfazer". */
+  /** S11: apaga a limpeza com as confirmações e tarefas. Não tem "Desfazer". */
   async apagar(id: string): Promise<void> {
-    await this.api.apagarSexta(id);
-    this.notificacoes.mostrar('Sexta apagada.');
+    await this.api.apagarLimpeza(id);
+    this.notificacoes.mostrar('Limpeza apagada.');
   }
 
   /**

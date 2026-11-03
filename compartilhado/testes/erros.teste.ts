@@ -10,7 +10,7 @@ const CODIGOS_DA_API = {
   TAREFA_NAO_ENCONTRADA: 404,
   CODIGO_INVALIDO: 404,
   TELEFONE_NAO_CONFERE: 404,
-  SEXTA_PASSADA: 409,
+  LIMPEZA_PASSADA: 409,
   SEM_VAGA: 409,
   TELEFONE_REPETIDO: 409,
   DATA_REPETIDA: 409,
@@ -36,16 +36,16 @@ describe('catálogo de erros', () => {
   });
 
   it('usa as mensagens escritas nas regras', () => {
-    expect(mensagemDoErro('SEM_VAGA')).toBe('As vagas desta sexta acabaram.');
-    expect(mensagemDoErro('TELEFONE_REPETIDO')).toBe('Esse telefone já está confirmado nesta sexta.');
+    expect(mensagemDoErro('SEM_VAGA')).toBe('As vagas desta limpeza acabaram.');
+    expect(mensagemDoErro('TELEFONE_REPETIDO')).toBe('Esse telefone já está confirmado nesta limpeza.');
     expect(mensagemDoErro('TELEFONE_NAO_CONFERE')).toBe(
-      'Esse telefone não confere com nenhuma confirmação desta sexta.',
+      'Esse telefone não confere com nenhuma confirmação desta limpeza.',
     );
     expect(mensagemDoErro('SENHA_INCORRETA')).toBe(
       'Senha incorreta. Peça a senha para quem administra o app.',
     );
     expect(mensagemDoErro('SESSAO_EXPIRADA')).toBe('Entre de novo na área de quem organiza.');
-    expect(mensagemDoErro('DATA_REPETIDA')).toBe('Já existe uma sexta cadastrada nessa data.');
+    expect(mensagemDoErro('DATA_REPETIDA')).toBe('Já existe uma limpeza cadastrada nessa data.');
     expect(mensagemDoErro('ERRO_INTERNO')).toBe('Algo deu errado. Tente de novo em instantes.');
   });
 

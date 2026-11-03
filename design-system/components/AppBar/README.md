@@ -6,7 +6,7 @@ Barra no topo de todas as telas, no azul-marinho de identidade (`header`), com o
 
 ```html
 <header class="appbar">
-  <h1 class="appbar__title">Limpeza na Sexta</h1>
+  <h1 class="appbar__title">Limpeza da Igreja</h1>
   <nav class="appbar__nav" aria-label="Principal">
     <a class="appbar__link" aria-current="page" href="/">Esta semana</a>
     <a class="appbar__link" href="/escala">Escala</a>

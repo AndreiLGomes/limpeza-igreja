@@ -1,6 +1,6 @@
 /**
  * "/confirmar?dia=ID": formulário "Confirmar presença" (TelaConfirmar; regras C1–C8 e P3).
- * - "Qual sexta?" mostra só as sextas com vaga (C6); com ?dia=ID, ela já vem escolhida.
+ * - "Qual limpeza?" mostra só as limpezas com vaga (C6); com ?dia=ID, ela já vem escolhida.
  * - Erro de formulário: aviso no topo E mensagem embaixo do campo. Erro de conexão: notificação.
  * - Deu certo: volta para o início com a notificação "Presença confirmada para …" (C8).
  */
@@ -20,7 +20,7 @@ import { Escala } from '@nucleo/escala';
 import { ehSemConexao, mensagemDaFalha, notificarFalha } from '@nucleo/falhas';
 import { Estado } from '../../comum/estado/estado';
 
-const MENSAGEM_DIA_OBRIGATORIO = 'Escolha a sexta.';
+const MENSAGEM_DIA_OBRIGATORIO = 'Escolha a limpeza.';
 
 @Component({
   selector: 'app-tela-confirmar',
@@ -33,14 +33,14 @@ const MENSAGEM_DIA_OBRIGATORIO = 'Escolha a sexta.';
       <app-estado
         [estado]="escala.estado()"
         [erro]="escala.erro()"
-        textoCarregando="Carregando as sextas…"
+        textoCarregando="Carregando as limpezas…"
         (tentar)="escala.carregar()"
       >
-        @if (sextasComVaga().length > 0) {
+        @if (limpezasComVaga().length > 0) {
           <form appFormulario class="card cartao-de-formulario" [formGroup]="formulario" (ngSubmit)="enviar()">
             <app-cabecalho-do-formulario titulo="Confirmar presença">
               <p class="form__desc">
-                Escolha a sexta e conte como pode ajudar. Campos com <span class="form__required">*</span> são
+                Escolha a limpeza e conte como pode ajudar. Campos com <span class="form__required">*</span> são
                 obrigatórios.
               </p>
             </app-cabecalho-do-formulario>
@@ -70,8 +70,8 @@ const MENSAGEM_DIA_OBRIGATORIO = 'Escolha a sexta.';
               </app-campo>
             </div>
 
-            <app-campo rotulo="Qual sexta?" obrigatorio [controle]="formulario.controls.dia">
-              <app-selecao formControlName="dia" [opcoes]="sextasComVaga()" textoInicial="Escolha uma sexta" />
+            <app-campo rotulo="Qual limpeza?" obrigatorio [controle]="formulario.controls.dia">
+              <app-selecao formControlName="dia" [opcoes]="limpezasComVaga()" textoInicial="Escolha uma limpeza" />
             </app-campo>
 
             <app-escolhas legenda="Quanto tempo você pode ficar?" formControlName="tempo" [opcoes]="tempos" />
@@ -90,8 +90,8 @@ const MENSAGEM_DIA_OBRIGATORIO = 'Escolha a sexta.';
         } @else {
           <div class="card">
             <app-vazio
-              titulo="Nenhuma sexta com vaga"
-              texto="As próximas sextas estão completas ou ainda não foram cadastradas."
+              titulo="Nenhuma limpeza com vaga"
+              texto="As próximas limpezas estão completas ou ainda não foram cadastradas."
             >
               <a appBotao variante="secundario" routerLink="/escala">Ver a escala</a>
             </app-vazio>
@@ -111,8 +111,8 @@ export class TelaConfirmar implements OnInit {
 
   protected readonly tempos: Opcao[] = TEMPOS.map((tempo) => ({ valor: tempo, rotulo: TEXTO_DO_TEMPO[tempo] }));
 
-  /** C6: só as sextas com vaga. */
-  protected readonly sextasComVaga = computed<Opcao[]>(() =>
+  /** C6: só as limpezas com vaga. */
+  protected readonly limpezasComVaga = computed<Opcao[]>(() =>
     this.escala
       .dias()
       .filter((dia) => vagasLivres(dia) > 0)
@@ -136,9 +136,9 @@ export class TelaConfirmar implements OnInit {
   protected readonly salvando = signal(false);
 
   constructor() {
-    // C6: quando a escala chega, já escolhe a sexta do endereço (se tiver vaga) ou a primeira com vaga.
+    // C6: quando a escala chega, já escolhe a limpeza do endereço (se tiver vaga) ou a primeira com vaga.
     effect(() => {
-      const opcoes = this.sextasComVaga();
+      const opcoes = this.limpezasComVaga();
       const escolhida = this.formulario.controls.dia;
       if (opcoes.length === 0 || (escolhida.value && opcoes.some((opcao) => opcao.valor === escolhida.value))) return;
       const doEndereco = opcoes.find((opcao) => opcao.valor === this.dia());
@@ -184,7 +184,7 @@ export class TelaConfirmar implements OnInit {
     const campos = { ...(erro.dados.campos ?? {}) };
     if (erro.codigo === 'TELEFONE_REPETIDO') campos['telefone'] = erro.message;
     mostrarErrosNosCampos(this.formulario, campos);
-    // SEM_VAGA (C5): a sexta lotou nesse meio-tempo; a lista de sextas com vaga é atualizada.
+    // SEM_VAGA (C5): a limpeza lotou nesse meio-tempo; a lista de limpezas com vaga é atualizada.
     if (erro.codigo === 'SEM_VAGA') void this.escala.carregar();
   }
 }

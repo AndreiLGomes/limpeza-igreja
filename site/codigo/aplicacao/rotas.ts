@@ -40,18 +40,18 @@ export const rotas: Routes = [
     children: [
       {
         path: '',
-        title: 'Sextas',
-        loadComponent: () => import('./telas/organizar/sextas/sextas').then((modulo) => modulo.TelaSextas),
+        title: 'Limpezas',
+        loadComponent: () => import('./telas/organizar/limpezas/limpezas').then((modulo) => modulo.TelaLimpezas),
       },
       {
-        path: 'sexta/nova',
-        title: 'Nova sexta',
-        loadComponent: () => import('./telas/organizar/sexta/sexta').then((modulo) => modulo.TelaSexta),
+        path: 'limpeza/nova',
+        title: 'Nova limpeza',
+        loadComponent: () => import('./telas/organizar/limpeza/limpeza').then((modulo) => modulo.TelaLimpeza),
       },
       {
-        path: 'sexta/:id',
-        title: 'Editar sexta',
-        loadComponent: () => import('./telas/organizar/sexta/sexta').then((modulo) => modulo.TelaSexta),
+        path: 'limpeza/:id',
+        title: 'Editar limpeza',
+        loadComponent: () => import('./telas/organizar/limpeza/limpeza').then((modulo) => modulo.TelaLimpeza),
       },
     ],
   },

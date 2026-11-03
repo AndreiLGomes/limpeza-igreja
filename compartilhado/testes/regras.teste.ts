@@ -22,16 +22,16 @@ describe('vagasLivres', () => {
 });
 
 describe('podeConfirmar (C3)', () => {
-  it('pode em sexta futura com vaga, e também no próprio dia', () => {
+  it('pode em limpeza futura com vaga, e também no próprio dia', () => {
     expect(podeConfirmar(dia(5, 3), HOJE)).toBe(true);
     expect(podeConfirmar(dia(5, 3, HOJE), HOJE)).toBe(true);
   });
 
-  it('não pode em sexta passada', () => {
+  it('não pode em limpeza passada', () => {
     expect(podeConfirmar(dia(5, 0, '2026-10-09'), HOJE)).toBe(false);
   });
 
-  it('não pode em sexta cheia', () => {
+  it('não pode em limpeza cheia', () => {
     expect(podeConfirmar(dia(5, 5), HOJE)).toBe(false);
   });
 });
@@ -63,7 +63,7 @@ describe('statusDasTarefas (T5)', () => {
     expect(statusDasTarefas(tarefas(true, true))).toEqual({ tom: 'ok', texto: 'Limpeza feita' });
   });
 
-  it('sexta sem tarefas: sem etiqueta', () => {
+  it('limpeza sem tarefas: sem etiqueta', () => {
     expect(statusDasTarefas([])).toBeNull();
   });
 

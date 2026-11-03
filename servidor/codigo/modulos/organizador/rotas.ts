@@ -43,7 +43,7 @@ rotasDoOrganizador.post(organizador.sair, exigirOrganizador, async (_requisicao,
 });
 
 rotasDoOrganizador.get(organizador.dias, exigirOrganizador, async (_requisicao, resposta) => {
-  resposta.json(await servicoDeDias.sextasDoOrganizador());
+  resposta.json(await servicoDeDias.limpezasDoOrganizador());
 });
 
 rotasDoOrganizador.get(organizador.sugestaoTarefas, exigirOrganizador, async (_requisicao, resposta) => {

@@ -43,19 +43,19 @@ export class MinhasConfirmacoes {
     gravar('local', CHAVE, JSON.stringify(lista));
   }
 
-  /** C7: guarda o código depois de confirmar (uma por sexta). */
+  /** C7: guarda o código depois de confirmar (uma por limpeza). */
   guardar(confirmacao: ConfirmacaoGuardada): void {
     this.salvar([...this._lista().filter((item) => item.diaId !== confirmacao.diaId), confirmacao]);
   }
 
-  /** A confirmação deste celular naquela sexta, se houver. */
-  daSexta(diaId: string): ConfirmacaoGuardada | undefined {
+  /** A confirmação deste celular naquela limpeza, se houver. */
+  daLimpeza(diaId: string): ConfirmacaoGuardada | undefined {
     return this._lista().find((item) => item.diaId === diaId);
   }
 
-  /** X1: este celular confirmou nesta sexta (e a pessoa ainda está na escala)? */
+  /** X1: este celular confirmou nesta limpeza (e a pessoa ainda está na escala)? */
   confirmouEm(dia: Pick<DiaPublico, 'id' | 'pessoas'>): boolean {
-    const guardada = this.daSexta(dia.id);
+    const guardada = this.daLimpeza(dia.id);
     return Boolean(guardada && dia.pessoas.some((pessoa) => pessoa.id === guardada.pessoaId));
   }
 
@@ -65,9 +65,9 @@ export class MinhasConfirmacoes {
   }
 
   /**
-   * X6: apaga, sem avisar, as confirmações cuja pessoa não aparece mais na sexta
+   * X6: apaga, sem avisar, as confirmações cuja pessoa não aparece mais na limpeza
    * (o organizador removeu, ou a pessoa cancelou pelo telefone em outro aparelho).
-   * Sextas que não vieram na lista não são mexidas (podem só estar fora das 8 próximas).
+   * Limpezas que não vieram na lista não são mexidas (podem só estar fora das 8 próximas).
    */
   limparSumidas(dias: Pick<DiaPublico, 'id' | 'pessoas'>[]): void {
     const sumidas = this._lista().filter((item) => {

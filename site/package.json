@@ -2,7 +2,7 @@
   "name": "@limpeza/site",
   "version": "0.1.0",
   "private": true,
-  "description": "Telas da Limpeza na Sexta: Angular 22.",
+  "description": "Telas da Limpeza da Igreja: Angular 22.",
   "packageManager": "npm@11.19.0",
   "scripts": {
     "ng": "ng",

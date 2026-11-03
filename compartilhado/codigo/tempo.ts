@@ -1,8 +1,8 @@
 /**
  * hoje(): a data de hoje em America/Sao_Paulo (D1), no formato "AAAA-MM-DD".
- * É o ÚNICO lugar do código que sabe o fuso horário do aplicativo.
+ * É o ÚNICO lugar do código que sabe o fuso horário do aplicativo: o servidor, o site e os testes usam este.
  */
-const FUSO_DO_APP = 'America/Sao_Paulo';
+export const FUSO_DO_APP = 'America/Sao_Paulo';
 
 /** "en-CA" escreve a data como AAAA-MM-DD, sem depender do idioma do servidor. */
 const formatoDeData = new Intl.DateTimeFormat('en-CA', {

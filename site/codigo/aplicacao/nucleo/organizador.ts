@@ -72,7 +72,7 @@ export const exigirOrganizador: CanActivateFn = () => {
   return organizador.logado() || inject(Router).parseUrl(TELA_DE_SENHA);
 };
 
-/** Guarda da tela de senha: quem já entrou vai direto para a lista de sextas. */
+/** Guarda da tela de senha: quem já entrou vai direto para a lista de limpezas. */
 export const quemNaoEntrou: CanActivateFn = () =>
   !inject(Organizador).logado() || inject(Router).parseUrl('/organizar');
 

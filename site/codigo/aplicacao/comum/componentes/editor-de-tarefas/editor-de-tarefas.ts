@@ -60,7 +60,7 @@ export function linhaDeTarefa(nome = '', id: string | null = null): LinhaDeTaref
     </fieldset>
 
     <app-janela titulo="Remover esta tarefa?" [(aberta)]="confirmando">
-      <p class="dialog__text">"{{ nomeEmRemocao() }}" sai da lista desta sexta quando você salvar.</p>
+      <p class="dialog__text">"{{ nomeEmRemocao() }}" sai da lista desta limpeza quando você salvar.</p>
       <div acoesDaJanela>
         <button appBotao variante="secundario" type="button" autofocus (click)="confirmando.set(false)">
           Manter tarefa

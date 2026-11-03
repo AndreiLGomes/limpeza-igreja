@@ -4,6 +4,7 @@ export * from './erros.js';
 export * from './telefone.js';
 export * from './textos.js';
 export * from './datas.js';
+export * from './tempo.js';
 export * from './pessoas.js';
 export * from './regras.js';
 export * from './esquemas.js';

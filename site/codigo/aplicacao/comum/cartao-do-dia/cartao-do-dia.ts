@@ -1,7 +1,7 @@
 /**
- * <app-cartao-do-dia [dia]="dia" />: o cartão de uma sexta na tela inicial e na escala (DiaCard, docs/06).
+ * <app-cartao-do-dia [dia]="dia" />: o cartão de uma limpeza na tela inicial e na escala (DiaCard, docs/06).
  * - Título: data por extenso. Detalhes: "19h às 21h · 3 de 5 vagas preenchidas". Etiqueta pelo statusDoDia.
- * - Este celular confirmou (X1): "Você vai nesta sexta" + "Cancelar minha presença" (janela de confirmação).
+ * - Este celular confirmou (X1): "Você vai nesta limpeza" + "Cancelar minha presença" (janela de confirmação).
  * - Senão, com vaga: "Confirmar presença". Sempre: "Ver tarefas".
  * - Com gente confirmada: "Cancelar uma presença" (X2), que pede o telefone usado.
  */
@@ -33,7 +33,7 @@ let proximoFormulario = 0;
       <app-etiqueta situacaoDoCartao [tom]="situacao().tom">{{ situacao().texto }}</app-etiqueta>
       <app-grupo-de-avatares [nomes]="nomes()" [total]="dia().vagas" />
       @if (euVou()) {
-        <p class="cartao-do-dia__eu-vou"><app-icone nome="calendar-check" /> Você vai nesta sexta</p>
+        <p class="cartao-do-dia__eu-vou"><app-icone nome="calendar-check" /> Você vai nesta limpeza</p>
       }
       <div acoesDoCartao>
         @if (euVou()) {

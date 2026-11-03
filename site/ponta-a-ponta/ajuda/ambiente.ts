@@ -44,7 +44,7 @@ export function aplicarMigracoes(): void {
   comandoDoServidor('migrar');
 }
 
-/** Volta o banco de teste aos dados de exemplo (4 sextas; Andrei, João e Maria na primeira). */
+/** Volta o banco de teste aos dados de exemplo (4 limpezas; Andrei, João e Maria na primeira). */
 export function reiniciarDados(): void {
   comandoDoServidor('dados-de-exemplo');
 }

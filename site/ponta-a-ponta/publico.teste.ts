@@ -1,12 +1,12 @@
 /**
  * Cenários de ponta a ponta da parte pública (docs/07, cenários 1–8, 14, 16 e 17).
- * Dados de exemplo: 4 sextas; na primeira, Andrei (47900000001), João (47900000002) e Maria;
- * cada sexta com 4 tarefas. O banco volta a esse estado antes de cada teste.
+ * Dados de exemplo (servidor/codigo/banco/exemplos.ts): 4 limpezas, às quintas; na primeira, Andrei (47900000001), João (47900000002) e Maria;
+ * cada limpeza com 4 tarefas. O banco volta a esse estado antes de cada teste.
  */
 import type { Page } from '@playwright/test';
 import { expect, notificacao, semRolagemLateral, teste } from './ajuda/teste';
 
-/** O cartão da próxima sexta na tela inicial. */
+/** O cartão da próxima limpeza na tela inicial. */
 const cartao = (pagina: Page) => pagina.locator('app-cartao-do-dia').first();
 
 /** Confirma presença pelo formulário (sem esperar o fim). */
@@ -16,7 +16,7 @@ async function preencherConfirmacao(pagina: Page, nome: string, telefone: string
   await pagina.getByLabel('Telefone').fill(telefone);
 }
 
-teste('1. a tela inicial mostra linhas cinzas e depois o cartão da próxima sexta @escuro', async ({ page }) => {
+teste('1. a tela inicial mostra linhas cinzas e depois o cartão da próxima limpeza @escuro', async ({ page }) => {
   // Atrasa a resposta da escala para dar tempo de ver o "carregando".
   await page.route('**/api/dias', async (rota) => {
     await new Promise((pronto) => setTimeout(pronto, 800));
@@ -24,9 +24,9 @@ teste('1. a tela inicial mostra linhas cinzas e depois o cartão da próxima sex
   });
   await page.goto('/');
   await expect(page.locator('.skeleton').first()).toBeVisible();
-  await expect(cartao(page).locator('.card__title')).toHaveText(/^Sexta, \d+ de \w+/);
+  await expect(cartao(page).locator('.card__title')).toHaveText(/^Quinta, \d+ de \w+/);
   await expect(page.locator('.skeleton')).toHaveCount(0);
-  await expect(page).toHaveTitle('Esta semana · Limpeza na Sexta');
+  await expect(page).toHaveTitle('Esta semana · Limpeza da Igreja');
   await semRolagemLateral(page);
 });
 
@@ -43,11 +43,11 @@ teste('2. confirmar vazio mostra o aviso "Faltam 2 informações" e as mensagens
 teste('3. confirmar com telefone já usado mostra a mensagem do servidor no aviso', async ({ page }) => {
   await preencherConfirmacao(page, 'Outra Pessoa', '47 90000-0001');
   await page.getByRole('button', { name: 'Confirmar presença' }).click();
-  await expect(page.locator('form app-aviso')).toContainText('Esse telefone já está confirmado nesta sexta.');
+  await expect(page.locator('form app-aviso')).toContainText('Esse telefone já está confirmado nesta limpeza.');
   await semRolagemLateral(page);
 });
 
-teste('4, 5 e 6. confirmar, ver "Você vai nesta sexta" e cancelar a própria presença @escuro', async ({ page }) => {
+teste('4, 5 e 6. confirmar, ver "Você vai nesta limpeza" e cancelar a própria presença @escuro', async ({ page }) => {
   // 4. Confirmar certo → "Salvando…" → volta ao início com notificação → nome no cartão.
   await page.route('**/api/dias/*/confirmacoes', async (rota) => {
     await new Promise((pronto) => setTimeout(pronto, 600));
@@ -57,12 +57,12 @@ teste('4, 5 e 6. confirmar, ver "Você vai nesta sexta" e cancelar a própria pr
   await page.getByRole('button', { name: 'Confirmar presença' }).click();
   await expect(page.getByRole('button', { name: 'Salvando…' })).toBeDisabled();
   await expect(page).toHaveURL(/\/$/);
-  await expect(notificacao(page, /Presença confirmada para sexta, \d+ de \w+\./)).toBeVisible();
+  await expect(notificacao(page, /Presença confirmada para quinta, \d+ de \w+\./)).toBeVisible();
   await expect(cartao(page).getByRole('img', { name: 'Pedro Lima' })).toBeVisible();
   await semRolagemLateral(page);
 
-  // 5. O cartão mostra "Você vai nesta sexta" e "Cancelar minha presença".
-  await expect(cartao(page).getByText('Você vai nesta sexta')).toBeVisible();
+  // 5. O cartão mostra "Você vai nesta limpeza" e "Cancelar minha presença".
+  await expect(cartao(page).getByText('Você vai nesta limpeza')).toBeVisible();
   await expect(cartao(page).getByRole('button', { name: 'Confirmar presença' })).toHaveCount(0);
 
   // 6. Cancelar minha presença → janela → notificação → o nome some.
@@ -73,7 +73,7 @@ teste('4, 5 e 6. confirmar, ver "Você vai nesta sexta" e cancelar a própria pr
   await janela.getByRole('button', { name: 'Cancelar presença' }).click();
   await expect(notificacao(page, 'Presença cancelada.')).toBeVisible();
   await expect(cartao(page).getByRole('img', { name: 'Pedro Lima' })).toHaveCount(0);
-  await expect(cartao(page).getByText('Você vai nesta sexta')).toHaveCount(0);
+  await expect(cartao(page).getByText('Você vai nesta limpeza')).toHaveCount(0);
 });
 
 teste('7. "Cancelar uma presença": telefone errado mostra a mensagem; o certo cancela', async ({ page }) => {
@@ -85,7 +85,7 @@ teste('7. "Cancelar uma presença": telefone errado mostra a mensagem; o certo c
 
   await janela.getByLabel('Seu telefone').fill('47 98888-7777');
   await janela.getByRole('button', { name: 'Cancelar presença' }).click();
-  await expect(janela.getByText('Esse telefone não confere com nenhuma confirmação desta sexta.')).toBeVisible();
+  await expect(janela.getByText('Esse telefone não confere com nenhuma confirmação desta limpeza.')).toBeVisible();
 
   await janela.getByLabel('Seu telefone').fill('47 90000-0002');
   await janela.getByRole('button', { name: 'Cancelar presença' }).click();
@@ -150,7 +150,7 @@ teste('17. a vitrine não tem rolagem lateral', async ({ page }) => {
   await semRolagemLateral(page);
 });
 
-teste('escala e "Ver tarefas" levam para a sexta certa', async ({ page }) => {
+teste('escala e "Ver tarefas" levam para a limpeza certa', async ({ page }) => {
   await page.goto('/escala');
   await expect(page.locator('app-cartao-do-dia')).toHaveCount(4);
   const segunda = page.locator('app-cartao-do-dia').nth(1);

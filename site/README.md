@@ -1,4 +1,4 @@
-# Site — Limpeza na Sexta
+# Site — Limpeza da Igreja
 
 As telas do app em Angular 22 (componentes *standalone*, *signals*, sem zone.js).
 

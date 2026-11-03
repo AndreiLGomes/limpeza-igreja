@@ -24,7 +24,7 @@ export async function inserir(banco: Executor, valores: typeof confirmacoes.$inf
   return criada;
 }
 
-/** A confirmação dona do código (pelo hash), com a data da sexta. */
+/** A confirmação dona do código (pelo hash), com a data da limpeza. */
 export async function buscarPorCodigo(codigoHash: string): Promise<{ id: string; data: string } | undefined> {
   const [achada] = await bd
     .select({ id: confirmacoes.id, data: dias.data })
@@ -38,7 +38,7 @@ export async function apagar(id: string): Promise<void> {
   await bd.delete(confirmacoes).where(eq(confirmacoes.id, id));
 }
 
-/** Apaga a pessoa daquela sexta e devolve os dados dela (para o "Desfazer", O5). */
+/** Apaga a pessoa daquela limpeza e devolve os dados dela (para o "Desfazer", O5). */
 export async function apagarDoDia(diaId: string, pessoaId: string): Promise<Confirmacao | undefined> {
   const [apagada] = await bd
     .delete(confirmacoes)
@@ -47,7 +47,7 @@ export async function apagarDoDia(diaId: string, pessoaId: string): Promise<Conf
   return apagada;
 }
 
-/** Apaga a confirmação desse telefone nessa sexta. Devolve se havia alguma. */
+/** Apaga a confirmação desse telefone nessa limpeza. Devolve se havia alguma. */
 export async function apagarPorTelefone(diaId: string, telefone: string): Promise<boolean> {
   const apagadas = await bd
     .delete(confirmacoes)

@@ -31,15 +31,15 @@ describe('PATCH /api/dias/:id/tarefas/:tarefaId (T1, T2)', () => {
     expect(depois?.feitaEm).toBeNull();
   });
 
-  it('sexta passada → 409 SEXTA_PASSADA', async () => {
+  it('limpeza passada → 409 LIMPEZA_PASSADA', async () => {
     const dia = await criarDiaPassado();
     const tarefa = await criarTarefa(dia);
     const resposta = await marcar(dia.id, tarefa.id, { feita: true });
     expect(resposta.status).toBe(409);
-    expect(resposta.body.codigo).toBe('SEXTA_PASSADA');
+    expect(resposta.body.codigo).toBe('LIMPEZA_PASSADA');
   });
 
-  it('tarefa de outra sexta ou que não existe → 404 TAREFA_NAO_ENCONTRADA', async () => {
+  it('tarefa de outra limpeza ou que não existe → 404 TAREFA_NAO_ENCONTRADA', async () => {
     const dia = await criarDia();
     const tarefaDeOutroDia = await criarTarefa(await criarDia());
     for (const tarefaId of [tarefaDeOutroDia.id, ID_QUE_NAO_EXISTE, 'abc']) {

@@ -1,4 +1,4 @@
-/** "/": tela inicial (TelaSemana). Título e o cartão da próxima sexta. */
+/** "/": tela inicial (TelaSemana). Título e o cartão da próxima limpeza. */
 import { Component, inject, type OnInit } from '@angular/core';
 import { Vazio } from '@componentes';
 import { Escala } from '@nucleo/escala';
@@ -10,7 +10,7 @@ import { Estado } from '../../comum/estado/estado';
   imports: [CartaoDoDia, Estado, Vazio],
   template: `
     <div class="pagina">
-      <h1 class="display">Limpeza de sexta-feira</h1>
+      <h1 class="display">Próxima limpeza</h1>
       <app-estado
         [estado]="escala.estado()"
         [erro]="escala.erro()"
@@ -22,7 +22,7 @@ import { Estado } from '../../comum/estado/estado';
         } @else {
           <div class="card">
             <app-vazio
-              titulo="Nenhuma sexta marcada"
+              titulo="Nenhuma limpeza marcada"
               texto="Quando quem organiza cadastrar as próximas limpezas, elas aparecem aqui."
             />
           </div>

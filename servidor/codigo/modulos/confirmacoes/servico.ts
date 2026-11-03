@@ -12,7 +12,7 @@ import * as repositorio from './repositorio.js';
 
 /**
  * Põe uma pessoa na escala: usado por "confirmar presença" e pelo "desfazer remoção" (O5).
- * A linha da sexta fica travada durante a transação: duas pessoas na última vaga ao mesmo tempo
+ * A linha da limpeza fica travada durante a transação: duas pessoas na última vaga ao mesmo tempo
  * são atendidas uma de cada vez, e a segunda recebe SEM_VAGA (C5).
  * Devolve a pessoa e o código de cancelamento puro, que só sai daqui uma vez (C7).
  */
@@ -62,7 +62,7 @@ export async function desfazerRemocao(diaId: string, dados: DadosConfirmacao): P
   return paraPessoaCompleta(pessoa);
 }
 
-/** X2: cancelar digitando o telefone usado na confirmação daquela sexta. */
+/** X2: cancelar digitando o telefone usado na confirmação daquela limpeza. */
 export async function cancelarPorTelefone(diaId: string, telefone: string): Promise<void> {
   exigirNaoPassada(await repositorioDeDias.buscar(diaId));
   if (!(await repositorio.apagarPorTelefone(diaId, telefone))) throw new ErroDeRegra('TELEFONE_NAO_CONFERE');

@@ -25,7 +25,7 @@ import { Organizador } from '@nucleo/organizador';
         <span class="empty__icon"><app-icone nome="lock" [tamanho]="24" /></span>
         <app-cabecalho-do-formulario
           titulo="Área de quem organiza"
-          descricao="Para criar sextas, mudar vagas e tarefas. Quem só vem limpar não precisa entrar aqui."
+          descricao="Para criar limpezas, mudar vagas e tarefas. Quem só vem limpar não precisa entrar aqui."
         />
         <app-campo rotulo="Senha de organizador" [controle]="formulario.controls.senha">
           <input appEntrada type="password" autocomplete="current-password" formControlName="senha" />

@@ -9,7 +9,7 @@ const MENSAGEM_PADRAO = 'Confira este campo.';
 
 /**
  * A mensagem a mostrar embaixo do campo, ou null se não há erro.
- * - `servidor`: mensagem que veio pronta da API (ex.: "Esse telefone já está confirmado nesta sexta.");
+ * - `servidor`: mensagem que veio pronta da API (ex.: "Esse telefone já está confirmado nesta limpeza.");
  * - `zod`: mensagem do esquema do compartilhado.
  */
 export function mensagemDeErro(erros: ValidationErrors | null | undefined): string | null {

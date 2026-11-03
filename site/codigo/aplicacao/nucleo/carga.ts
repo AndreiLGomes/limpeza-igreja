@@ -1,6 +1,6 @@
 /**
  * Carga<T>: dados que vêm do servidor, com o estado da carga ('carregando' | 'pronto' | 'erro') e a
- * mensagem de erro — tudo o que o <app-estado> precisa. Usada pela escala pública e pelas sextas do
+ * mensagem de erro — tudo o que o <app-estado> precisa. Usada pela escala pública e pelas limpezas do
  * organizador, para não repetir a mesma lógica.
  */
 import { signal, type WritableSignal } from '@angular/core';

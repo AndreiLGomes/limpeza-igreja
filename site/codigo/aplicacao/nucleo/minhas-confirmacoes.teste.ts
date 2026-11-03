@@ -4,8 +4,8 @@ import { MinhasConfirmacoes } from './minhas-confirmacoes';
 const PEDRO = { diaId: 'dia-1', pessoaId: 'pessoa-1', codigo: 'codigo-1' };
 const ANA = { diaId: 'dia-2', pessoaId: 'pessoa-2', codigo: 'codigo-2' };
 
-/** Uma sexta com estas pessoas (só o que o serviço olha). */
-const sexta = (id: string, ...pessoas: string[]) => ({ id, pessoas: pessoas.map((p) => ({ id: p, nome: p, tempo: 'todo' as const })) });
+/** Uma limpeza com estas pessoas (só o que o serviço olha). */
+const limpeza = (id: string, ...pessoas: string[]) => ({ id, pessoas: pessoas.map((p) => ({ id: p, nome: p, tempo: 'todo' as const })) });
 
 function criar(): MinhasConfirmacoes {
   TestBed.resetTestingModule();
@@ -19,25 +19,25 @@ describe('MinhasConfirmacoes', () => {
   it('grava e lê de novo, na chave "confirmacoes" (C7)', () => {
     criar().guardar(PEDRO);
     expect(JSON.parse(localStorage.getItem('confirmacoes')!)).toEqual([PEDRO]);
-    expect(criar().daSexta('dia-1')).toEqual(PEDRO);
+    expect(criar().daLimpeza('dia-1')).toEqual(PEDRO);
   });
 
-  it('uma confirmação por sexta: confirmar de novo substitui', () => {
+  it('uma confirmação por limpeza: confirmar de novo substitui', () => {
     const servico = criar();
     servico.guardar(PEDRO);
     servico.guardar({ ...PEDRO, pessoaId: 'pessoa-9', codigo: 'novo' });
     expect(servico.lista()).toEqual([{ ...PEDRO, pessoaId: 'pessoa-9', codigo: 'novo' }]);
   });
 
-  it('confirmouEm (X1): só se a pessoa ainda está na sexta', () => {
+  it('confirmouEm (X1): só se a pessoa ainda está na limpeza', () => {
     const servico = criar();
     servico.guardar(PEDRO);
-    expect(servico.confirmouEm(sexta('dia-1', 'pessoa-1'))).toBe(true);
-    expect(servico.confirmouEm(sexta('dia-1', 'outra'))).toBe(false);
-    expect(servico.confirmouEm(sexta('dia-2', 'pessoa-1'))).toBe(false);
+    expect(servico.confirmouEm(limpeza('dia-1', 'pessoa-1'))).toBe(true);
+    expect(servico.confirmouEm(limpeza('dia-1', 'outra'))).toBe(false);
+    expect(servico.confirmouEm(limpeza('dia-2', 'pessoa-1'))).toBe(false);
   });
 
-  it('esquecer (X5) apaga só daquela sexta', () => {
+  it('esquecer (X5) apaga só daquela limpeza', () => {
     const servico = criar();
     servico.guardar(PEDRO);
     servico.guardar(ANA);
@@ -45,11 +45,11 @@ describe('MinhasConfirmacoes', () => {
     expect(servico.lista()).toEqual([ANA]);
   });
 
-  it('limparSumidas (X6): apaga quem sumiu da sexta e não mexe em sextas que não vieram', () => {
+  it('limparSumidas (X6): apaga quem sumiu da limpeza e não mexe em limpezas que não vieram', () => {
     const servico = criar();
     servico.guardar(PEDRO);
     servico.guardar(ANA);
-    servico.limparSumidas([sexta('dia-1', 'outra-pessoa')]);
+    servico.limparSumidas([limpeza('dia-1', 'outra-pessoa')]);
     expect(servico.lista()).toEqual([ANA]);
   });
 
@@ -70,6 +70,6 @@ describe('MinhasConfirmacoes', () => {
     const servico = criar();
     expect(servico.lista()).toEqual([]);
     expect(() => servico.guardar(PEDRO)).not.toThrow();
-    expect(servico.daSexta('dia-1')).toEqual(PEDRO);
+    expect(servico.daLimpeza('dia-1')).toEqual(PEDRO);
   });
 });

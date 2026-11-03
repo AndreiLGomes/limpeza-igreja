@@ -62,7 +62,7 @@ export class Vitrine {
 
   // ---------- Formulário de exemplo, com as validações do compartilhado ----------
 
-  protected readonly sextas: Opcao[] = [
+  protected readonly limpezas: Opcao[] = [
     { valor: '2026-10-16', rotulo: 'Sexta, 16 de outubro' },
     { valor: '2026-10-23', rotulo: 'Sexta, 23 de outubro' },
     { valor: '2026-10-30', rotulo: 'Sexta, 30 de outubro' },

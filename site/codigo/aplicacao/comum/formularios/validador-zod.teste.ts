@@ -30,8 +30,8 @@ describe('validadorZod()', () => {
 
 describe('mensagens de erro', () => {
   it('a mensagem que veio do servidor tem prioridade', () => {
-    expect(mensagemDeErro({ zod: 'do esquema', servidor: 'Esse telefone já está confirmado nesta sexta.' })).toBe(
-      'Esse telefone já está confirmado nesta sexta.',
+    expect(mensagemDeErro({ zod: 'do esquema', servidor: 'Esse telefone já está confirmado nesta limpeza.' })).toBe(
+      'Esse telefone já está confirmado nesta limpeza.',
     );
     expect(mensagemDeErro(null)).toBeNull();
   });

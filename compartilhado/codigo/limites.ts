@@ -14,21 +14,21 @@ export const TELEFONE_MAX_DIGITOS = 11;
 /** Observação opcional da confirmação. */
 export const OBSERVACAO_MAX = 200;
 
-/** S4: vagas de uma sexta. */
+/** S4: vagas de uma limpeza. */
 export const VAGAS_MIN = 1;
 export const VAGAS_MAX = 30;
 export const VAGAS_PADRAO = 5;
 
-/** S3: horários padrão ao criar uma sexta. */
+/** S3: horários padrão ao criar uma limpeza. */
 export const INICIO_PADRAO = '19:00';
 export const FIM_PADRAO = '21:00';
 
-/** S5: tarefas de uma sexta. */
+/** S5: tarefas de uma limpeza. */
 export const TAREFAS_MAX = 30;
 export const TAREFA_NOME_MIN = 1;
 export const TAREFA_NOME_MAX = 80;
 
-/** S12: quantas sextas a escala pública mostra. */
+/** S12: quantas limpezas a escala pública mostra. */
 export const ESCALA_MAX_DIAS = 8;
 
 /** O2: validade da sessão do organizador. */

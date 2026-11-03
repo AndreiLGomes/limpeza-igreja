@@ -1,4 +1,4 @@
-# Servidor — Limpeza na Sexta
+# Servidor — Limpeza da Igreja
 
 A API: Node 24 + Express 5 + TypeScript + PostgreSQL 18 (Drizzle).
 

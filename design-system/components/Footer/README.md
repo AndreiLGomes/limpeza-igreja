@@ -7,7 +7,7 @@ Rodapé no fim de todas as telas públicas, com a troca de tema, o link discreto
 ```html
 <footer class="footer">
   <div class="footer__inner">
-    <span class="wordmark wordmark--sm wordmark--on-header">Limpeza na Sexta</span>
+    <span class="wordmark wordmark--sm wordmark--on-header">Limpeza da Igreja</span>
     <ul class="footer__links">
       <li><button class="footer__link" type="button">Tema escuro</button></li>
       <li><a class="footer__link" href="/organizar">Área de quem organiza</a></li>

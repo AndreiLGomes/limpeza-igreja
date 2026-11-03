@@ -92,11 +92,11 @@ export class Api {
     return this.pedir(this.http.post<void>(this.url(ROTAS.organizador.sair), {}));
   }
 
-  sextasDoOrganizador(): Promise<DiaCompleto[]> {
+  limpezasDoOrganizador(): Promise<DiaCompleto[]> {
     return this.pedir(this.http.get<DiaCompleto[]>(this.url(ROTAS.organizador.dias)));
   }
 
-  sextaDoOrganizador(id: string): Promise<DiaCompleto> {
+  limpezaDoOrganizador(id: string): Promise<DiaCompleto> {
     return this.pedir(this.http.get<DiaCompleto>(this.url(ROTAS.organizador.dia(id))));
   }
 
@@ -104,15 +104,15 @@ export class Api {
     return this.pedir(this.http.get<string[]>(this.url(ROTAS.organizador.sugestaoTarefas)));
   }
 
-  criarSexta(dados: EntradaDia): Promise<DiaCompleto> {
+  criarLimpeza(dados: EntradaDia): Promise<DiaCompleto> {
     return this.pedir(this.http.post<DiaCompleto>(this.url(ROTAS.organizador.dias), dados));
   }
 
-  editarSexta(id: string, dados: EntradaDia): Promise<DiaCompleto> {
+  editarLimpeza(id: string, dados: EntradaDia): Promise<DiaCompleto> {
     return this.pedir(this.http.put<DiaCompleto>(this.url(ROTAS.organizador.dia(id)), dados));
   }
 
-  apagarSexta(id: string): Promise<void> {
+  apagarLimpeza(id: string): Promise<void> {
     return this.pedir(this.http.delete<void>(this.url(ROTAS.organizador.dia(id))));
   }
 

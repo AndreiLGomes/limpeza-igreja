@@ -43,11 +43,11 @@ describe('Cancelar pelo código (X1, X4)', () => {
     expect((await cancelarPorCodigo(pessoa.codigo)).body.codigo).toBe('CODIGO_INVALIDO');
   });
 
-  it('sexta passada → 409 SEXTA_PASSADA e a pessoa continua lá', async () => {
+  it('limpeza passada → 409 LIMPEZA_PASSADA e a pessoa continua lá', async () => {
     const pessoa = await criarConfirmacao(await criarDiaPassado());
     const resposta = await cancelarPorCodigo(pessoa.codigo);
     expect(resposta.status).toBe(409);
-    expect(resposta.body.codigo).toBe('SEXTA_PASSADA');
+    expect(resposta.body.codigo).toBe('LIMPEZA_PASSADA');
     expect(await existe(pessoa.id)).toBe(true);
   });
 
@@ -73,11 +73,11 @@ describe('Cancelar pelo telefone (X2, X3, X4)', () => {
     expect(resposta.status).toBe(404);
     expect(resposta.body).toEqual({
       codigo: 'TELEFONE_NAO_CONFERE',
-      mensagem: 'Esse telefone não confere com nenhuma confirmação desta sexta.',
+      mensagem: 'Esse telefone não confere com nenhuma confirmação desta limpeza.',
     });
   });
 
-  it('só cancela a confirmação DAQUELA sexta', async () => {
+  it('só cancela a confirmação DAQUELA limpeza', async () => {
     const dia = await criarDia();
     const outroDia = await criarDia();
     const pessoa = await criarConfirmacao(outroDia, { telefone: '47999991234' });
@@ -85,10 +85,10 @@ describe('Cancelar pelo telefone (X2, X3, X4)', () => {
     expect(await existe(pessoa.id)).toBe(true);
   });
 
-  it('sexta passada → 409', async () => {
+  it('limpeza passada → 409', async () => {
     const dia = await criarDiaPassado();
     await criarConfirmacao(dia, { telefone: '47999991234' });
-    expect((await cancelarPorTelefone(dia.id, '47999991234')).body.codigo).toBe('SEXTA_PASSADA');
+    expect((await cancelarPorTelefone(dia.id, '47999991234')).body.codigo).toBe('LIMPEZA_PASSADA');
   });
 
   it('telefone inválido → 400 (não conta como tentativa errada)', async () => {

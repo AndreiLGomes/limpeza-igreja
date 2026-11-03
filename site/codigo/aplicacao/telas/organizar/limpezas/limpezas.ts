@@ -1,6 +1,6 @@
 /**
- * "/organizar": as próximas sextas com quem confirmou, com telefone (TelaOrganizar; S13, O4, O5).
- * "Nova sexta" é a única ação principal. Cada sexta tem o lápis de editar. Remover pede confirmação.
+ * "/organizar": as próximas limpezas com quem confirmou, com telefone (TelaOrganizar; S13, O4, O5).
+ * "Nova limpeza" é a única ação principal. Cada limpeza tem o lápis de editar. Remover pede confirmação.
  */
 import { Component, inject, signal, type OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -8,7 +8,7 @@ import {
   dataNaFrase, dataPorExtenso, horario, statusDoDia, type DiaCompleto, type PessoaCompleta,
 } from '@limpeza/compartilhado';
 import { Botao, Cartao, Etiqueta, Icone, Janela, ListaDePessoas, Vazio } from '@componentes';
-import { Sextas } from '@nucleo/sextas';
+import { Limpezas } from '@nucleo/limpezas';
 import { Estado } from '../../../comum/estado/estado';
 
 interface Remocao {
@@ -17,29 +17,29 @@ interface Remocao {
 }
 
 @Component({
-  selector: 'app-tela-sextas',
+  selector: 'app-tela-limpezas',
   imports: [Botao, Cartao, Estado, Etiqueta, Icone, Janela, ListaDePessoas, RouterLink, Vazio],
   template: `
     <div class="pagina">
       <div class="cabecalho">
-        <h1 class="title">Sextas</h1>
-        <a appBotao routerLink="/organizar/sexta/nova"><app-icone nome="plus" /> Nova sexta</a>
+        <h1 class="title">Limpezas</h1>
+        <a appBotao routerLink="/organizar/limpeza/nova"><app-icone nome="plus" /> Nova limpeza</a>
       </div>
 
       <app-estado
-        [estado]="sextas.estado()"
-        [erro]="sextas.erro()"
-        textoCarregando="Carregando as sextas…"
-        (tentar)="sextas.carregar()"
+        [estado]="limpezas.estado()"
+        [erro]="limpezas.erro()"
+        textoCarregando="Carregando as limpezas…"
+        (tentar)="limpezas.carregar()"
       >
-        @for (dia of sextas.dias(); track dia.id) {
+        @for (dia of limpezas.dias(); track dia.id) {
           <app-cartao [titulo]="titulo(dia)" [detalhes]="detalhes(dia)">
             <a
               situacaoDoCartao
               appBotao
               variante="discreto"
               icone
-              [routerLink]="['/organizar/sexta', dia.id]"
+              [routerLink]="['/organizar/limpeza', dia.id]"
               [attr.aria-label]="'Editar ' + dataNaFrase(dia.data)"
             >
               <app-icone nome="pencil" />
@@ -52,8 +52,8 @@ interface Remocao {
           </app-cartao>
         } @empty {
           <div class="card">
-            <app-vazio titulo="Nenhuma sexta marcada" texto="Cadastre a próxima limpeza para ela aparecer na escala.">
-              <a appBotao variante="secundario" routerLink="/organizar/sexta/nova">Cadastrar sexta</a>
+            <app-vazio titulo="Nenhuma limpeza marcada" texto="Cadastre a próxima limpeza para ela aparecer na escala.">
+              <a appBotao variante="secundario" routerLink="/organizar/limpeza/nova">Cadastrar limpeza</a>
             </app-vazio>
           </div>
         }
@@ -84,8 +84,8 @@ interface Remocao {
     }
   `,
 })
-export class TelaSextas implements OnInit {
-  protected readonly sextas = inject(Sextas);
+export class TelaLimpezas implements OnInit {
+  protected readonly limpezas = inject(Limpezas);
 
   protected readonly janelaAberta = signal(false);
   protected readonly remocao = signal<Remocao | null>(null);
@@ -93,7 +93,7 @@ export class TelaSextas implements OnInit {
   protected readonly dataNaFrase = dataNaFrase;
 
   ngOnInit(): void {
-    void this.sextas.carregar();
+    void this.limpezas.carregar();
   }
 
   protected titulo(dia: DiaCompleto): string {
@@ -118,6 +118,6 @@ export class TelaSextas implements OnInit {
   protected async remover(): Promise<void> {
     const remocao = this.remocao();
     this.janelaAberta.set(false);
-    if (remocao) await this.sextas.removerPessoa(remocao.dia, remocao.pessoa);
+    if (remocao) await this.limpezas.removerPessoa(remocao.dia, remocao.pessoa);
   }
 }

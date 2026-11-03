@@ -1,7 +1,7 @@
 /**
  * <app-selecao>: lista de opções (5 ou mais) com o visual do campo de texto (Select do Design System).
  * Vai dentro de um app-campo.
- *   <app-campo rotulo="Qual sexta?"><app-selecao [opcoes]="sextas" formControlName="dia" /></app-campo>
+ *   <app-campo rotulo="Qual limpeza?"><app-selecao [opcoes]="limpezas" formControlName="dia" /></app-campo>
  */
 import { Component, forwardRef, input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -38,6 +38,6 @@ import { CampoDeFormulario, type Opcao } from '../campo-de-formulario';
 })
 export class Selecao extends CampoDeFormulario<string> {
   readonly opcoes = input.required<Opcao[]>();
-  /** Texto mostrado enquanto nada foi escolhido, ex.: "Escolha uma sexta". */
+  /** Texto mostrado enquanto nada foi escolhido, ex.: "Escolha uma limpeza". */
   readonly textoInicial = input<string>();
 }

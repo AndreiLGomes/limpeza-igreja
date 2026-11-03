@@ -50,11 +50,11 @@ describe('POST /api/dias/:id/confirmacoes', () => {
     expect(resposta.body.campos).toEqual({ nome: MENSAGENS.nomeCurto, telefone: MENSAGENS.telefoneInvalido });
   });
 
-  it('sexta passada → 409 SEXTA_PASSADA (C3)', async () => {
+  it('limpeza passada → 409 LIMPEZA_PASSADA (C3)', async () => {
     const dia = await criarDiaPassado();
     const resposta = await confirmar(dia.id);
     expect(resposta.status).toBe(409);
-    expect(resposta.body.codigo).toBe('SEXTA_PASSADA');
+    expect(resposta.body.codigo).toBe('LIMPEZA_PASSADA');
   });
 
   it('sem vaga → 409 SEM_VAGA (C3)', async () => {
@@ -62,10 +62,10 @@ describe('POST /api/dias/:id/confirmacoes', () => {
     await criarConfirmacao(dia);
     const resposta = await confirmar(dia.id);
     expect(resposta.status).toBe(409);
-    expect(resposta.body).toEqual({ codigo: 'SEM_VAGA', mensagem: 'As vagas desta sexta acabaram.' });
+    expect(resposta.body).toEqual({ codigo: 'SEM_VAGA', mensagem: 'As vagas desta limpeza acabaram.' });
   });
 
-  it('telefone repetido na mesma sexta → 409; em outra sexta → 201 (C4)', async () => {
+  it('telefone repetido na mesma limpeza → 409; em outra limpeza → 201 (C4)', async () => {
     const dia = await criarDia();
     const outroDia = await criarDia();
     expect((await confirmar(dia.id)).status).toBe(201);
@@ -77,7 +77,7 @@ describe('POST /api/dias/:id/confirmacoes', () => {
     expect((await confirmar(outroDia.id)).status).toBe(201);
   });
 
-  it('sexta que não existe → 404', async () => {
+  it('limpeza que não existe → 404', async () => {
     const resposta = await confirmar(ID_QUE_NAO_EXISTE);
     expect(resposta.status).toBe(404);
     expect(resposta.body.codigo).toBe('DIA_NAO_ENCONTRADO');

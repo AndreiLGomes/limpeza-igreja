@@ -47,7 +47,7 @@ describe('tabela dias', () => {
     await esperarRecusa(inserirDia('2030-01-04', '19:00', '19:00', 5), VIOLA_CHECK, 'dias_fim_depois_do_inicio');
   });
 
-  it('S2: recusa duas sextas na mesma data', async () => {
+  it('S2: recusa duas limpezas na mesma data', async () => {
     await inserirDia('2030-01-04', '19:00', '21:00', 5);
     await esperarRecusa(inserirDia('2030-01-04', '08:00', '10:00', 3), VIOLA_UNIQUE, 'dias_data_unica');
   });
@@ -80,7 +80,7 @@ describe('tabela confirmacoes', () => {
     );
   });
 
-  it('C4: o mesmo telefone não confirma duas vezes na mesma sexta, mas pode em outra', async () => {
+  it('C4: o mesmo telefone não confirma duas vezes na mesma limpeza, mas pode em outra', async () => {
     const dia = await criarDia();
     const outroDia = await criarDia();
     await criarConfirmacao(dia, { telefone: '47999991234' });
@@ -94,7 +94,7 @@ describe('tabela confirmacoes', () => {
 });
 
 describe('tabela tarefas', () => {
-  it('S5: recusa nome repetido na mesma sexta e nome vazio', async () => {
+  it('S5: recusa nome repetido na mesma limpeza e nome vazio', async () => {
     const dia = await criarDia();
     await criarTarefa(dia, { nome: 'Varrer o salão' });
     await esperarRecusa(
@@ -116,7 +116,7 @@ describe('tabela tarefas', () => {
   });
 });
 
-describe('S11: apagar uma sexta apaga junto as confirmações e as tarefas', () => {
+describe('S11: apagar uma limpeza apaga junto as confirmações e as tarefas', () => {
   it('ON DELETE CASCADE', async () => {
     const dia = await criarDia();
     await criarConfirmacao(dia);

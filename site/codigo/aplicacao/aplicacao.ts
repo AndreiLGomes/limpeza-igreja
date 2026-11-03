@@ -15,7 +15,7 @@ const ABAS_PUBLICAS: AbaDaBarra[] = [
 
 /** Abas da área de quem organiza; "Sair" fica no rodapé (TelaOrganizar). */
 const ABAS_DO_ORGANIZADOR: AbaDaBarra[] = [
-  { rotulo: 'Sextas', rota: '/organizar' },
+  { rotulo: 'Limpezas', rota: '/organizar' },
   { rotulo: 'Ver como todos', rota: '/' },
 ];
 

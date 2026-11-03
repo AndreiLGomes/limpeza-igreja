@@ -30,7 +30,7 @@ export const MENSAGENS = {
   fimAntesDoInicio: 'O horário de fim tem que ser depois do início.',
   vagasInvalidas: `As vagas vão de ${VAGAS_MIN} a ${VAGAS_MAX}.`,
   tarefaLonga: `Cada tarefa pode ter no máximo ${TAREFA_NOME_MAX} letras.`,
-  tarefasDemais: `Uma sexta pode ter no máximo ${TAREFAS_MAX} tarefas.`,
+  tarefasDemais: `Uma limpeza pode ter no máximo ${TAREFAS_MAX} tarefas.`,
   tarefaRepetida: (nome: string) => `A tarefa "${nome}" aparece mais de uma vez.`,
   idInvalido: 'Endereço inválido.',
 } as const;

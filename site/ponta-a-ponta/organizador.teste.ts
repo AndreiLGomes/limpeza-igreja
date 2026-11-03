@@ -1,19 +1,18 @@
 /**
  * Cenários de ponta a ponta da área de quem organiza (docs/07, cenários 9–13 e 15).
- * Dados de exemplo: 4 sextas a partir da próxima sexta-feira; na primeira, Andrei (47 90000-0001),
- * João e Maria; na segunda, Paulo; cada sexta com 4 tarefas.
+ * Dados de exemplo (servidor/codigo/banco/exemplos.ts): 4 limpezas, às quintas, a partir da próxima
+ * quinta-feira; na primeira, Andrei (47 90000-0001), João e Maria; na segunda, Paulo; cada uma com 4 tarefas.
  */
 import type { Page } from '@playwright/test';
-import { dataPorExtenso, proximaSexta, somarDias } from '@limpeza/compartilhado';
+import { dataPorExtenso, hoje, proximoDiaDaSemana, somarDias } from '@limpeza/compartilhado';
+import { primeiraLimpezaDeExemplo, TAREFAS_DE_EXEMPLO } from '../../servidor/codigo/banco/exemplos';
 import { SENHA_DOS_TESTES } from './ajuda/ambiente';
 import { expect, notificacao, semRolagemLateral, teste } from './ajuda/teste';
 
-const TAREFAS_DE_EXEMPLO = ['Varrer o salão', 'Limpar os banheiros', 'Passar pano nos bancos', 'Tirar o lixo'];
+/** A primeira limpeza dos dados de exemplo (o banco volta a eles antes de cada teste). */
+const primeiraLimpeza = () => primeiraLimpezaDeExemplo(hoje());
 
-/** Hoje em São Paulo, no formato AAAA-MM-DD (igual ao servidor, D1). */
-const hoje = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date());
-
-const cartaoDaSexta = (pagina: Page, data: string) =>
+const cartaoDaLimpeza = (pagina: Page, data: string) =>
   pagina.locator('app-cartao').filter({ has: pagina.getByRole('heading', { name: dataPorExtenso(data) }) });
 
 async function entrar(pagina: Page): Promise<void> {
@@ -40,7 +39,7 @@ teste('9. senha errada mostra a mensagem no campo; a certa abre a área com "Org
   await expect(page.getByRole('link', { name: '47 90000-0001' })).toBeVisible();
   await expect(page.getByRole('link', { name: '47 90000-0001' })).toHaveAttribute('href', 'tel:+5547900000001');
   await expect(page.getByText('"vou levar o rodo novo"')).toBeVisible();
-  await expect(page).toHaveTitle('Sextas · Limpeza na Sexta');
+  await expect(page).toHaveTitle('Limpezas · Limpeza da Igreja');
   await semRolagemLateral(page);
 });
 
@@ -61,27 +60,25 @@ teste('10. remover pessoa: janela com foco em "Manter", notificação e "Desfaze
   await semRolagemLateral(page);
 });
 
-teste('11. nova sexta: tarefas sugeridas, aviso de não-sexta, contador, foco na tarefa nova e salvar', async ({
+teste('11. nova limpeza: tarefas sugeridas, qualquer dia, contador, foco na tarefa nova e salvar', async ({
   page,
 }) => {
   await entrar(page);
-  await page.getByRole('link', { name: 'Nova sexta' }).click();
-  await expect(page).toHaveURL(/\/organizar\/sexta\/nova$/);
-  await expect(page.getByRole('heading', { name: 'Nova sexta' })).toBeVisible();
+  await page.getByRole('link', { name: 'Nova limpeza' }).click();
+  await expect(page).toHaveURL(/\/organizar\/limpeza\/nova$/);
+  await expect(page.getByRole('heading', { name: 'Nova limpeza' })).toBeVisible();
 
-  // S7: já vem com as tarefas da sexta mais recente.
+  // S7: já vem com as tarefas da limpeza mais recente.
   const tarefas = page.locator('.editlist__row input');
   await expect(tarefas).toHaveCount(4);
   expect(await tarefas.evaluateAll((campos) => campos.map((campo) => (campo as HTMLInputElement).value))).toEqual(
     TAREFAS_DE_EXEMPLO,
   );
 
-  // S6: data que não é sexta-feira mostra o aviso.
-  const sextaNova = somarDias(proximaSexta(hoje()), 7 * 6);
-  await page.getByLabel('Data').fill(somarDias(sextaNova, 1));
-  await expect(page.getByText('Essa data não é uma sexta-feira.')).toBeVisible();
-  await page.getByLabel('Data').fill(sextaNova);
-  await expect(page.getByText('Essa data não é uma sexta-feira.')).toHaveCount(0);
+  // S6: qualquer dia da semana vale (aqui, uma segunda), sem aviso de dia.
+  const novaData = proximoDiaDaSemana(somarDias(primeiraLimpeza(), 7 * 6), 'Segunda');
+  await page.getByLabel('Data').fill(novaData);
+  await expect(page.locator('app-aviso')).toHaveCount(0);
 
   // Contador + e −.
   const vagas = page.getByRole('spinbutton', { name: 'Vagas' });
@@ -97,45 +94,45 @@ teste('11. nova sexta: tarefas sugeridas, aviso de não-sexta, contador, foco na
   await page.keyboard.type('Lavar a calçada');
 
   await semRolagemLateral(page);
-  await page.getByRole('button', { name: 'Salvar sexta' }).click();
+  await page.getByRole('button', { name: 'Salvar limpeza' }).click();
   await expect(page).toHaveURL(/\/organizar$/);
-  await expect(notificacao(page, /Sexta criada para sexta, \d+ de \w+\./)).toBeVisible();
-  await expect(cartaoDaSexta(page, sextaNova)).toContainText('0 de 5 vagas · 5 tarefas');
+  await expect(notificacao(page, /Limpeza criada para segunda, \d+ de \w+\./)).toBeVisible();
+  await expect(cartaoDaLimpeza(page, novaData)).toContainText('0 de 5 vagas · 5 tarefas');
 });
 
 teste('12. editar: vagas abaixo dos confirmados mostram o aviso e bloqueiam "Salvar"', async ({ page }) => {
   await entrar(page);
-  const primeira = proximaSexta(hoje());
-  await cartaoDaSexta(page, primeira).getByRole('link', { name: /^Editar / }).click();
-  await expect(page.getByRole('heading', { name: 'Editar sexta' })).toBeVisible();
+  const primeira = primeiraLimpeza();
+  await cartaoDaLimpeza(page, primeira).getByRole('link', { name: /^Editar / }).click();
+  await expect(page.getByRole('heading', { name: 'Editar limpeza' })).toBeVisible();
   await expect(page.getByRole('spinbutton', { name: 'Vagas' })).toHaveValue('5');
 
   for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Diminuir vagas' }).click();
   await expect(page.getByRole('spinbutton', { name: 'Vagas' })).toHaveValue('2');
   await expect(page.getByText('Já 3 pessoas confirmaram. As vagas não podem ser menos que isso.')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Salvar sexta' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Salvar limpeza' })).toBeDisabled();
 
   await page.getByRole('button', { name: 'Aumentar vagas' }).click();
-  await expect(page.getByRole('button', { name: 'Salvar sexta' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Salvar limpeza' })).toBeEnabled();
   await semRolagemLateral(page);
 });
 
-teste('13. apagar sexta: janela e a sexta some da lista', async ({ page }) => {
+teste('13. apagar limpeza: janela e a limpeza some da lista', async ({ page }) => {
   await entrar(page);
-  const quarta = somarDias(proximaSexta(hoje()), 21);
+  const quartaLimpeza = somarDias(primeiraLimpeza(), 21);
   await expect(page.locator('app-cartao')).toHaveCount(4);
-  await cartaoDaSexta(page, quarta).getByRole('link', { name: /^Editar / }).click();
-  await page.getByRole('button', { name: 'Apagar sexta' }).click();
+  await cartaoDaLimpeza(page, quartaLimpeza).getByRole('link', { name: /^Editar / }).click();
+  await page.getByRole('button', { name: 'Apagar limpeza' }).click();
 
-  const janela = page.getByRole('dialog', { name: 'Apagar esta sexta?' });
+  const janela = page.getByRole('dialog', { name: 'Apagar esta limpeza?' });
   await expect(janela).toContainText('Ninguém confirmou presença nela.');
-  await expect(janela.getByRole('button', { name: 'Manter sexta' })).toBeFocused();
-  await janela.getByRole('button', { name: 'Apagar sexta' }).click();
+  await expect(janela.getByRole('button', { name: 'Manter limpeza' })).toBeFocused();
+  await janela.getByRole('button', { name: 'Apagar limpeza' }).click();
 
   await expect(page).toHaveURL(/\/organizar$/);
-  await expect(notificacao(page, 'Sexta apagada.')).toBeVisible();
+  await expect(notificacao(page, 'Limpeza apagada.')).toBeVisible();
   await expect(page.locator('app-cartao')).toHaveCount(3);
-  await expect(cartaoDaSexta(page, quarta)).toHaveCount(0);
+  await expect(cartaoDaLimpeza(page, quartaLimpeza)).toHaveCount(0);
 });
 
 teste('15. "Sair" no rodapé: abrir /organizar pede a senha de novo', async ({ page }) => {

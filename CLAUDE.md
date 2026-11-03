@@ -1,6 +1,6 @@
 # Limpeza Igreja — instruções para o Claude Code
 
-App para organizar a limpeza da igreja às sextas-feiras: quem vem, quando vem e o que já foi feito.
+App para organizar a limpeza da igreja: quem vem, quando vem e o que já foi feito.
 Projeto pessoal do Andrei (dev front-end, Angular). **Ainda não existe código**: você vai
 construir tudo a partir da documentação.
 

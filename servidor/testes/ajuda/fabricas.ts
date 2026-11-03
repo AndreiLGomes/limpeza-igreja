@@ -3,13 +3,12 @@
  * Passe só o que importa para o teste, ex.: criarDia({ vagas: 1 }).
  * Nenhum teste monta dados "na mão" quando existe uma fábrica para isso.
  */
-import { FIM_PADRAO, INICIO_PADRAO, somarDias, VAGAS_PADRAO } from '@limpeza/compartilhado';
+import { FIM_PADRAO, hoje, INICIO_PADRAO, somarDias, VAGAS_PADRAO } from '@limpeza/compartilhado';
 import { bd } from '../../codigo/banco/cliente.js';
 import {
   confirmacoes, dias, tarefas, type Confirmacao, type Dia, type TarefaDoBanco,
 } from '../../codigo/banco/esquema.js';
 import { BYTES_DO_CODIGO, gerarToken, hashDeToken } from '../../codigo/comum/seguranca.js';
-import { hoje } from '../../codigo/comum/tempo.js';
 
 /** Um id no formato certo (UUID) que não existe no banco: para os testes de 404. */
 export const ID_QUE_NAO_EXISTE = '6f1c1b0e-8a3e-4c1a-9b7d-2f4e5a6b7c8d';
@@ -18,7 +17,7 @@ export const ID_QUE_NAO_EXISTE = '6f1c1b0e-8a3e-4c1a-9b7d-2f4e5a6b7c8d';
 let sequencia = 0;
 const proximo = () => ++sequencia;
 
-/** Uma sexta no futuro (a partir de daqui a uma semana), 19:00–21:00, 5 vagas. */
+/** Uma limpeza no futuro (a partir de daqui a uma semana), 19:00–21:00, 5 vagas. */
 export async function criarDia(dados: Partial<typeof dias.$inferInsert> = {}): Promise<Dia> {
   const [dia] = await bd
     .insert(dias)
@@ -33,7 +32,7 @@ export async function criarDia(dados: Partial<typeof dias.$inferInsert> = {}): P
   return dia!;
 }
 
-/** Sexta que já passou (ontem). */
+/** Limpeza que já passou (ontem). */
 export function criarDiaPassado(dados: Partial<typeof dias.$inferInsert> = {}): Promise<Dia> {
   return criarDia({ data: somarDias(hoje(), -1), ...dados });
 }

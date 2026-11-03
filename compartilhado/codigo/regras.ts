@@ -17,12 +17,12 @@ export function vagasLivres(dia: Pick<DiaComVagas, 'vagas' | 'pessoas'>): number
   return Math.max(0, dia.vagas - dia.pessoas.length);
 }
 
-/** C3: só dá para confirmar em sexta não passada e com vaga livre. */
+/** C3: só dá para confirmar em limpeza não passada e com vaga livre. */
 export function podeConfirmar(dia: DiaComVagas, hoje: string): boolean {
   return !ehPassada(dia.data, hoje) && vagasLivres(dia) > 0;
 }
 
-/** Etiqueta do card de uma sexta: "Ninguém confirmou", "Faltam N" ou "Completo". */
+/** Etiqueta do card de uma limpeza: "Ninguém confirmou", "Faltam N" ou "Completo". */
 export function statusDoDia(dia: Pick<DiaComVagas, 'vagas' | 'pessoas'>): Status {
   if (dia.pessoas.length === 0) return { tom: 'faltando', texto: 'Ninguém confirmou' };
   const faltam = vagasLivres(dia);
@@ -36,7 +36,7 @@ export function contadorDeTarefas(tarefas: readonly Pick<Tarefa, 'feita'>[]): st
   return `${feitas} de ${tarefas.length} feitas`;
 }
 
-/** T5: etiqueta conforme as tarefas. Sexta sem tarefas não tem etiqueta (null). */
+/** T5: etiqueta conforme as tarefas. Limpeza sem tarefas não tem etiqueta (null). */
 export function statusDasTarefas(tarefas: readonly Pick<Tarefa, 'feita'>[]): Status | null {
   if (tarefas.length === 0) return null;
   const feitas = tarefas.filter((tarefa) => tarefa.feita).length;

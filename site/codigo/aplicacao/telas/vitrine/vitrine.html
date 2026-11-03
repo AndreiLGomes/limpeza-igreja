@@ -40,8 +40,8 @@
         <button appBotao variante="secundario" icone type="button" aria-label="Adicionar">
           <app-icone nome="plus" />
         </button>
-        <button appBotao type="button"><app-icone nome="plus" /> Nova sexta</button>
-        <button appBotao variante="perigo-discreto" type="button"><app-icone nome="trash-2" /> Apagar sexta</button>
+        <button appBotao type="button"><app-icone nome="plus" /> Nova limpeza</button>
+        <button appBotao variante="perigo-discreto" type="button"><app-icone nome="trash-2" /> Apagar limpeza</button>
       </div>
       <button appBotao larguraToda type="button">Largura toda</button>
     </div>
@@ -53,7 +53,7 @@
     <form appFormulario class="card" [formGroup]="formulario" (ngSubmit)="enviar()">
       <app-cabecalho-do-formulario titulo="Confirmar presença">
         <p class="form__desc">
-          Escolha a sexta e conte como pode ajudar. Campos com <span class="form__required">*</span> são obrigatórios.
+          Escolha a limpeza e conte como pode ajudar. Campos com <span class="form__required">*</span> são obrigatórios.
         </p>
       </app-cabecalho-do-formulario>
 
@@ -75,8 +75,8 @@
         </app-campo>
       </div>
 
-      <app-campo rotulo="Qual sexta?" obrigatorio [controle]="formulario.controls.dia">
-        <app-selecao formControlName="dia" [opcoes]="sextas" textoInicial="Escolha uma sexta" />
+      <app-campo rotulo="Qual limpeza?" obrigatorio [controle]="formulario.controls.dia">
+        <app-selecao formControlName="dia" [opcoes]="limpezas" textoInicial="Escolha uma limpeza" />
       </app-campo>
 
       <app-escolhas legenda="Quanto tempo você pode ficar?" formControlName="tempo" [opcoes]="tempos" />
@@ -97,7 +97,7 @@
         <app-contador formControlName="vagas" [minimo]="vagasMinimo" [maximo]="vagasMaximo" unidade="vagas" />
       </app-campo>
 
-      <app-editor-de-tarefas legenda="Tarefas desta sexta" [lista]="formulario.controls.tarefas" />
+      <app-editor-de-tarefas legenda="Tarefas desta limpeza" [lista]="formulario.controls.tarefas" />
 
       <div appAcoesDoFormulario>
         <button appBotao variante="discreto" type="button" (click)="limpar()">Cancelar</button>
@@ -174,7 +174,7 @@
     <app-estado estado="erro" erro="Confira sua internet e tente de novo." />
 
     <div class="card">
-      <app-vazio titulo="Nenhuma sexta marcada" texto="Quando quem organiza cadastrar as próximas limpezas, elas aparecem aqui.">
+      <app-vazio titulo="Nenhuma limpeza marcada" texto="Quando quem organiza cadastrar as próximas limpezas, elas aparecem aqui.">
         <button appBotao variante="secundario" type="button">Atualizar</button>
       </app-vazio>
     </div>

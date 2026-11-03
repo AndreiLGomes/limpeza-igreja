@@ -4,6 +4,7 @@
  * As portas 3000 e 4200 precisam estar livres (desligue o "npm start" e o "npm run desenvolver").
  */
 import { defineConfig, devices } from '@playwright/test';
+import { FUSO_DO_APP } from '@limpeza/compartilhado';
 import { AMBIENTE_DO_SERVIDOR, ENDERECO_DA_API, ENDERECO_DO_SITE, PASTA_RAIZ } from './ponta-a-ponta/ajuda/ambiente';
 
 export default defineConfig({
@@ -18,7 +19,7 @@ export default defineConfig({
   use: {
     baseURL: ENDERECO_DO_SITE,
     locale: 'pt-BR',
-    timezoneId: 'America/Sao_Paulo',
+    timezoneId: FUSO_DO_APP,
     trace: 'retain-on-failure',
   },
   projects: [

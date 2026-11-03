@@ -1,6 +1,6 @@
-# Limpeza Igreja
+# Limpeza da Igreja
 
-App para organizar a limpeza da igreja às sextas-feiras: quem vem, quando vem e o que já foi feito.
+App para organizar a limpeza da igreja: quem vem, quando vem e o que já foi feito.
 
 > Projeto pessoal. Não é um aplicativo oficial da Congregação Cristã no Brasil.
 
@@ -47,7 +47,7 @@ Gere o hash da senha de organizador. O comando pede a senha e mostra uma linha
 npm run gerar-hash-senha --workspace servidor
 ```
 
-Crie as tabelas e, se quiser, coloque sextas de exemplo:
+Crie as tabelas e, se quiser, coloque limpezas de exemplo:
 
 ```bash
 npm run migrar --workspace servidor

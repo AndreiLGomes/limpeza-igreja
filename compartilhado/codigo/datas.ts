@@ -6,12 +6,13 @@ import { inicialMinuscula } from './textos.js';
 
 const DIAS_DA_SEMANA = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'] as const;
 
+/** Nome do dia da semana, como aparece na tela ("Quinta"). */
+export type DiaDaSemana = (typeof DIAS_DA_SEMANA)[number];
+
 const MESES = [
   'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
   'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
 ] as const;
-
-const SEXTA_FEIRA = 5;
 
 /** Formato de data aceito pela API. */
 export const FORMATO_DATA = /^\d{4}-\d{2}-\d{2}$/;
@@ -61,20 +62,15 @@ export function horario(inicio: string, fim: string): string {
   return `${hora(inicio)} às ${hora(fim)}`;
 }
 
-/** S6: a data cai numa sexta-feira? */
-export function ehSexta(data: string): boolean {
-  return diaDaSemana(data) === SEXTA_FEIRA;
-}
-
 /** "2026-10-16" + 7 → "2026-10-23" (aceita números negativos). */
 export function somarDias(data: string, quantos: number): string {
   const { ano, mes, dia } = partesDaData(data);
   return new Date(Date.UTC(ano, mes - 1, dia + quantos)).toISOString().slice(0, 10);
 }
 
-/** A primeira sexta-feira a partir da data (a própria data, se já for sexta). */
-export function proximaSexta(data: string): string {
-  const faltam = (SEXTA_FEIRA - diaDaSemana(data) + 7) % 7;
+/** O próximo dia da semana a partir da data (a própria data, se já for esse dia). Ex.: a próxima quinta. */
+export function proximoDiaDaSemana(data: string, dia: DiaDaSemana): string {
+  const faltam = (DIAS_DA_SEMANA.indexOf(dia) - diaDaSemana(data) + 7) % 7;
   return somarDias(data, faltam);
 }
 

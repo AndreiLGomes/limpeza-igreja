@@ -1,7 +1,7 @@
 {
   "name": "limpeza-igreja",
   "private": true,
-  "description": "App para organizar a limpeza da igreja às sextas-feiras.",
+  "description": "App para organizar a limpeza da igreja.",
   "workspaces": [
     "compartilhado",
     "servidor",

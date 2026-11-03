@@ -2,7 +2,7 @@
   "name": "@limpeza/servidor",
   "version": "0.1.0",
   "private": true,
-  "description": "Servidor da Limpeza na Sexta: Node + Express 5 + PostgreSQL.",
+  "description": "Servidor da Limpeza da Igreja: Node + Express 5 + PostgreSQL.",
   "type": "module",
   "scripts": {
     "desenvolver": "tsx watch --env-file-if-exists=.env codigo/servidor.ts",

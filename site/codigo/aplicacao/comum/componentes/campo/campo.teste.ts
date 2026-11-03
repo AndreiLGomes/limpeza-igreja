@@ -64,7 +64,7 @@ describe('Campo', () => {
     await dicaSer('Com DDD');
     expect(comErro()).toBe(false);
 
-    tela.telefone.setErrors({ servidor: 'Esse telefone já está confirmado nesta sexta.' });
-    await dicaSer('Esse telefone já está confirmado nesta sexta.');
+    tela.telefone.setErrors({ servidor: 'Esse telefone já está confirmado nesta limpeza.' });
+    await dicaSer('Esse telefone já está confirmado nesta limpeza.');
   });
 });

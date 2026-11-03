@@ -1,5 +1,5 @@
 /**
- * "/tarefas?dia=ID": as tarefas de uma sexta (TelaTarefas). Sem `dia`, a próxima sexta.
+ * "/tarefas?dia=ID": as tarefas de uma limpeza (TelaTarefas). Sem `dia`, a próxima limpeza.
  * Marcar e desmarcar muda a tela na hora; se o servidor falhar, volta (T3). Contador e etiqueta (T5).
  */
 import { Component, computed, inject, input, type OnInit } from '@angular/core';
@@ -39,7 +39,7 @@ import { Estado } from '../../comum/estado/estado';
             } @else {
               <app-vazio
                 icone="brush"
-                titulo="Nenhuma tarefa nesta sexta"
+                titulo="Nenhuma tarefa nesta limpeza"
                 texto="Quando quem organiza cadastrar as tarefas, elas aparecem aqui."
               />
             }
@@ -47,7 +47,7 @@ import { Estado } from '../../comum/estado/estado';
         } @else {
           <div class="card">
             <app-vazio
-              [titulo]="dia() ? 'Essa sexta não está na escala' : 'Nenhuma sexta marcada'"
+              [titulo]="dia() ? 'Essa limpeza não está na escala' : 'Nenhuma limpeza marcada'"
               [texto]="dia() ? 'Ela pode ter passado ou sido apagada.' : 'Quando quem organiza cadastrar as próximas limpezas, elas aparecem aqui.'"
             >
               @if (dia()) {

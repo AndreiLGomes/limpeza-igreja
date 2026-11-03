@@ -6,7 +6,7 @@ import { paraTarefa } from '../../comum/mapeadores.js';
 import { exigirNaoPassada } from '../dias/exigir-nao-passada.js';
 import * as repositorio from './repositorio.js';
 
-/** T1: qualquer pessoa marca e desmarca. T2: só em sexta não passada. */
+/** T1: qualquer pessoa marca e desmarca. T2: só em limpeza não passada. */
 export async function marcar(diaId: string, tarefaId: string, feita: boolean): Promise<Tarefa> {
   const tarefa = await repositorio.buscarComData(diaId, tarefaId);
   exigirNaoPassada(tarefa, 'TAREFA_NAO_ENCONTRADA');
@@ -14,9 +14,9 @@ export async function marcar(diaId: string, tarefaId: string, feita: boolean): P
 }
 
 /**
- * Grava a lista de tarefas de uma sexta, na ordem recebida (usado ao criar e ao editar).
+ * Grava a lista de tarefas de uma limpeza, na ordem recebida (usado ao criar e ao editar).
  * S9: tarefa com `id` continua a mesma (mantém "feita", mesmo se renomeada); sem `id` é nova;
- * a que existia e não veio é apagada. Um `id` que não é desta sexta é recusado.
+ * a que existia e não veio é apagada. Um `id` que não é desta limpeza é recusado.
  */
 export async function salvarDoDia(tx: Transacao, diaId: string, lista: TarefaEditada[]): Promise<void> {
   const existentes = new Set((await repositorio.listarIdsDoDia(tx, diaId)).map((tarefa) => tarefa.id));

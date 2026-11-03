@@ -1,10 +1,9 @@
-/** Organizador: sextas e pessoas (S1–S13, O5). */
+/** Organizador: limpezas e pessoas (S1–S13, O5). */
 import { eq } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { MENSAGENS, mensagemDoErro, somarDias } from '@limpeza/compartilhado';
+import { hoje, MENSAGENS, mensagemDoErro, proximoDiaDaSemana, somarDias } from '@limpeza/compartilhado';
 import { bd } from '../codigo/banco/cliente.js';
 import { confirmacoes, dias, tarefas } from '../codigo/banco/esquema.js';
-import { hoje } from '../codigo/comum/tempo.js';
 import { criarAplicacaoDeTeste } from './ajuda/aplicacao.js';
 import { limparBanco } from './ajuda/banco.js';
 import { criarConfirmacao, criarDia, criarDiaPassado, criarTarefa, ID_QUE_NAO_EXISTE } from './ajuda/fabricas.js';
@@ -27,8 +26,8 @@ beforeEach(async () => {
   org = await comoOrganizador(aplicacao);
 });
 
-describe('Listar (S13) e ver uma sexta', () => {
-  it('mesmas sextas da escala pública, com telefone formatado e observação', async () => {
+describe('Listar (S13) e ver uma limpeza', () => {
+  it('mesmas limpezas da escala pública, com telefone formatado e observação', async () => {
     await criarDiaPassado();
     const dia = await criarDia({ data: daquiA(2) });
     await criarConfirmacao(dia, { nome: 'Ana Souza', telefone: '47999991234', observacao: 'levo o rodo' });
@@ -45,7 +44,7 @@ describe('Listar (S13) e ver uma sexta', () => {
     expect(new Date(resposta.body[0].pessoas[0].criadoEm).toString()).not.toBe('Invalid Date');
   });
 
-  it('uma sexta pelo id; 404 se não existe', async () => {
+  it('uma limpeza pelo id; 404 se não existe', async () => {
     const dia = await criarDia();
     expect((await org.get(`/api/organizador/dias/${dia.id}`)).body.id).toBe(dia.id);
     expect((await org.get(`/api/organizador/dias/${ID_QUE_NAO_EXISTE}`)).status).toBe(404);
@@ -53,7 +52,7 @@ describe('Listar (S13) e ver uma sexta', () => {
 });
 
 describe('Sugestão de tarefas (S7)', () => {
-  it('nomes das tarefas da sexta mais recente, em ordem', async () => {
+  it('nomes das tarefas da limpeza mais recente, em ordem', async () => {
     const antiga = await criarDia({ data: daquiA(3) });
     await criarTarefa(antiga, { nome: 'Antiga', ordem: 0 });
     const recente = await criarDia({ data: daquiA(10) });
@@ -63,7 +62,7 @@ describe('Sugestão de tarefas (S7)', () => {
     expect((await org.get('/api/organizador/sugestao-tarefas')).body).toEqual(['Primeira', 'Segunda']);
   });
 
-  it('vale mesmo quando a mais recente já passou; lista vazia sem sextas', async () => {
+  it('vale mesmo quando a mais recente já passou; lista vazia sem limpezas', async () => {
     expect((await org.get('/api/organizador/sugestao-tarefas')).body).toEqual([]);
     const passada = await criarDiaPassado();
     await criarTarefa(passada, { nome: 'Varrer' });
@@ -71,7 +70,7 @@ describe('Sugestão de tarefas (S7)', () => {
   });
 });
 
-describe('Criar sexta (S1–S5)', () => {
+describe('Criar limpeza (S1–S5)', () => {
   it('válida → 201; tarefa vazia ignorada e nomes aparados', async () => {
     const resposta = await org.post('/api/organizador/dias', NOVA);
     expect(resposta.status).toBe(201);
@@ -79,13 +78,15 @@ describe('Criar sexta (S1–S5)', () => {
     expect(resposta.body.tarefas.map((t: { nome: string }) => t.nome)).toEqual(['Varrer o salão', 'Tirar o lixo']);
   });
 
-  it('S6: data que não é sexta-feira também é aceita', async () => {
-    const naoSexta = [1, 2, 3, 4, 5, 6, 7].map(daquiA).find((data) => new Date(`${data}T12:00:00Z`).getUTCDay() !== 5);
-    expect((await org.post('/api/organizador/dias', { ...NOVA, data: naoSexta })).status).toBe(201);
+  it('S6: qualquer dia da semana é aceito (quinta e segunda)', async () => {
+    const quinta = proximoDiaDaSemana(daquiA(40), 'Quinta');
+    const segunda = proximoDiaDaSemana(daquiA(40), 'Segunda');
+    expect((await org.post('/api/organizador/dias', { ...NOVA, data: quinta })).status).toBe(201);
+    expect((await org.post('/api/organizador/dias', { ...NOVA, data: segunda })).status).toBe(201);
   });
 
-  it('data passada → 409 SEXTA_PASSADA (S1); hoje é aceito', async () => {
-    expect((await org.post('/api/organizador/dias', { ...NOVA, data: daquiA(-1) })).body.codigo).toBe('SEXTA_PASSADA');
+  it('data passada → 409 LIMPEZA_PASSADA (S1); hoje é aceito', async () => {
+    expect((await org.post('/api/organizador/dias', { ...NOVA, data: daquiA(-1) })).body.codigo).toBe('LIMPEZA_PASSADA');
     expect((await org.post('/api/organizador/dias', { ...NOVA, data: hoje() })).status).toBe(201);
   });
 
@@ -93,7 +94,7 @@ describe('Criar sexta (S1–S5)', () => {
     await criarDia({ data: NOVA.data });
     const resposta = await org.post('/api/organizador/dias', NOVA);
     expect(resposta.status).toBe(409);
-    expect(resposta.body).toEqual({ codigo: 'DATA_REPETIDA', mensagem: 'Já existe uma sexta cadastrada nessa data.' });
+    expect(resposta.body).toEqual({ codigo: 'DATA_REPETIDA', mensagem: 'Já existe uma limpeza cadastrada nessa data.' });
   });
 
   it('fim antes do início → 400 (S3)', async () => {
@@ -117,7 +118,7 @@ describe('Criar sexta (S1–S5)', () => {
   });
 });
 
-describe('Editar sexta (S8, S9, S10)', () => {
+describe('Editar limpeza (S8, S9, S10)', () => {
   it('S9: renomear uma tarefa mantém "feita"; nova entra; a que não veio sai; a ordem segue a lista', async () => {
     const dia = await criarDia();
     const varrer = await criarTarefa(dia, { nome: 'Varrer', ordem: 0, feita: true });
@@ -152,25 +153,25 @@ describe('Editar sexta (S8, S9, S10)', () => {
     expect((await org.put(`/api/organizador/dias/${dia.id}`, { ...NOVA, data: dia.data, vagas: 4 })).status).toBe(200);
   });
 
-  it('S10: editar sexta passada → 409 SEXTA_PASSADA', async () => {
+  it('S10: editar limpeza passada → 409 LIMPEZA_PASSADA', async () => {
     const dia = await criarDiaPassado();
     const resposta = await org.put(`/api/organizador/dias/${dia.id}`, NOVA);
     expect(resposta.status).toBe(409);
-    expect(resposta.body.codigo).toBe('SEXTA_PASSADA');
+    expect(resposta.body.codigo).toBe('LIMPEZA_PASSADA');
   });
 
-  it('não pode mudar para uma data passada nem para a data de outra sexta', async () => {
+  it('não pode mudar para uma data passada nem para a data de outra limpeza', async () => {
     const dia = await criarDia();
     const outra = await criarDia();
     expect((await org.put(`/api/organizador/dias/${dia.id}`, { ...NOVA, data: daquiA(-1) })).body.codigo).toBe(
-      'SEXTA_PASSADA',
+      'LIMPEZA_PASSADA',
     );
     expect((await org.put(`/api/organizador/dias/${dia.id}`, { ...NOVA, data: outra.data })).body.codigo).toBe(
       'DATA_REPETIDA',
     );
   });
 
-  it('tarefa com id de outra sexta → 404, sem mudar nada', async () => {
+  it('tarefa com id de outra limpeza → 404, sem mudar nada', async () => {
     const dia = await criarDia({ vagas: 5 });
     const deOutra = await criarTarefa(await criarDia());
     const resposta = await org.put(`/api/organizador/dias/${dia.id}`, {
@@ -184,13 +185,13 @@ describe('Editar sexta (S8, S9, S10)', () => {
     expect(semMudanca?.vagas).toBe(5);
   });
 
-  it('sexta que não existe → 404', async () => {
+  it('limpeza que não existe → 404', async () => {
     expect((await org.put(`/api/organizador/dias/${ID_QUE_NAO_EXISTE}`, NOVA)).status).toBe(404);
   });
 });
 
-describe('Apagar sexta (S11)', () => {
-  it('some a sexta, as confirmações e as tarefas', async () => {
+describe('Apagar limpeza (S11)', () => {
+  it('some a limpeza, as confirmações e as tarefas', async () => {
     const dia = await criarDia();
     await criarConfirmacao(dia);
     await criarTarefa(dia);
@@ -202,7 +203,7 @@ describe('Apagar sexta (S11)', () => {
     expect((await org.delete(`/api/organizador/dias/${dia.id}`)).status).toBe(404);
   });
 
-  it('sexta passada também pode ser apagada', async () => {
+  it('limpeza passada também pode ser apagada', async () => {
     const dia = await criarDiaPassado();
     expect((await org.delete(`/api/organizador/dias/${dia.id}`)).status).toBe(204);
   });
@@ -248,7 +249,7 @@ describe('Remover pessoa e desfazer (O5)', () => {
     expect(resposta.body.codigo).toBe('SEM_VAGA');
   });
 
-  it('pessoa que não existe ou de outra sexta → 404 PESSOA_NAO_ENCONTRADA', async () => {
+  it('pessoa que não existe ou de outra limpeza → 404 PESSOA_NAO_ENCONTRADA', async () => {
     const dia = await criarDia();
     const deOutra = await criarConfirmacao(await criarDia());
     const resposta = await org.delete(`/api/organizador/dias/${dia.id}/pessoas/${deOutra.id}`);
