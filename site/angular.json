@@ -25,6 +25,7 @@
             "index": "codigo/index.html",
             "tsConfig": "tsconfig.aplicacao.json",
             "inlineStyleLanguage": "scss",
+            "allowedCommonJsDependencies": ["core-js", "raf", "rgbcolor", "html2canvas"],
             "assets": [
               {
                 "glob": "**/*",

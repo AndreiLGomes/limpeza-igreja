@@ -1,4 +1,5 @@
 /** A folha de presença e o cabeçalho da folha (L10, L11). */
+import { readFileSync } from 'node:fs';
 import { hoje } from '@limpeza/compartilhado';
 import { criarLimpezaDeHoje, marcarChegada } from './ajuda/api';
 import { entrarComoOrganizador, expect, notificacao, semRolagemLateral, teste } from './ajuda/teste';
@@ -42,6 +43,15 @@ teste('folha: cabeçalho, quem veio com X no EPI, assinatura do app e linhas em 
   await expect(linhas.nth(1)).not.toContainText('Assinado');
   await expect(page.locator('body')).not.toContainText('91111-2222');
   await semRolagemLateral(page);
+
+  // "Gerar PDF" baixa o arquivo direto, com o mesmo conteúdo da tela e sem telefone.
+  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Gerar PDF' }).click()]);
+  expect(download.suggestedFilename()).toBe(`folha-de-presenca-${hoje()}.pdf`);
+  const pdf = readFileSync(await download.path()).toString('latin1');
+  expect(pdf.startsWith('%PDF')).toBe(true);
+  expect(pdf).toContain('(Célia Gomes)');
+  expect(pdf).toMatch(/Assinado no app em \d{2}\/\d{2} às \d{2}:\d{2}/);
+  expect(pdf).not.toContain('91111');
 });
 
 teste('folha impressa: sempre clara, 2 páginas com muita gente e o cabeçalho das colunas repetido @escuro', async ({ page }) => {

@@ -1,5 +1,7 @@
 import type { PessoaCompleta } from '@limpeza/compartilhado';
-import { linhasDaFolha } from './linhas-da-folha';
+import {
+  camposDoCabecalho, CELULA_DO_NOME, celulasDaLinha, COLUNAS_DA_FOLHA, linhasDaFolha, nomeDoPdf, quadrinhosDoServico,
+} from './conteudo-da-folha';
 
 const pessoa = (nome: string, extra: Partial<PessoaCompleta>): PessoaCompleta => ({
   id: nome, nome, tempo: 'todo', telefone: null, observacao: null, criadoEm: '',
@@ -31,5 +33,34 @@ describe('linhasDaFolha', () => {
   it('com mais gente que o mínimo, não acrescenta linhas em branco', () => {
     const muitas = Array.from({ length: 20 }, (_, i) => pessoa(`P${i}`, { entrada: '19:00' }));
     expect(linhasDaFolha({ data: '2026-03-27', pessoas: muitas })).toHaveLength(20);
+  });
+});
+
+describe('cabeçalho, células e nome do arquivo (tela e PDF)', () => {
+  const dia = {
+    data: '2026-11-03',
+    cabecalho: { casaDeOracao: '23', local: 'Taiti', setor: null, atividades: 'Limpeza', tipoDeServico: 'apoio' as const },
+  };
+
+  it('campos na ordem da folha de papel; vazio fica em branco', () => {
+    expect(camposDoCabecalho(dia).map((campo) => `${campo.rotulo} ${campo.valor}`)).toEqual([
+      'Casa de Oração nº (Relatório): 23', 'Local: Taiti', 'Administração/Setor: ', 'Mês: novembro', 'Ano: 2026',
+      'Atividades: Limpeza',
+    ]);
+  });
+
+  it('só o tipo escolhido fica marcado', () => {
+    expect(quadrinhosDoServico(dia).map((quadrinho) => quadrinho.marcado)).toEqual([true, false, false]);
+  });
+
+  it('uma célula por coluna (EPI e horário em duas)', () => {
+    const celulas = celulasDaLinha(linhasDaFolha({ data: '2026-11-03', pessoas: [pessoa('Ana', { entrada: '19:00', recebeuEpi: false })] })[0]!);
+    expect(celulas).toEqual(['03', '', '', 'Ana', '', 'X', '19:00', '', '']);
+    expect(celulas).toHaveLength(COLUNAS_DA_FOLHA.reduce((total, coluna) => total + (coluna.partes ? 2 : 1), 0));
+    expect(celulas[CELULA_DO_NOME]).toBe('Ana');
+  });
+
+  it('nome do PDF com a data', () => {
+    expect(nomeDoPdf('2026-11-03')).toBe('folha-de-presenca-2026-11-03.pdf');
   });
 });
