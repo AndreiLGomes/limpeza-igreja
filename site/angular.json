@@ -50,7 +50,13 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "codigo/aplicacao/nucleo/ambiente.ts",
+                  "with": "codigo/aplicacao/nucleo/ambiente.producao.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,

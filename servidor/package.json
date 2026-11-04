@@ -8,6 +8,7 @@
     "desenvolver": "tsx watch --env-file-if-exists=.env codigo/servidor.ts",
     "build": "tsc -p tsconfig.compilar.json",
     "start": "node --env-file-if-exists=.env compilado/servidor.js",
+    "migrar:compilado": "node --env-file-if-exists=.env compilado/banco/migrar.js",
     "test": "vitest run",
     "testes:acompanhar": "vitest",
     "migracao:gerar": "drizzle-kit generate",

@@ -1,0 +1,22 @@
+# Servidor (API) na Render. Os valores secretos (sync: false) são colados no painel da Render, nunca aqui.
+services:
+  - type: web
+    name: limpeza-igreja-api
+    runtime: node
+    plan: free
+    region: virginia
+    buildCommand: npm ci --include=dev && npm run build -w compartilhado && npm run build -w servidor
+    # Aplica as migrações do banco antes de ligar o servidor (não apaga nada; só cria o que falta).
+    startCommand: npm run migrar:compilado -w servidor && npm start -w servidor
+    healthCheckPath: /api/saude
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PROXIES_CONFIAVEIS
+        value: "1"
+      - key: URL_DO_BANCO
+        sync: false
+      - key: SENHA_ORGANIZADOR_HASH
+        sync: false
+      - key: ORIGEM_DO_SITE
+        sync: false

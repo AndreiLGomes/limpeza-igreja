@@ -29,6 +29,7 @@ export interface OpcoesDaAplicacao {
 export function criarAplicacao(opcoes: OpcoesDaAplicacao = {}) {
   const registro = opcoes.registro ?? criarRegistro();
   const aplicacao = express();
+  aplicacao.set('trust proxy', configuracao.PROXIES_CONFIAVEIS);
 
   aplicacao.use(helmet());
   aplicacao.use(cors({ origin: configuracao.ORIGEM_DO_SITE }));

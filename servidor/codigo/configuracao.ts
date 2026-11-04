@@ -15,6 +15,9 @@ const esquemaAmbiente = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     PORTA: z.coerce.number().int().min(1).max(65535).default(3000),
+    // Quantos intermediários (proxies) ficam na frente do servidor na hospedagem: 1 na Render, 0 no computador.
+    // Assim o servidor enxerga o endereço de cada pessoa (limite de tentativas). Nunca "true": daria para falsificar.
+    PROXIES_CONFIAVEIS: z.coerce.number().int().min(0).max(5).default(0),
     URL_DO_BANCO: opcional(z.url()),
     URL_DO_BANCO_TESTE: opcional(z.url()),
     // Hash bcrypt, nunca a senha pura (O1). Gere com "npm run gerar-hash-senha".
@@ -34,7 +37,8 @@ export type Configuracao = z.output<typeof esquemaAmbiente> & {
 };
 
 export function lerConfiguracao(ambiente: Record<string, string | undefined> = process.env): Configuracao {
-  const resultado = esquemaAmbiente.safeParse(ambiente);
+  // A hospedagem (Render) informa a porta em "PORT"; a "PORTA" do .env, quando existe, vale mais.
+  const resultado = esquemaAmbiente.safeParse({ ...ambiente, PORTA: ambiente.PORTA || ambiente.PORT });
   if (!resultado.success) {
     const problemas = resultado.error.issues.map((problema) => `- ${problema.path.join('.')}: ${problema.message}`);
     throw new Error(`Variáveis de ambiente inválidas (veja servidor/.env.exemplo):\n${problemas.join('\n')}`);

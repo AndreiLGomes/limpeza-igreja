@@ -50,4 +50,16 @@ describe('config.ts', () => {
   it('recusa porta inválida', () => {
     expect(() => lerConfiguracao({ ...AMBIENTE, PORTA: 'abc' })).toThrow(/PORTA/);
   });
+
+  it('na hospedagem, usa a PORT que ela informa quando não há PORTA', () => {
+    const { PORTA: _semPorta, ...semPorta } = AMBIENTE;
+    expect(lerConfiguracao({ ...semPorta, PORT: '10000' }).PORTA).toBe(10000);
+    expect(lerConfiguracao({ ...AMBIENTE, PORT: '10000' }).PORTA).toBe(3000);
+  });
+
+  it('proxies confiáveis: nenhum por padrão, e só números inteiros', () => {
+    expect(lerConfiguracao(AMBIENTE).PROXIES_CONFIAVEIS).toBe(0);
+    expect(lerConfiguracao({ ...AMBIENTE, PROXIES_CONFIAVEIS: '1' }).PROXIES_CONFIAVEIS).toBe(1);
+    expect(() => lerConfiguracao({ ...AMBIENTE, PROXIES_CONFIAVEIS: 'true' })).toThrow(/PROXIES_CONFIAVEIS/);
+  });
 });

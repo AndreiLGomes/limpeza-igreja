@@ -96,6 +96,50 @@ npm run build
 O servidor compilado fica em `servidor/compilado/` (rode com `npm start --workspace servidor`) e o site em
 `site/compilado/`.
 
+## Colocar no ar
+
+O site fica na **Vercel**, o servidor na **Render** e o banco na **Neon**. Os três têm plano gratuito. No plano
+gratuito, a Render desliga o servidor quando ninguém usa: o primeiro acesso depois disso pode levar cerca de 50 segundos.
+
+Nenhuma senha ou endereço de banco vai para o repositório: esses valores são colados só nos painéis.
+
+### 1. Banco (Neon)
+
+1. Crie um projeto em [neon.tech](https://neon.tech), na região **AWS US East (N. Virginia)**, perto do servidor.
+2. Copie o endereço de conexão **direto** (sem `-pooler` no nome). Ele é o `URL_DO_BANCO` do passo 3.
+
+### 2. Código (GitHub)
+
+Crie um repositório vazio no GitHub e envie o código. As pastas `docs/` e `.claude/` não vão junto.
+
+### 3. Servidor (Render)
+
+1. Em [render.com](https://render.com), escolha **New > Blueprint** e selecione o repositório. O `render.yaml` já
+   traz os comandos e as configurações.
+2. Gere o hash da senha de organizador no seu computador, com `npm run gerar-hash-senha --workspace servidor`.
+3. Preencha no painel:
+   - `URL_DO_BANCO`: o endereço copiado da Neon;
+   - `SENHA_ORGANIZADOR_HASH`: o hash gerado (nunca a senha pura);
+   - `ORIGEM_DO_SITE`: o endereço do site na Vercel, sem barra no fim. Se ainda não souber, use
+     `https://limpeza-igreja.vercel.app` e corrija depois do passo 4.
+4. Confira se `https://limpeza-igreja-api.onrender.com/api/saude` responde `{"ok":true}`. As tabelas são criadas
+   sozinhas a cada início do servidor.
+
+Se a Render der outro endereço ao serviço, troque-o em `site/codigo/aplicacao/nucleo/ambiente.producao.ts` e envie a
+mudança ao GitHub.
+
+### 4. Site (Vercel)
+
+1. Em [vercel.com](https://vercel.com), importe o repositório sem mudar nada: o `vercel.json` já traz os comandos.
+2. Copie o endereço que a Vercel mostrar. Se for diferente do que está em `ORIGEM_DO_SITE`, corrija na Render.
+
+### 5. Conferir
+
+1. Abra o site, confirme presença numa limpeza e entre como organizador.
+2. Erre a senha até aparecer o aviso de muitas tentativas e, em seguida, tente entrar pelo celular usando a rede
+   móvel. Se o celular também estiver bloqueado, o valor de `PROXIES_CONFIAVEIS` na Render está errado para a
+   hospedagem: o servidor não está enxergando o endereço de cada pessoa.
+
 ## Pastas
 
 | Pasta | O que tem |
