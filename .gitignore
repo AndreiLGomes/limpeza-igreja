@@ -7,10 +7,8 @@ dist/
 .env
 *.log
 
-# Planejamento e trabalho interno (regra do Andrei: não vão para o GitHub)
+# Documentos de planejamento (ficam só no computador de quem desenvolve)
 docs/
-.claude/
-.superpowers/
 
 # Gerados a partir de design-system/ (site/comandos/gerar-estilos.mjs)
 site/codigo/estilos/_variaveis.scss
