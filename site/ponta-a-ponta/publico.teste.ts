@@ -27,7 +27,23 @@ teste('1. a tela inicial mostra linhas cinzas e depois o cartão da próxima lim
   await expect(cartao(page).locator('.card__title')).toHaveText(/^Quinta, \d+ de \w+/);
   await expect(page.locator('.skeleton')).toHaveCount(0);
   await expect(page).toHaveTitle('Esta semana · Limpeza da Igreja');
+  await expect(page.getByText('O servidor está iniciando.')).toHaveCount(0);
   await semRolagemLateral(page);
+});
+
+teste('servidor demorando (hospedagem acordando): avisa que está iniciando e mostra a limpeza quando responde', async ({ page }) => {
+  // Mais que ESPERA_PARA_AVISAR_MS (4 s), como o primeiro acesso depois de o servidor desligar.
+  await page.route('**/api/dias', async (rota) => {
+    await new Promise((pronto) => setTimeout(pronto, 6000));
+    await rota.continue();
+  });
+  await page.goto('/');
+  const aviso = page.getByRole('status').filter({ hasText: 'O servidor está iniciando.' });
+  await expect(aviso).toBeVisible({ timeout: 5500 });
+  await expect(aviso).toContainText('até 1 minuto');
+  await semRolagemLateral(page);
+  await expect(cartao(page).locator('.card__title')).toHaveText(/^Quinta, \d+ de \w+/, { timeout: 10_000 });
+  await expect(aviso).toHaveCount(0);
 });
 
 teste('2. confirmar vazio mostra o aviso "Faltam 2 informações" e as mensagens nos campos', async ({ page }) => {
